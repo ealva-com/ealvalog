@@ -14,23 +14,8 @@
  * limitations under the License.
  */
 
-package ealvalog;
+include ':ealvalog'
+include ':ealvalog-jdk'
 
-import org.jetbrains.annotations.NotNull;
+rootProject.name = 'ealvalog-parent'
 
-/**
- * A no-op {@link LoggerFactory} instance - returns only {@link NullLogger#INSTANCE}
- * <p>
- * Created by Eric A. Snell on 2/28/17.
- */
-public enum NullLoggerFactory implements LoggerFactory {
-  INSTANCE;
-
-  @NotNull public Logger make(@NotNull final String name) {
-    return NullLogger.INSTANCE;
-  }
-
-  @Override public @NotNull Logger make(@NotNull final String name, @NotNull final Marker marker) {
-    return NullLogger.INSTANCE;
-  }
-}

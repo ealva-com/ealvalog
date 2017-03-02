@@ -1,11 +1,32 @@
+/*
+ * Copyright 2017 Eric A. Snell
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package ealvalog.impl;
 
 import ealvalog.Level;
 import ealvalog.Marker;
+import ealvalog.NullMarker;
+import ealvalog.base.BaseLogger;
+import ealvalog.util.LogMessageFormatter;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.Formatter;
-import java.util.Locale;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 /**
@@ -13,7 +34,7 @@ import java.util.logging.Logger;
  * <p>
  * Created by Eric A. Snell on 2/28/17.
  */
-public class JdkLogger implements ealvalog.Logger {
+public class JdkLogger extends BaseLogger {
   private java.util.logging.Logger jdkLogger;
 
   public JdkLogger(final String name) {
@@ -24,64 +45,8 @@ public class JdkLogger implements ealvalog.Logger {
     return jdkLogger.getName();
   }
 
-  @Override public boolean isLoggable(@NotNull final Level level) {
+  @Override public boolean isLoggable(@NotNull final Level level, @Nullable final Marker marker) {
     return jdkLogger.isLoggable(levelToJdkLevel(level));
-  }
-
-  @Override public boolean isLoggable(@NotNull final Level level, @NotNull final Marker marker) {
-    return false;
-  }
-
-  @Override public void log(@NotNull final Level level, @NotNull final String msg) {
-    jdkLogger.log(levelToJdkLevel(level), msg);
-  }
-
-  @Override public void log(@NotNull final Level level, @NotNull final Marker marker, @NotNull final String msg) {
-
-  }
-
-  @Override public void log(@NotNull final Level level, @NotNull final Throwable throwable, @NotNull final String msg) {
-
-  }
-
-  @Override
-  public void log(@NotNull final Level level, @NotNull final Marker marker, @NotNull final Throwable throwable, @NotNull final String msg) {
-
-  }
-
-  @Override public void log(@NotNull final Level level, @NotNull final String format, @NotNull final Object... formatArgs) {
-
-  }
-
-  @Override
-  public void log(@NotNull final Level level,
-                  @NotNull final Marker marker,
-                  @NotNull final String format,
-                  @NotNull final Object... formatArgs) {
-
-  }
-
-  @Override
-  public void log(@NotNull final Level level,
-                  @NotNull final Throwable throwable,
-                  @NotNull final String format,
-                  @NotNull final Object... formatArgs) {
-
-  }
-
-  @Override
-  public void log(@NotNull final Level level,
-                  @NotNull final Marker marker,
-                  @NotNull final Throwable throwable,
-                  @NotNull final String format,
-                  @NotNull final Object... formatArgs) {
-    if (isLoggable(level)) {
-      jdkLogger.log(levelToJdkLevel(level), formatLogMsg(format, formatArgs), throwable);
-    }
-  }
-
-  private String formatLogMsg(final @NotNull String format, final Object[] formatArgs) {
-    return String.format(Locale.ROOT, format, formatArgs);
   }
 
   private java.util.logging.Level levelToJdkLevel(final Level level) {
@@ -102,4 +67,40 @@ public class JdkLogger implements ealvalog.Logger {
     throw new IllegalArgumentException("Level must be from TRACE to CRITICAL");
   }
 
+  @Override
+  protected void doLog(final @NotNull Level level,
+                       final @Nullable Marker marker,
+                       final @Nullable Throwable throwable,
+                       final @Nullable StackTraceElement callerLocation,
+                       final @NotNull LogMessageFormatter formatter,
+                       final @NotNull String msg,
+                       final @NotNull Object[] formatArgs) {
+    if (isLoggable(level, marker)) {
+      List<Object> parameters = new ArrayList<>(2);
+      LogRecord logRecord = new LogRecord(levelToJdkLevel(level), formatter.format(msg, formatArgs).toString());
+      parameters.add(NullMarker.nullToNullInstance(marker));
+      if (callerLocation != null) {
+        logRecord.setSourceClassName(callerLocation.getClassName());
+        logRecord.setSourceMethodName(callerLocation.getMethodName());
+        parameters.add(callerLocation.getLineNumber());
+      }
+
+      if (throwable != null) {
+        logRecord.setThrown(throwable);
+      }
+      logRecord.setParameters(parameters.toArray());
+      postRecordToLogger(logRecord);
+    }
+  }
+
+  /** Visible for test */
+  @SuppressWarnings("WeakerAccess")
+  void postRecordToLogger(final LogRecord logRecord) {
+    jdkLogger.log(logRecord);
+  }
+
+  /** @return true if there is not a throwable and if the level is {@link Level#CRITICAL} or {@link Level#ERROR} */
+  @Override protected boolean shouldIncludeLocation(final @NotNull Level level, final @Nullable Marker marker, final Throwable throwable) {
+    return throwable == null && (level == Level.CRITICAL || level == Level.ERROR);
+  }
 }
