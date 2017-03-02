@@ -190,9 +190,9 @@ public abstract class BaseLogger implements Logger {
   /**
    * All logging funnels through here. Subclasses implement this method to perform the actual concrete logging.
    * <p>
-   * Note: even though a particular implementation of this class returns false from {@link #shouldIncludeLocation(Level, Marker, Throwable)}, this
-   * method might still receive a valid {@link StackTraceElement} instance if another part of the framework required the information. So
-   * though unexpected, implementations may still wish to make use of the information if available.
+   * Note: even though a particular implementation of this class returns false from {@link #shouldIncludeLocation(Level, Marker,
+   * Throwable)}, this method might still receive a valid {@link StackTraceElement} instance if another part of the framework required the
+   * information. So though unexpected, implementations may still wish to make use of the information if available.
    *
    * @param level          the log level
    * @param marker         an optional {@link Marker}
@@ -211,8 +211,9 @@ public abstract class BaseLogger implements Logger {
                                 @NotNull final Object... formatArgs);
 
   /**
-   * Does this Logger implementation want information about where the log method was invoked. This may be an expensive operation. If a
-   * Throwable is included in the log information,
+   * Does this Logger implementation want information about where the log method was invoked. This may be a relatively expensive operation.
+   * If a Throwable is included in the log information it might be enough information, though the throw site may drastically differ from
+   * the log site.
    *
    * @return true if the log information should include a {@link StackTraceElement} indicating the call site of the log invocation.
    */
