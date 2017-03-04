@@ -1,6 +1,8 @@
 /*
  * Copyright 2017 Eric A. Snell
  *
+ * This file is part of eAlvaLog.
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -59,22 +61,22 @@ public class CompositeLogger extends BaseLogger {
   }
 
   @Override
-  protected void doLog(final @NotNull Level level,
-                       final @Nullable Marker marker,
-                       final @Nullable Throwable throwable,
-                       final @Nullable StackTraceElement callerLocation,
-                       final @NotNull LogMessageFormatter formatter,
-                       final @NotNull String msg,
-                       final @NotNull Object[] formatArgs) {
+  protected void printLog(final @NotNull Level level,
+                          final @Nullable Marker marker,
+                          final @Nullable Throwable throwable,
+                          final @Nullable StackTraceElement callerLocation,
+                          final @NotNull LogMessageFormatter formatter,
+                          final @NotNull String msg,
+                          final @NotNull Object[] formatArgs) {
     for (int i = 0, size = loggerList.size(); i < size; i++) {
       final BaseLogger baseLogger = loggerList.get(i);
       if (baseLogger.isLoggable(level, marker)) {
-        baseLogger.doLog(level, marker, throwable, callerLocation, formatter, msg, formatArgs);
+        baseLogger.printLog(level, marker, throwable, callerLocation, formatter, msg, formatArgs);
       }
     }
   }
 
-  @Override protected boolean shouldIncludeLocation(@NotNull final Level level, @Nullable final Marker marker, final Throwable throwable) {
+  @Override protected boolean shouldIncludeLocation(@NotNull final Level level, @Nullable final Marker marker, @Nullable final Throwable throwable) {
     for (int i = 0, size = loggerList.size(); i < size; i++) {
       if (loggerList.get(i).shouldIncludeLocation(level, marker, throwable)) {
         return true;

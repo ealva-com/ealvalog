@@ -1,6 +1,8 @@
 /*
  * Copyright 2017 Eric A. Snell
  *
+ * This file is part of eAlvaLog.
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -68,13 +70,13 @@ public class JdkLogger extends BaseLogger {
   }
 
   @Override
-  protected void doLog(final @NotNull Level level,
-                       final @Nullable Marker marker,
-                       final @Nullable Throwable throwable,
-                       final @Nullable StackTraceElement callerLocation,
-                       final @NotNull LogMessageFormatter formatter,
-                       final @NotNull String msg,
-                       final @NotNull Object[] formatArgs) {
+  protected void printLog(final @NotNull Level level,
+                          final @Nullable Marker marker,
+                          final @Nullable Throwable throwable,
+                          final @Nullable StackTraceElement callerLocation,
+                          final @NotNull LogMessageFormatter formatter,
+                          final @NotNull String msg,
+                          final @NotNull Object[] formatArgs) {
     if (isLoggable(level, marker)) {
       List<Object> parameters = new ArrayList<>(2);
       LogRecord logRecord = new LogRecord(levelToJdkLevel(level), formatter.format(msg, formatArgs).toString());
@@ -100,7 +102,7 @@ public class JdkLogger extends BaseLogger {
   }
 
   /** @return true if there is not a throwable and if the level is {@link Level#CRITICAL} or {@link Level#ERROR} */
-  @Override protected boolean shouldIncludeLocation(final @NotNull Level level, final @Nullable Marker marker, final Throwable throwable) {
+  @Override protected boolean shouldIncludeLocation(final @NotNull Level level, final @Nullable Marker marker, @Nullable final Throwable throwable) {
     return throwable == null && (level == Level.CRITICAL || level == Level.ERROR);
   }
 }

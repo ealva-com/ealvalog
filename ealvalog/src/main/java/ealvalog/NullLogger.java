@@ -1,6 +1,8 @@
 /*
  * Copyright 2017 Eric A. Snell
  *
+ * This file is part of eAlvaLog.
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -54,8 +56,6 @@ public enum NullLogger implements Logger {
   public void log(@NotNull final Level level, @NotNull final Marker marker, @NotNull final Throwable throwable, @NotNull final String msg) {
   }
 
-  public void log(@NotNull final Level level, @NotNull final String format, @NotNull final Object... formatArgs) {}
-
   public void log(@NotNull final Level level,
                   @NotNull final Marker marker,
                   @NotNull final String format,
@@ -96,5 +96,20 @@ public enum NullLogger implements Logger {
                   @NotNull final Object arg3,
                   @NotNull final Object arg4,
                   final @NotNull Object[] remaining) {}
+
+  @Override
+  public void logImmediate(@NotNull final Level level,
+                           @Nullable final Marker marker,
+                           @Nullable final Throwable throwable,
+                           final int stackDepth,
+                           @NotNull final String msg,
+                           final @NotNull Object[] formatArgs) {}
+
+  @Override
+  public void logImmediate(@NotNull final Level level,
+                           @Nullable final Throwable throwable,
+                           final int stackDepth,
+                           @NotNull final String msg,
+                           final @NotNull Object[] formatArgs) {}
 
 }

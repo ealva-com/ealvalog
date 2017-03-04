@@ -1,6 +1,8 @@
 /*
  * Copyright 2017 Eric A. Snell
  *
+ * This file is part of eAlvaLog.
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -29,9 +31,9 @@ import org.jetbrains.annotations.Nullable;
  * <p>
  * Created by Eric A. Snell on 3/1/17.
  */
+@SuppressWarnings("WeakerAccess")
 public abstract class BaseLogger implements Logger {
   private static final int STACK_DEPTH = 1;
-  private static final Object[] EMPTY_ARRAY = new Object[0];
 
   private static final ThreadLocal<LogMessageFormatter> threadLocalFormatter =
       new ThreadLocal<LogMessageFormatter>() {
@@ -49,7 +51,7 @@ public abstract class BaseLogger implements Logger {
       };
 
 
-  private Marker marker;
+  @Nullable private Marker marker;
 
   protected BaseLogger() {
     this.marker = null;
@@ -59,46 +61,40 @@ public abstract class BaseLogger implements Logger {
     this.marker = marker;
   }
 
-  @Override public Marker getMarker() {
+  @Nullable @Override public Marker getMarker() {
     return marker;
   }
 
-  @Override public void setMarker(final Marker marker) {
+  @Override public void setMarker(@Nullable final Marker marker) {
     this.marker = marker;
   }
 
   @Override public boolean isLoggable(@NotNull final Level level) {
-    return isLoggable(level, null);
+    return isLoggable(level, marker);
   }
 
   @Override public void log(@NotNull final Level level, @NotNull final String msg) {
-    if (isLoggable(level)) {
-      doLog(level, marker, null, getCallSite(STACK_DEPTH, level, marker, null), threadLocalFormatter.get(), msg, EMPTY_ARRAY);
+    if (isLoggable(level, marker)) {
+      logImmediate(level, marker, null, STACK_DEPTH, msg, NO_ARGUMENTS);
     }
   }
 
   @Override public void log(@NotNull final Level level, @NotNull final Marker marker, @NotNull final String msg) {
     if (isLoggable(level, marker)) {
-      doLog(level, marker, null, getCallSite(STACK_DEPTH, level, marker, null), threadLocalFormatter.get(), msg, EMPTY_ARRAY);
+      logImmediate(level, marker, null, STACK_DEPTH, msg, NO_ARGUMENTS);
     }
   }
 
   @Override public void log(@NotNull final Level level, @NotNull final Throwable throwable, @NotNull final String msg) {
-    if (isLoggable(level)) {
-      doLog(level, marker, throwable, getCallSite(STACK_DEPTH, level, marker, throwable), threadLocalFormatter.get(), msg, EMPTY_ARRAY);
+    if (isLoggable(level, marker)) {
+      logImmediate(level, marker, throwable, STACK_DEPTH, msg, NO_ARGUMENTS);
     }
   }
 
   @Override
   public void log(@NotNull final Level level, @NotNull final Marker marker, @NotNull final Throwable throwable, @NotNull final String msg) {
     if (isLoggable(level, marker)) {
-      doLog(level, marker, throwable, getCallSite(STACK_DEPTH, level, marker, throwable), threadLocalFormatter.get(), msg, EMPTY_ARRAY);
-    }
-  }
-
-  @Override public void log(@NotNull final Level level, @NotNull final String format, @NotNull final Object... formatArgs) {
-    if (isLoggable(level)) {
-      doLog(level, marker, null, getCallSite(STACK_DEPTH, level, marker, null), threadLocalFormatter.get(), format, formatArgs);
+      logImmediate(level, marker, throwable, STACK_DEPTH, msg, NO_ARGUMENTS);
     }
   }
 
@@ -108,7 +104,7 @@ public abstract class BaseLogger implements Logger {
                   @NotNull final String format,
                   @NotNull final Object... formatArgs) {
     if (isLoggable(level, marker)) {
-      doLog(level, marker, null, getCallSite(STACK_DEPTH, level, marker, null), threadLocalFormatter.get(), format, formatArgs);
+      logImmediate(level, marker, null, STACK_DEPTH, format, formatArgs);
     }
   }
 
@@ -117,8 +113,8 @@ public abstract class BaseLogger implements Logger {
                   @NotNull final Throwable throwable,
                   @NotNull final String format,
                   @NotNull final Object... formatArgs) {
-    if (isLoggable(level)) {
-      doLog(level, marker, throwable, getCallSite(STACK_DEPTH, level, marker, throwable), threadLocalFormatter.get(), format, formatArgs);
+    if (isLoggable(level, marker)) {
+      logImmediate(level, marker, throwable, STACK_DEPTH, format, formatArgs);
     }
   }
 
@@ -127,15 +123,17 @@ public abstract class BaseLogger implements Logger {
                   @NotNull final Marker marker,
                   @NotNull final Throwable throwable,
                   @NotNull final String format,
-                  final @NotNull Object[] formatArgs) {
-
+                  @NotNull final Object... formatArgs) {
+    if (isLoggable(level, marker)) {
+      logImmediate(level, marker, throwable, STACK_DEPTH, format, formatArgs);
+    }
   }
 
   @Override public void log(@NotNull final Level level,
                             @NotNull final String format,
                             @NotNull final Object arg1) {
     if (isLoggable(level, marker)) {
-      doLog(level, marker, null, getCallSite(STACK_DEPTH, level, marker, null), threadLocalFormatter.get(), format, arg1);
+      logImmediate(level, marker, null, STACK_DEPTH, format, arg1);
     }
   }
 
@@ -144,7 +142,7 @@ public abstract class BaseLogger implements Logger {
                             @NotNull final Object arg1,
                             @NotNull final Object arg2) {
     if (isLoggable(level, marker)) {
-      doLog(level, marker, null, getCallSite(STACK_DEPTH, level, marker, null), threadLocalFormatter.get(), format, arg1, arg2);
+      logImmediate(level, marker, null, STACK_DEPTH, format, arg1, arg2);
     }
   }
 
@@ -154,7 +152,7 @@ public abstract class BaseLogger implements Logger {
                             @NotNull final Object arg2,
                             @NotNull final Object arg3) {
     if (isLoggable(level, marker)) {
-      doLog(level, marker, null, getCallSite(STACK_DEPTH, level, marker, null), threadLocalFormatter.get(), format, arg1, arg2, arg3);
+      logImmediate(level, marker, null, STACK_DEPTH, format, arg1, arg2, arg3);
     }
   }
 
@@ -165,7 +163,7 @@ public abstract class BaseLogger implements Logger {
                             @NotNull final Object arg3,
                             @NotNull final Object arg4) {
     if (isLoggable(level, marker)) {
-      doLog(level, marker, null, getCallSite(STACK_DEPTH, level, marker, null), threadLocalFormatter.get(), format, arg1, arg2, arg3, arg4);
+      logImmediate(level, marker, null, STACK_DEPTH, format, arg1, arg2, arg3, arg4);
     }
   }
 
@@ -177,14 +175,26 @@ public abstract class BaseLogger implements Logger {
                             @NotNull final Object arg4,
                             @NotNull final Object... remaining) {
     if (isLoggable(level, marker)) {
-      doLog(level,
-            marker,
-            null,
-            getCallSite(STACK_DEPTH, level, marker, null),
-            threadLocalFormatter.get(),
-            format,
-            combineArgs(remaining, arg1, arg2, arg3, arg4));
+      logImmediate(level, marker, null, STACK_DEPTH, format, LogUtil.combineArgs(remaining, arg1, arg2, arg3, arg4));
     }
+  }
+
+  @Override public void logImmediate(@NotNull final Level level,
+                                     @Nullable final Marker marker,
+                                     @Nullable final Throwable throwable,
+                                     final int stackDepth,
+                                     @NotNull final String msg,
+                                     @NotNull final Object... formatArgs) {
+    printLog(level, marker, throwable, getCallSite(stackDepth + 1, level, marker, throwable), threadLocalFormatter.get(), msg, formatArgs);
+  }
+
+  @Override
+  public void logImmediate(@NotNull final Level level,
+                           @Nullable final Throwable throwable,
+                           final int stackDepth,
+                           @NotNull final String msg,
+                           final @NotNull Object... formatArgs) {
+    printLog(level, marker, throwable, getCallSite(stackDepth + 1, level, marker, throwable), threadLocalFormatter.get(), msg, formatArgs);
   }
 
   /**
@@ -202,13 +212,13 @@ public abstract class BaseLogger implements Logger {
    * @param msg            the message or format string passed by the client
    * @param formatArgs     any format arguments passed by the client. Never null but may be zero length if no formatting is necessary
    */
-  protected abstract void doLog(@NotNull final Level level,
-                                @Nullable final Marker marker,
-                                @Nullable final Throwable throwable,
-                                @Nullable final StackTraceElement callerLocation,
-                                @NotNull final LogMessageFormatter formatter,
-                                @NotNull final String msg,
-                                @NotNull final Object... formatArgs);
+  protected abstract void printLog(@NotNull final Level level,
+                                   @Nullable final Marker marker,
+                                   @Nullable final Throwable throwable,
+                                   @Nullable final StackTraceElement callerLocation,
+                                   @NotNull final LogMessageFormatter formatter,
+                                   @NotNull final String msg,
+                                   @NotNull final Object... formatArgs);
 
   /**
    * Does this Logger implementation want information about where the log method was invoked. This may be a relatively expensive operation.
@@ -217,36 +227,16 @@ public abstract class BaseLogger implements Logger {
    *
    * @return true if the log information should include a {@link StackTraceElement} indicating the call site of the log invocation.
    */
-  protected abstract boolean shouldIncludeLocation(@NotNull Level level, @Nullable Marker marker, final Throwable throwable);
+  protected abstract boolean shouldIncludeLocation(@NotNull Level level, @Nullable Marker marker, @Nullable final Throwable throwable);
 
-  private StackTraceElement getCallSite(final int currentStackDepthFromCallSite,
-                                        final Level level,
-                                        final Marker marker,
-                                        final Throwable throwable) {
+  protected StackTraceElement getCallSite(final int currentStackDepthFromCallSite,
+                                          @NotNull final Level level,
+                                          @Nullable final Marker marker,
+                                          @Nullable final Throwable throwable) {
     if (shouldIncludeLocation(level, marker, throwable)) {
-      LogUtil.getCallerLocation(currentStackDepthFromCallSite + 1);
+      return LogUtil.getCallerLocation(currentStackDepthFromCallSite + 1);
     }
     return null;
-  }
-
-  /**
-   * Make an Object[] from 2 original arrays. The first array was passed in by the client as original varargs. The second, our internal
-   * varargs, should actually precede the original as they were listed first in the parameter list by the client.
-   *
-   * @param formatArgs objects that come LAST in the resulting array
-   * @param preceding  objects that come first, specified as varargs as a nicety
-   *
-   * @return joined array of objects, {@code preceding} first, followed by {@code formatArgs}
-   */
-  @NotNull private Object[] combineArgs(@NotNull final Object[] formatArgs, @NotNull Object... preceding) {
-    Object[] result = new Object[formatArgs.length + preceding.length];
-    System.arraycopy(preceding, 0, result, 0, preceding.length);
-    System.arraycopy(formatArgs, 0, result, preceding.length, formatArgs.length);
-    return result;
-  }
-
-  @NotNull private Object[] convertToObjects(@NotNull Object... primitivesOrObjects) {
-    return primitivesOrObjects;
   }
 
 }
