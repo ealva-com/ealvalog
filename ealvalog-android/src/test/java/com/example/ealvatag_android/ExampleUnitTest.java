@@ -16,23 +16,20 @@
  * limitations under the License.
  */
 
-package ealvalog;
+package com.example.ealvatag_android;
 
-import org.jetbrains.annotations.NotNull;
+import org.junit.Test;
+
+import static org.junit.Assert.*;
 
 /**
- * A no-op {@link LoggerFactory} instance - returns only {@link NullLogger#INSTANCE}
- * <p>
- * Created by Eric A. Snell on 2/28/17.
+ * Example local unit test, which will execute on the development machine (host).
+ *
+ * @see <a href="http://d.android.com/tools/testing">Testing documentation</a>
  */
-public enum NullLoggerFactory implements LoggerFactory {
-  INSTANCE;
-
-  @NotNull public Logger get(@NotNull final String name) {
-    return NullLogger.INSTANCE;
-  }
-
-  @Override public @NotNull Logger get(@NotNull final String name, @NotNull final Marker marker) {
-    return NullLogger.INSTANCE;
+public class ExampleUnitTest {
+  @Test
+  public void addition_isCorrect() throws Exception {
+    assertEquals(4, 2 + 2);
   }
 }

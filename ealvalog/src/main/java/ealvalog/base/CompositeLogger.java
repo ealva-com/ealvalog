@@ -18,9 +18,8 @@
 
 package ealvalog.base;
 
-import ealvalog.Level;
+import ealvalog.LogLevel;
 import ealvalog.Marker;
-import ealvalog.util.LogMessageFormatter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -51,7 +50,7 @@ public class CompositeLogger extends BaseLogger {
     return name;
   }
 
-  @Override public boolean isLoggable(@NotNull final Level level, @Nullable final Marker marker) {
+  @Override public boolean isLoggable(@NotNull final LogLevel level, @Nullable final Marker marker) {
     for (int i = 0, size = loggerList.size(); i < size; i++) {
       if (loggerList.get(i).isLoggable(level, marker)) {
         return true;
@@ -61,22 +60,21 @@ public class CompositeLogger extends BaseLogger {
   }
 
   @Override
-  protected void printLog(final @NotNull Level level,
+  protected void printLog(final @NotNull LogLevel level,
                           final @Nullable Marker marker,
                           final @Nullable Throwable throwable,
                           final @Nullable StackTraceElement callerLocation,
-                          final @NotNull LogMessageFormatter formatter,
                           final @NotNull String msg,
                           final @NotNull Object[] formatArgs) {
     for (int i = 0, size = loggerList.size(); i < size; i++) {
       final BaseLogger baseLogger = loggerList.get(i);
       if (baseLogger.isLoggable(level, marker)) {
-        baseLogger.printLog(level, marker, throwable, callerLocation, formatter, msg, formatArgs);
+        baseLogger.printLog(level, marker, throwable, callerLocation, msg, formatArgs);
       }
     }
   }
 
-  @Override protected boolean shouldIncludeLocation(@NotNull final Level level, @Nullable final Marker marker, @Nullable final Throwable throwable) {
+  @Override protected boolean shouldIncludeLocation(@NotNull final LogLevel level, @Nullable final Marker marker, @Nullable final Throwable throwable) {
     for (int i = 0, size = loggerList.size(); i < size; i++) {
       if (loggerList.get(i).shouldIncludeLocation(level, marker, throwable)) {
         return true;

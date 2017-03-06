@@ -48,58 +48,58 @@ public interface Logger {
   void setMarker(@Nullable Marker marker);
 
   /**
-   * Will a log at this {@link Level} result in an actual log statement
+   * Will a log at this {@link LogLevel} result in an actual log statement
    *
-   * @param level the level to test, one of {@link Level#TRACE}, {@link Level#DEBUG}, {@link Level#INFO}, {@link Level#WARN}, {@link
-   *              Level#ERROR}, {@link Level#CRITICAL}
+   * @param level the level to test, one of {@link LogLevel#TRACE}, {@link LogLevel#DEBUG}, {@link LogLevel#INFO}, {@link LogLevel#WARN}, {@link
+   *              LogLevel#ERROR}, {@link LogLevel#CRITICAL}
    *
    * @return true if a log statement will be produced at this level
    */
-  boolean isLoggable(@NotNull Level level);
+  boolean isLoggable(@NotNull LogLevel level);
 
   /**
-   * Will a log at this {@link Level}, and with the given {@link Marker}, result in an actual log statement
+   * Will a log at this {@link LogLevel}, and with the given {@link Marker}, result in an actual log statement
    *
-   * @param level  the level to test, one of {@link Level#TRACE}, {@link Level#DEBUG}, {@link Level#INFO}, {@link Level#WARN}, {@link
-   *               Level#ERROR}, {@link Level#CRITICAL}
+   * @param level  the level to test, one of {@link LogLevel#TRACE}, {@link LogLevel#DEBUG}, {@link LogLevel#INFO}, {@link LogLevel#WARN}, {@link
+   *               LogLevel#ERROR}, {@link LogLevel#CRITICAL}
    * @param marker {@link Marker} to test
    *
    * @return true if a log statement will be produced at this level
    */
-  boolean isLoggable(@NotNull Level level, @Nullable Marker marker);
+  boolean isLoggable(@NotNull LogLevel level, @Nullable Marker marker);
 
-  void log(@NotNull Level level, @NotNull String msg);
+  void log(@NotNull LogLevel level, @NotNull String msg);
 
-  void log(@NotNull Level level, @NotNull Marker marker, @NotNull String msg);
+  void log(@NotNull LogLevel level, @NotNull Marker marker, @NotNull String msg);
 
-  void log(@NotNull Level level, @NotNull Throwable throwable, @NotNull String msg);
+  void log(@NotNull LogLevel level, @NotNull Throwable throwable, @NotNull String msg);
 
-  void log(@NotNull Level level, @NotNull Marker marker, @NotNull Throwable throwable, @NotNull String msg);
+  void log(@NotNull LogLevel level, @NotNull Marker marker, @NotNull Throwable throwable, @NotNull String msg);
 
-  void log(@NotNull Level level, @NotNull Marker marker, @NotNull String format, @NotNull Object... formatArgs);
+  void log(@NotNull LogLevel level, @NotNull Marker marker, @NotNull String format, @NotNull Object... formatArgs);
 
-  void log(@NotNull Level level, @NotNull Throwable throwable, @NotNull String format, @NotNull Object... formatArgs);
+  void log(@NotNull LogLevel level, @NotNull Throwable throwable, @NotNull String format, @NotNull Object... formatArgs);
 
-  void log(@NotNull Level level,
+  void log(@NotNull LogLevel level,
            @NotNull Marker marker,
            @NotNull Throwable throwable,
            @NotNull String format,
            @NotNull Object... arg);
 
-  void log(@NotNull Level level, @NotNull String format, @NotNull Object arg1);
+  void log(@NotNull LogLevel level, @NotNull String format, @NotNull Object arg1);
 
-  void log(@NotNull Level level, @NotNull String format, @NotNull Object arg1, @NotNull Object arg2);
+  void log(@NotNull LogLevel level, @NotNull String format, @NotNull Object arg1, @NotNull Object arg2);
 
-  void log(@NotNull Level level, @NotNull String format, @NotNull Object arg1, @NotNull Object arg2, @NotNull Object arg3);
+  void log(@NotNull LogLevel level, @NotNull String format, @NotNull Object arg1, @NotNull Object arg2, @NotNull Object arg3);
 
-  void log(@NotNull Level level,
+  void log(@NotNull LogLevel level,
            @NotNull String format,
            @NotNull Object arg1,
            @NotNull Object arg2,
            @NotNull Object arg3,
            @NotNull Object arg4);
 
-  void log(@NotNull Level level,
+  void log(@NotNull LogLevel level,
            @NotNull String format,
            @NotNull Object arg1,
            @NotNull Object arg2,
@@ -118,7 +118,7 @@ public interface Logger {
    * @param msg the log message
    * @param formatArgs any formatting arguments if {@code msg} is a printf style format string (see {@link Formatter}
    */
-  void logImmediate(@NotNull Level level,
+  void logImmediate(@NotNull LogLevel level,
                     @Nullable Marker marker,
                     @Nullable Throwable throwable,
                     int stackDepth,
@@ -135,7 +135,7 @@ public interface Logger {
    * @param msg the log message
    * @param formatArgs any formatting arguments if {@code msg} is a printf style format string (see {@link Formatter}
    */
-  void logImmediate(@NotNull Level level,
+  void logImmediate(@NotNull LogLevel level,
                     @Nullable Throwable throwable,
                     int stackDepth,
                     @NotNull String msg,

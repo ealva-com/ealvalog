@@ -18,6 +18,7 @@
 
 include ':ealvalog'
 include ':ealvalog-jdk'
+include ':ealvalog-android'
 
 rootProject.name = 'ealvalog-parent'
 

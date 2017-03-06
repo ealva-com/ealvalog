@@ -26,24 +26,26 @@ import org.jetbrains.annotations.NotNull;
  * Created by Eric A. Snell on 2/28/17.
  */
 public interface LoggerFactory {
+  String ROOT_LOGGER_NAME = "";
+
   /**
-   * Make a Logger instance with the given {@code name}
+   * Get a Logger instance with the given {@code name}
    *
    * @param name the name of the logger. This name will be treated as if it were a class name with the canonical package hierarchy
    *
    * @return {@link Logger} instance
    */
-  @NotNull Logger make(@NotNull String name);
+  @NotNull Logger get(@NotNull String name);
 
   /**
-   * Make a Logger instance with the given {@code name} that always logs {@code marker}
+   * Get a Logger instance with the given {@code name} that always logs {@code marker}
    *
    * @param name   the name of the logger. This name will be treated as if it were a class name with the canonical package hierarchy
    * @param marker every log from the returned {@link Logger} will use this as it's {@link Marker} unless overridden on a per method basis
    *
    * @return {@link Logger} instance
-   * @see Logger#log(Level, String)
-   * @see Logger#log(Level, Marker, String)
+   * @see Logger#log(LogLevel, String)
+   * @see Logger#log(LogLevel, Marker, String)
    */
-  @NotNull Logger make(@NotNull String name, @NotNull Marker marker);
+  @NotNull Logger get(@NotNull String name, @NotNull Marker marker);
 }

@@ -20,8 +20,11 @@ apply plugin: 'java'
 
 sourceCompatibility = 1.7
 targetCompatibility = 1.7
+
+
 version = '0.0.1'
 jar {
+
     manifest {
         attributes 'Implementation-Title': 'ealvalog',
                    'Implementation-Version': version
@@ -33,10 +36,9 @@ repositories {
 }
 
 dependencies {
-    compile 'org.jetbrains:annotations:15.0'
-
+    compile 'org.jetbrains:annotations:13.0'
     // Test libraries
-    testCompile ('junit:junit:4.12') {
+    testCompile('junit:junit:4.12') {
         exclude module: 'hamcrest-core'
     }
     testCompile 'org.hamcrest:hamcrest-library:1.3'

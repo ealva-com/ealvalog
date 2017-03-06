@@ -32,6 +32,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 @SuppressWarnings("WeakerAccess")
 public class MarkerImpl implements Marker {
+  private static final char OPEN = '[';
+  private static final char SEPARATOR = ',';
+  private static final char CLOSE = ']';
   private final String name;
   private final List<Marker> children;
 
@@ -70,5 +73,29 @@ public class MarkerImpl implements Marker {
 
   public Iterator<Marker> iterator() {
     return children.iterator();
+  }
+
+  @Override public String toString() {
+    if (children.isEmpty()) {
+      return name;
+    }
+    return toStringBuilder(new StringBuilder()).toString();
+  }
+
+  @Override public @NotNull StringBuilder toStringBuilder(@NotNull final StringBuilder builder) {
+    // subclasses would typically invoke super.toStringBuilder(builder) first
+    if (children.isEmpty()) {
+      return builder.append(name);
+    }
+
+    builder.append(name).append(OPEN);
+    for (int i = 0, size = children.size(); i < size; i++) {
+      if (i != 0) {
+        builder.append(SEPARATOR);
+      }
+      children.get(i).toStringBuilder(builder);
+    }
+    builder.append(CLOSE);
+    return builder;
   }
 }

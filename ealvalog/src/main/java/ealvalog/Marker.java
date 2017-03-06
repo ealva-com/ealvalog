@@ -50,4 +50,16 @@ public interface Marker extends Serializable, Iterable<Marker> {
    * @return an iterator over child markers
    */
   Iterator<Marker> iterator();
+
+  /**
+   * Essentially the same as {@link #toString()} except the information is appended to the {@link StringBuilder} parameter. This is a
+   * {@link #toString()} variant that works with inheritance and contained objects that support this pattern.
+   *
+   * This method's contract is that it accepts a non-null builder, appends information to it, and then returns the same StringBuilder it
+   * was passed as a parameter.
+   *
+   * @param builder the builder to append {@link #toString()} information to
+   * @return the {@code builder} parameter to allow call chaining
+   */
+  @NotNull StringBuilder toStringBuilder(@NotNull StringBuilder builder);
 }

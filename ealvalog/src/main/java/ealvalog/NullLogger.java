@@ -39,57 +39,57 @@ public enum NullLogger implements Logger {
 
   public void setMarker(@Nullable final Marker marker) {}
 
-  public boolean isLoggable(@NotNull final Level level) {
+  public boolean isLoggable(@NotNull final LogLevel level) {
     return false;
   }
 
-  public boolean isLoggable(@NotNull final Level level, @Nullable final Marker marker) {
+  public boolean isLoggable(@NotNull final LogLevel level, @Nullable final Marker marker) {
     return false;
   }
 
-  public void log(@NotNull final Level level, @NotNull final String msg) {}
+  public void log(@NotNull final LogLevel level, @NotNull final String msg) {}
 
-  public void log(@NotNull final Level level, @NotNull final Marker marker, @NotNull final String msg) {}
+  public void log(@NotNull final LogLevel level, @NotNull final Marker marker, @NotNull final String msg) {}
 
-  public void log(@NotNull final Level level, @NotNull final Throwable throwable, @NotNull final String msg) {}
+  public void log(@NotNull final LogLevel level, @NotNull final Throwable throwable, @NotNull final String msg) {}
 
-  public void log(@NotNull final Level level, @NotNull final Marker marker, @NotNull final Throwable throwable, @NotNull final String msg) {
+  public void log(@NotNull final LogLevel level, @NotNull final Marker marker, @NotNull final Throwable throwable, @NotNull final String msg) {
   }
 
-  public void log(@NotNull final Level level,
+  public void log(@NotNull final LogLevel level,
                   @NotNull final Marker marker,
                   @NotNull final String format,
                   @NotNull final Object... formatArgs) {}
 
-  public void log(@NotNull final Level level,
+  public void log(@NotNull final LogLevel level,
                   @NotNull final Throwable throwable,
                   @NotNull final String format,
                   @NotNull final Object... formatArgs) {}
 
-  public void log(@NotNull final Level level,
+  public void log(@NotNull final LogLevel level,
                   @NotNull final Marker marker,
                   @NotNull final Throwable throwable,
                   @NotNull final String format,
                   final @NotNull Object[] formatArgs) {}
 
-  public void log(@NotNull final Level level, @NotNull final String format, @NotNull final Object arg1) {}
+  public void log(@NotNull final LogLevel level, @NotNull final String format, @NotNull final Object arg1) {}
 
-  public void log(@NotNull final Level level, @NotNull final String format, @NotNull final Object arg1, @NotNull final Object arg2) {}
+  public void log(@NotNull final LogLevel level, @NotNull final String format, @NotNull final Object arg1, @NotNull final Object arg2) {}
 
-  public void log(@NotNull final Level level,
+  public void log(@NotNull final LogLevel level,
                   @NotNull final String format,
                   @NotNull final Object arg1,
                   @NotNull final Object arg2,
                   @NotNull final Object arg3) {}
 
-  public void log(@NotNull final Level level,
+  public void log(@NotNull final LogLevel level,
                   @NotNull final String format,
                   @NotNull final Object arg1,
                   @NotNull final Object arg2,
                   @NotNull final Object arg3,
                   @NotNull final Object arg4) {}
 
-  public void log(@NotNull final Level level,
+  public void log(@NotNull final LogLevel level,
                   @NotNull final String format,
                   @NotNull final Object arg1,
                   @NotNull final Object arg2,
@@ -98,7 +98,7 @@ public enum NullLogger implements Logger {
                   final @NotNull Object[] remaining) {}
 
   @Override
-  public void logImmediate(@NotNull final Level level,
+  public void logImmediate(@NotNull final LogLevel level,
                            @Nullable final Marker marker,
                            @Nullable final Throwable throwable,
                            final int stackDepth,
@@ -106,7 +106,7 @@ public enum NullLogger implements Logger {
                            final @NotNull Object[] formatArgs) {}
 
   @Override
-  public void logImmediate(@NotNull final Level level,
+  public void logImmediate(@NotNull final LogLevel level,
                            @Nullable final Throwable throwable,
                            final int stackDepth,
                            @NotNull final String msg,

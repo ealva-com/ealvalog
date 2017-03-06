@@ -18,6 +18,7 @@
 
 package ealvalog;
 
+import ealvalog.base.LogUtil;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -25,37 +26,46 @@ import org.jetbrains.annotations.NotNull;
  * {@link LoggerFactory} before use.
  * <p>
  * This class has a dependency on a concrete {@link LoggerFactory} instance which must be set before use. Setting and using this factory
- * is not thread safe - this is the responsibility of the client. It's expected this will be done during application load.
+ * is the responsibility of the client. It's expected this will be done during application load.
  * <p>
  * Created by Eric A. Snell on 2/28/17.
  */
 @SuppressWarnings("unused")
 public class TheLoggerFactory {
-  private static LoggerFactory loggerFactory = NullLoggerFactory.INSTANCE;
+  private static final int STACK_DEPTH = 1;
+  private static volatile LoggerFactory loggerFactory = NullLoggerFactory.INSTANCE;
 
+  /** Set the {@link ealvalog.LoggerFactory} to be used for all calls to this factory */
   public static void setFactory(@NotNull final LoggerFactory factory) {
     loggerFactory = factory;
   }
 
-  @NotNull
-  public static Logger make(@NotNull final Class<?> aClass) {
-    return loggerFactory.make(aClass.getName());
+  public static @NotNull Logger getRoot() {
+    return loggerFactory.get(LoggerFactory.ROOT_LOGGER_NAME);
   }
 
-  @NotNull
-  public static Logger make(@NotNull final String name) {
-    return loggerFactory.make(name);
+  public static @NotNull Logger get() {
+    return loggerFactory.get(LogUtil.getCallerLocation(STACK_DEPTH).getClassName());
   }
 
-  @NotNull
-  public static Logger make(@NotNull final Class<?> aClass, @NotNull final Marker marker) {
-    return loggerFactory.make(aClass.getName(), marker);
+  public static @NotNull Logger get(final @NotNull Marker marker) {
+    return loggerFactory.get(LogUtil.getCallerLocation(STACK_DEPTH).getClassName(), marker);
   }
 
-  @NotNull
-  public static Logger make(@NotNull final String name, @NotNull final Marker marker) {
-    return loggerFactory.make(name, marker);
+  public static @NotNull Logger get(@NotNull final Class<?> aClass) {
+    return loggerFactory.get(aClass.getName());
   }
 
+  public static @NotNull Logger get(@NotNull final String name) {
+    return loggerFactory.get(name);
+  }
+
+  public static @NotNull Logger get(@NotNull final Class<?> aClass, @NotNull final Marker marker) {
+    return loggerFactory.get(aClass.getName(), marker);
+  }
+
+  public static @NotNull Logger get(@NotNull final String name, @NotNull final Marker marker) {
+    return loggerFactory.get(name, marker);
+  }
 
 }

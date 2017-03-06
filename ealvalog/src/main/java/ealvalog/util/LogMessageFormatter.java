@@ -67,7 +67,7 @@ public class LogMessageFormatter {
    */
   public LogMessageFormatter format(@NotNull final String format,
                                     @NotNull final Object... args) {
-    return format(Locale.getDefault(Locale.Category.FORMAT), format, args);
+    return format(Locale.getDefault(), format, args);
   }
 
   /**

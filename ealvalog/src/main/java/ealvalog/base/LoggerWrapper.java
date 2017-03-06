@@ -18,7 +18,7 @@
 
 package ealvalog.base;
 
-import ealvalog.Level;
+import ealvalog.LogLevel;
 import ealvalog.Logger;
 import ealvalog.Marker;
 import org.jetbrains.annotations.NotNull;
@@ -34,9 +34,9 @@ import static ealvalog.base.LogUtil.combineArgs;
  * or introducing conditional logic because the code path was time critical and trace/debug/info level logging was causing performance
  * problems when not being used. This is especially true in resource constrained environments, such as Android.
  * <p>
- * If the client has numerous low level log statements, eg. {@link Level#TRACE}, {@link Level#DEBUG}, {@link Level#INFO}, etc, and many
+ * If the client has numerous low level log statements, eg. {@link LogLevel#TRACE}, {@link LogLevel#DEBUG}, {@link LogLevel#INFO}, etc, and many
  * primitives are logged, this may cause a lot of unnecessary object creation due to autoboxing. If the log level is high, such as {@link
- * Level#ERROR}, every call to log at lower levels will require object creation, though the logging may actually never occur. This class,
+ * LogLevel#ERROR}, every call to log at lower levels will require object creation, though the logging may actually never occur. This class,
  * and it's subclasses (developed by you), gives you the trade-off between an extra method invocation or 'n' number of autoboxing objects
  * created. An small example class is provided.
  *
@@ -58,7 +58,7 @@ import static ealvalog.base.LogUtil.combineArgs;
  * <p>
  *
  * In the next example with 5 arguments, 6 object creations would be saved if the logging did not occur: 5 auto boxing and an Object[]
- * allocation. This is compared to the general framework call {@link #log(Level, String, Object, Object, Object, Object, Object...)}
+ * allocation. This is compared to the general framework call {@link #log(LogLevel, String, Object, Object, Object, Object, Object...)}
  *
  * <p><pre>
  * {@code
@@ -97,41 +97,41 @@ public class LoggerWrapper implements Logger {
     realLogger.setMarker(marker);
   }
 
-  @Override public boolean isLoggable(@NotNull final Level level) {
+  @Override public boolean isLoggable(@NotNull final LogLevel level) {
     return realLogger.isLoggable(level, null);
   }
 
-  @Override public boolean isLoggable(@NotNull final Level level, @Nullable final Marker marker) {
+  @Override public boolean isLoggable(@NotNull final LogLevel level, @Nullable final Marker marker) {
     return realLogger.isLoggable(level, marker);
   }
 
-  @Override public void log(@NotNull final Level level, @NotNull final String msg) {
+  @Override public void log(@NotNull final LogLevel level, @NotNull final String msg) {
     if (realLogger.isLoggable(level)) {
       realLogger.logImmediate(level, null, STACK_DEPTH, msg, NO_ARGUMENTS);
     }
   }
 
-  @Override public void log(@NotNull final Level level, @NotNull final Marker marker, @NotNull final String msg) {
+  @Override public void log(@NotNull final LogLevel level, @NotNull final Marker marker, @NotNull final String msg) {
     if (realLogger.isLoggable(level, marker)) {
       realLogger.logImmediate(level, marker, null, STACK_DEPTH, msg, NO_ARGUMENTS);
     }
   }
 
-  @Override public void log(@NotNull final Level level, @NotNull final Throwable throwable, @NotNull final String msg) {
+  @Override public void log(@NotNull final LogLevel level, @NotNull final Throwable throwable, @NotNull final String msg) {
     if (realLogger.isLoggable(level)) {
       realLogger.logImmediate(level, throwable, STACK_DEPTH, msg, NO_ARGUMENTS);
     }
   }
 
   @Override
-  public void log(@NotNull final Level level, @NotNull final Marker marker, @NotNull final Throwable throwable, @NotNull final String msg) {
+  public void log(@NotNull final LogLevel level, @NotNull final Marker marker, @NotNull final Throwable throwable, @NotNull final String msg) {
     if (realLogger.isLoggable(level, marker)) {
       realLogger.logImmediate(level, marker, throwable, STACK_DEPTH, msg, NO_ARGUMENTS);
     }
   }
 
   @Override
-  public void log(@NotNull final Level level,
+  public void log(@NotNull final LogLevel level,
                   @NotNull final Marker marker,
                   @NotNull final String format,
                   @NotNull final Object... formatArgs) {
@@ -141,7 +141,7 @@ public class LoggerWrapper implements Logger {
   }
 
   @Override
-  public void log(@NotNull final Level level,
+  public void log(@NotNull final LogLevel level,
                   @NotNull final Throwable throwable,
                   @NotNull final String format,
                   @NotNull final Object... formatArgs) {
@@ -151,7 +151,7 @@ public class LoggerWrapper implements Logger {
   }
 
   @Override
-  public void log(@NotNull final Level level,
+  public void log(@NotNull final LogLevel level,
                   @NotNull final Marker marker,
                   @NotNull final Throwable throwable,
                   @NotNull final String format,
@@ -161,7 +161,7 @@ public class LoggerWrapper implements Logger {
     }
   }
 
-  @Override public void log(@NotNull final Level level,
+  @Override public void log(@NotNull final LogLevel level,
                             @NotNull final String format,
                             @NotNull final Object arg1) {
     if (realLogger.isLoggable(level)) {
@@ -169,7 +169,7 @@ public class LoggerWrapper implements Logger {
     }
   }
 
-  @Override public void log(@NotNull final Level level,
+  @Override public void log(@NotNull final LogLevel level,
                             @NotNull final String format,
                             @NotNull final Object arg1,
                             @NotNull final Object arg2) {
@@ -178,7 +178,7 @@ public class LoggerWrapper implements Logger {
     }
   }
 
-  @Override public void log(@NotNull final Level level,
+  @Override public void log(@NotNull final LogLevel level,
                             @NotNull final String format,
                             @NotNull final Object arg1,
                             @NotNull final Object arg2,
@@ -188,7 +188,7 @@ public class LoggerWrapper implements Logger {
     }
   }
 
-  @Override public void log(@NotNull final Level level,
+  @Override public void log(@NotNull final LogLevel level,
                             @NotNull final String format,
                             @NotNull final Object arg1,
                             @NotNull final Object arg2,
@@ -199,7 +199,7 @@ public class LoggerWrapper implements Logger {
     }
   }
 
-  @Override public void log(@NotNull final Level level,
+  @Override public void log(@NotNull final LogLevel level,
                             @NotNull final String format,
                             @NotNull final Object arg1,
                             @NotNull final Object arg2,
@@ -211,7 +211,7 @@ public class LoggerWrapper implements Logger {
     }
   }
 
-  @Override public void logImmediate(@NotNull final Level level,
+  @Override public void logImmediate(@NotNull final LogLevel level,
                                      @Nullable final Marker marker,
                                      @Nullable final Throwable throwable,
                                      final int stackDepth,
@@ -221,7 +221,7 @@ public class LoggerWrapper implements Logger {
   }
 
   @Override
-  public void logImmediate(@NotNull final Level level,
+  public void logImmediate(@NotNull final LogLevel level,
                            @Nullable final Throwable throwable,
                            final int stackDepth,
                            @NotNull final String msg,

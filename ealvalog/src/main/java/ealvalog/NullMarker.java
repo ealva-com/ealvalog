@@ -67,6 +67,10 @@ public enum NullMarker implements Marker {
     };
   }
 
+  @NotNull @Override public StringBuilder toStringBuilder(@NotNull final StringBuilder builder) {
+    return builder;
+  }
+
   public static Marker nullToNullInstance(final @Nullable Marker marker) {
     return marker == null ? NullMarker.INSTANCE : marker;
   }
