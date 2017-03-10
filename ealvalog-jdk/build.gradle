@@ -21,13 +21,13 @@ apply plugin: 'java'
 sourceCompatibility = 1.7
 targetCompatibility = 1.7
 
+version = VERSION_NAME
 
-version = '0.0.1'
 jar {
 
     manifest {
         attributes 'Implementation-Title': 'eAlvaLog-jdk',
-                   'Implementation-Version': version
+                   'Implementation-Version': VERSION_NAME
     }
 }
 
