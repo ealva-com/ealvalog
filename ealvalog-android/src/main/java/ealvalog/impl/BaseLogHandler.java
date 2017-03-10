@@ -53,7 +53,12 @@ public abstract class BaseLogHandler implements LogHandler {
                          @NotNull final String msg,
                          @NotNull final Object... formatArgs) {
     if (callerLocation != null) {
-      formatter.getBuilder().append(callerLocation.getMethodName()).append(':').append(callerLocation.getLineNumber()).append(' ');
+      formatter.getBuilder()
+               .append('(')
+               .append(callerLocation.getMethodName())
+               .append(':')
+               .append(callerLocation.getLineNumber())
+               .append(") ");
     }
     final String logMessage = formatter.format(getLocale(), msg, formatArgs)
                                        .toString();
