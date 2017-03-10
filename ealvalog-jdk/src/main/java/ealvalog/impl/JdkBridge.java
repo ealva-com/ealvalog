@@ -22,7 +22,7 @@ import ealvalog.AlwaysYesFilter;
 import ealvalog.LogLevel;
 import ealvalog.LoggerFilter;
 import ealvalog.Marker;
-import ealvalog.base.LogUtil;
+import ealvalog.util.LogUtil;
 import ealvalog.core.Bridge;
 import ealvalog.core.CoreLogger;
 import org.jetbrains.annotations.NotNull;

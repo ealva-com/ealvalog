@@ -54,8 +54,7 @@ Why?
   object creation at the call site when logging does not occur and at lower framework levels. Once it is determined logging will occur, 
   the I/O processing greatly exceeds the formatting code. Async logging (TBD) greatly removes any concern over this style of formatting 
   as it moves formatting off to another thread, process, or computer.
-  9. The resulting libraries are very small. If you are developing a library and only use the eAlvaLog api, the overhead at this time 
-  (2017-03-10) is 22k. 
+  9. The resulting libraries are very small.
  
 Libraries
 ---------

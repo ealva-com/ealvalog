@@ -18,7 +18,7 @@
 
 package ealvalog;
 
-import ealvalog.base.LogUtil;
+import ealvalog.util.LogUtil;
 import org.jetbrains.annotations.NotNull;
 
 /**

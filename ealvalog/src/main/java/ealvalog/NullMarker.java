@@ -18,15 +18,15 @@
 
 package ealvalog;
 
+import ealvalog.util.LogUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
-import java.util.NoSuchElementException;
 
 /**
  * A no-op implementation of the {@link Marker} interface
- *
+ * <p>
  * Created by Eric A. Snell on 2/28/17.
  */
 public enum NullMarker implements Marker {
@@ -53,18 +53,7 @@ public enum NullMarker implements Marker {
   }
 
   public Iterator<Marker> iterator() {
-    return new Iterator<Marker>() {
-      public void remove() {
-      }
-
-      public boolean hasNext() {
-        return false;
-      }
-
-      public Marker next() {
-        throw new NoSuchElementException();
-      }
-    };
+    return LogUtil.emptyIterator();
   }
 
   @NotNull @Override public StringBuilder toStringBuilder(@NotNull final StringBuilder builder) {
@@ -74,4 +63,5 @@ public enum NullMarker implements Marker {
   public static Marker nullToNullInstance(final @Nullable Marker marker) {
     return marker == null ? NullMarker.INSTANCE : marker;
   }
+
 }

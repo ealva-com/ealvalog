@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package ealvalog.base;
+package ealvalog.core;
 
 import ealvalog.LogLevel;
 import ealvalog.Marker;
@@ -36,6 +36,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
  * <p>
  * Created by Eric A. Snell on 3/2/17.
  */
+@SuppressWarnings("PrivateMemberAccessBetweenOuterAndInnerClass")
 public class BaseLoggerTest {
 
   private static final String SOME_MESSAGE = "some message";
@@ -49,7 +50,7 @@ public class BaseLoggerTest {
   @Before
   public void setup() {
     logger = new LoggerImpl();
-    markerParameter = new MarkerImpl("Marker");
+    markerParameter = new ealvalog.core.MarkerImpl("Marker");
     loggerMarker = new MarkerImpl("Marker");
     loggerWithMarker = new LoggerImpl(loggerMarker);
     theThrowable = new Throwable();
@@ -331,7 +332,7 @@ public class BaseLoggerTest {
   }
 
 
-  class LoggerImpl extends BaseLogger {
+  class LoggerImpl extends ealvalog.core.BaseLogger {
 
     private static final String NAME = "";
 
@@ -371,6 +372,7 @@ public class BaseLoggerTest {
     }
 
     boolean isLoggableInvoked;
+
     @Override public boolean isLoggable(@NotNull final LogLevel level, final @Nullable Marker marker, final @Nullable Throwable throwable) {
       isLoggableInvoked = true;
       return shouldLog;

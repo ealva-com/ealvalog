@@ -16,23 +16,19 @@
  * limitations under the License.
  */
 
-package com.example.ealvatag_android;
+package ealvalog.impl;
 
 
 import ealvalog.LogLevel;
 import ealvalog.Logger;
 import ealvalog.Marker;
 import ealvalog.TheLoggerFactory;
-import ealvalog.impl.AndroidLogger;
-import ealvalog.impl.AndroidLoggerFactory;
-import ealvalog.impl.LogHandler;
 import ealvalog.util.LogMessageFormatter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.MockitoAnnotations;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;

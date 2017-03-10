@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package ealvalog.base;
+package ealvalog.core;
 
 import ealvalog.LogLevel;
 import ealvalog.Logger;
@@ -24,7 +24,7 @@ import ealvalog.Marker;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static ealvalog.base.LogUtil.combineArgs;
+import static ealvalog.util.LogUtil.combineArgs;
 
 /**
  * This class is provided as a convenience base class to customize the logger interface. Subclasses can provide a very specific interface of

@@ -21,7 +21,6 @@ package ealvalog.core;
 import ealvalog.LogLevel;
 import ealvalog.LoggerFilter;
 import ealvalog.Marker;
-import ealvalog.base.BaseLogger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

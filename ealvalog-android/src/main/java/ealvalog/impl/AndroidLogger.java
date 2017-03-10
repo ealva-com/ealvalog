@@ -20,8 +20,8 @@ package ealvalog.impl;
 
 import ealvalog.LogLevel;
 import ealvalog.Marker;
-import ealvalog.base.BaseLogger;
-import ealvalog.base.LogUtil;
+import ealvalog.core.BaseLogger;
+import ealvalog.util.LogUtil;
 import ealvalog.util.LogMessageFormatter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -63,10 +63,7 @@ public class AndroidLogger extends BaseLogger {
     logHandler.set(handler);
   }
 
-  public static LogHandler getHandler() {
-    return logHandler.get();
-  }
-
+  @SuppressWarnings("unused")
   public static void removeHandler() {
     logHandler.set(NullLogHandler.INSTANCE);
   }

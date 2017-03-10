@@ -18,25 +18,21 @@
 
 package ealvalog.util;
 
-import org.jetbrains.annotations.Nullable;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /**
- * A no-op throwable that is only usable as a placeholder for an absent {@code Optional<Throwable>}
+ * Convenience class for when an empty iterator is all that's required
  *
- * Created by Eric A. Snell on 3/5/17.
+ * Created by Eric A. Snell on 3/10/17.
  */
-public final class NullThrowable extends Throwable {
-  public static final Throwable INSTANCE = new NullThrowable();
+@SuppressWarnings("WeakerAccess")
+public class EmptyIterator<E> implements Iterator<E> {
+  public static final EmptyIterator<Object> EMPTY_ITERATOR = new EmptyIterator<>();
 
-  public static Throwable nullToNullInstance(@Nullable final Throwable throwable) {
-    return throwable == null ? INSTANCE : throwable;
-  }
+  public boolean hasNext() { return false; }
 
-  private NullThrowable() {
-    super("");
-  }
+  public E next() { throw new NoSuchElementException(); }
 
-  @Override public synchronized Throwable fillInStackTrace() {
-    return this;
-  }
+  public void remove() { throw new IllegalStateException(); }
 }

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package ealvalog.base;
+package ealvalog.core;
 
 import ealvalog.LogLevel;
 import ealvalog.Logger;
@@ -167,7 +167,7 @@ public abstract class BaseLogger implements Logger {
                             @NotNull final Object arg4,
                             @NotNull final Object... remaining) {
     if (isLoggable(level, marker, null)) {
-      logImmediate(level, marker, null, STACK_DEPTH, format, LogUtil.combineArgs(remaining, arg1, arg2, arg3, arg4));
+      logImmediate(level, marker, null, STACK_DEPTH, format, ealvalog.util.LogUtil.combineArgs(remaining, arg1, arg2, arg3, arg4));
     }
   }
 

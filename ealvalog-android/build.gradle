@@ -60,6 +60,7 @@ dependencies {
     testCompile 'org.mockito:mockito-core:2.6.9'
 
     compile project(path: ':ealvalog')
+    compile project(path: ':ealvalog-core')
 }
 
 apply from: rootProject.file('gradle/gradle-mvn-push.gradle')

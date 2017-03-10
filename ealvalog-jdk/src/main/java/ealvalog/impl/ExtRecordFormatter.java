@@ -21,8 +21,8 @@ package ealvalog.impl;
 
 import ealvalog.LogLevel;
 import ealvalog.NullMarker;
+import ealvalog.util.FormattableThrowable;
 import ealvalog.util.LogMessageFormatter;
-import ealvalog.util.NullThrowable;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.IllegalFormatConversionException;
@@ -192,7 +192,7 @@ public class ExtRecordFormatter extends Formatter {
     formatterArgs[LOGGER_NAME_INDEX] = record.getLoggerName();
     formatterArgs[LOG_LEVEL_INDEX] = LogLevel.fromLevel(record.getLevel());
     formatterArgs[DATE_INDEX] = Long.valueOf(record.getMillis());
-    formatterArgs[THROWN_INDEX] = NullThrowable.nullToNullInstance(record.getThrown());
+    formatterArgs[THROWN_INDEX] = FormattableThrowable.throwableToFormattable(record.getThrown());
     formatterArgs[CLASS_NAME_INDEX] = record.getSourceClassName();
     formatterArgs[METHOD_NAME_INDEX] = record.getSourceMethodName();
   }
@@ -200,5 +200,6 @@ public class ExtRecordFormatter extends Formatter {
   private static class ExtLogMessageFormatter extends LogMessageFormatter {
     final Object[] formatterArgs = new Object[11];
 
+    ExtLogMessageFormatter() {}
   }
 }

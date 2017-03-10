@@ -19,8 +19,8 @@
 package ealvalog.impl;
 
 import ealvalog.LogLevel;
-import ealvalog.base.LogUtil;
-import ealvalog.base.MarkerImpl;
+import ealvalog.util.LogUtil;
+import ealvalog.core.MarkerImpl;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package ealvalog.base;
+package ealvalog.core;
 
 import ealvalog.Marker;
 import org.jetbrains.annotations.NotNull;
