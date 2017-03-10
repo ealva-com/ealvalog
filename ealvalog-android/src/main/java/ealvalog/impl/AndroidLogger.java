@@ -3,6 +3,7 @@ package ealvalog.impl;
 import ealvalog.LogLevel;
 import ealvalog.Marker;
 import ealvalog.base.BaseLogger;
+import ealvalog.base.LogUtil;
 import ealvalog.util.LogMessageFormatter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -52,17 +53,13 @@ public class AndroidLogger extends BaseLogger {
     logHandler.set(NullLogHandler.INSTANCE);
   }
 
-  private final String name;
   private final String tag;
+  private boolean includeLocation;
 
-  public AndroidLogger(final String name) {
-    this(name, null);
-  }
-
-  public AndroidLogger(final String name, final @Nullable Marker marker) {
-    super(marker);
-    this.name = name;
+  AndroidLogger(final String name, final boolean includeLocation, final @Nullable Marker marker) {
+    super(name, marker);
     tag = tagFromName(name);
+    this.includeLocation = includeLocation;
   }
 
   private String tagFromName(final String name) {
@@ -75,11 +72,7 @@ public class AndroidLogger extends BaseLogger {
     return tag.length() > MAX_TAG_LENGTH ? tag.substring(0, MAX_TAG_LENGTH) : tag;
   }
 
-  @Override public @NotNull String getName() {
-    return name;
-  }
-
-  @Override public boolean isLoggable(@NotNull final LogLevel level, @Nullable final Marker marker) {
+  @Override public boolean isLoggable(final @NotNull LogLevel level, final @Nullable Marker marker, final @Nullable Throwable throwable) {
     return logHandler.get().isLoggable(tag, levelToAndroidLevel(level));
   }
 
@@ -87,24 +80,25 @@ public class AndroidLogger extends BaseLogger {
   protected void printLog(final @NotNull LogLevel level,
                           final @Nullable Marker marker,
                           final @Nullable Throwable throwable,
-                          final @Nullable StackTraceElement callerLocation,
+                          final int stackDepth,
                           final @NotNull String msg,
                           final @NotNull Object... formatArgs) {
+    final int androidLevel = levelToAndroidLevel(level);
     logHandler.get().prepareLog(tag,
-                                levelToAndroidLevel(level),
+                                androidLevel,
                                 marker,
                                 throwable,
-                                callerLocation,
+                                getLogSiteInfo(androidLevel, marker, throwable, stackDepth + 1),
                                 threadLocalFormatter.get(),
                                 msg,
                                 formatArgs);
   }
 
-  @Override
-  protected boolean shouldIncludeLocation(@NotNull final LogLevel level,
-                                          @Nullable final Marker marker,
-                                          final @Nullable Throwable throwable) {
-    return logHandler.get().shouldIncludeLocation(tag, levelToAndroidLevel(level), marker, throwable);
+  private StackTraceElement getLogSiteInfo(final int androidLevel, final Marker marker, final Throwable throwable, final int stackDepth) {
+    if (includeLocation || logHandler.get().shouldIncludeLocation(tag, androidLevel, marker, throwable)) {
+      return LogUtil.getCallerLocation(stackDepth + 1);
+    }
+    return null;
   }
 
   protected int levelToAndroidLevel(@NotNull final LogLevel level) {
@@ -126,4 +120,11 @@ public class AndroidLogger extends BaseLogger {
     }
   }
 
+  @Override public void setIncludeLocation(final boolean includeLocation) {
+    this.includeLocation = includeLocation;
+  }
+
+  @Override public boolean getIncludeLocation() {
+    return includeLocation;
+  }
 }

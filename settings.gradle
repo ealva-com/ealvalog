@@ -16,9 +16,7 @@
  * limitations under the License.
  */
 
-include ':ealvalog'
-include ':ealvalog-jdk'
-include ':ealvalog-android'
+include ':ealvalog', ':ealvalog-core', ':ealvalog-jdk', ':ealvalog-android'
 
 rootProject.name = 'ealvalog-parent'
 

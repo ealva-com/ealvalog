@@ -38,14 +38,42 @@ public interface LoggerFactory {
   @NotNull Logger get(@NotNull String name);
 
   /**
+   * Get a Logger instance with the given {@code name}
+   *
+   * @param name            the name of the logger. This name will be treated as if it were a class name with the canonical package
+   *                        hierarchy
+   * @param includeLocation include call site location in every log call. Formatters must be configured to display this optional
+   *                        information.
+   *
+   * @return {@link Logger} instance
+   */
+  @NotNull Logger get(@NotNull String name, boolean includeLocation);
+
+  /**
    * Get a Logger instance with the given {@code name} that always logs {@code marker}
    *
    * @param name   the name of the logger. This name will be treated as if it were a class name with the canonical package hierarchy
    * @param marker every log from the returned {@link Logger} will use this as it's {@link Marker} unless overridden on a per method basis
    *
    * @return {@link Logger} instance
+   *
    * @see Logger#log(LogLevel, String)
    * @see Logger#log(LogLevel, Marker, String)
    */
   @NotNull Logger get(@NotNull String name, @NotNull Marker marker);
+
+  /**
+   * Get a Logger instance with the given {@code name} that always logs {@code marker}
+   *
+   * @param name   the name of the logger. This name will be treated as if it were a class name with the canonical package hierarchy
+   * @param marker every log from the returned {@link Logger} will use this as it's {@link Marker} unless overridden on a per method basis
+   * @param includeLocation include call site location in every log call. Formatters must be configured to display this optional
+   *                        information.
+   *
+   * @return {@link Logger} instance
+   *
+   * @see Logger#log(LogLevel, String)
+   * @see Logger#log(LogLevel, Marker, String)
+   */
+  @NotNull Logger get(@NotNull String name, @NotNull Marker marker, boolean includeLocation);
 }

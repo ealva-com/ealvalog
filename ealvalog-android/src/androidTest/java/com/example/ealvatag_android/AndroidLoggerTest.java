@@ -19,13 +19,24 @@
 package com.example.ealvatag_android;
 
 
+import ealvalog.LogLevel;
+import ealvalog.Logger;
+import ealvalog.Marker;
 import ealvalog.TheLoggerFactory;
 import ealvalog.impl.AndroidLogger;
 import ealvalog.impl.AndroidLoggerFactory;
-import ealvalog.impl.DebugLogHandler;
+import ealvalog.impl.LogHandler;
+import ealvalog.util.LogMessageFormatter;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.MockitoAnnotations;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 
 import android.support.test.runner.AndroidJUnit4;
 
@@ -37,13 +48,61 @@ import android.support.test.runner.AndroidJUnit4;
  */
 @RunWith(AndroidJUnit4.class)
 public class AndroidLoggerTest {
+  private MockLogHandler handler;
+
   @Before
   public void setup() {
+    handler = new MockLogHandler();
+    AndroidLogger.setHandler(handler);
     TheLoggerFactory.setFactory(new AndroidLoggerFactory());
   }
 
   @Test
   public void testDebugHandler() {
-    AndroidLogger.setHandler(new DebugLogHandler());
+    final Logger logger = TheLoggerFactory.get();
+    logger.log(LogLevel.CRITICAL, "The msg");
+    assertThat(handler.prepareLogInvoked, is(true));
+    assertThat(handler.prepareLogCallerLocation.getClassName(), is(equalTo(AndroidLoggerTest.class.getName())));
+  }
+
+  @SuppressWarnings("WeakerAccess")
+  public static final class MockLogHandler implements LogHandler {
+
+    public boolean isLoggableInvoked = false;
+    public String isLoggableTag = null;
+    public int isLoggableLevel = 0;
+    public boolean isLoggableReturn = true;
+    @Override public boolean isLoggable(@NotNull final String tag, final int level) {
+      isLoggableInvoked = true;
+      isLoggableTag = tag;
+      isLoggableLevel = level;
+      return isLoggableReturn;
+    }
+
+    public boolean shouldIncludeLocationInvoked = false;
+    public boolean shouldIncludeLocatoinReturn = true;
+    @Override
+    public boolean shouldIncludeLocation(@NotNull final String tag,
+                                         final int level,
+                                         @Nullable final Marker marker,
+                                         @Nullable final Throwable throwable) {
+      shouldIncludeLocationInvoked = true;
+      return shouldIncludeLocatoinReturn;
+    }
+
+    public boolean prepareLogInvoked = false;
+    public StackTraceElement prepareLogCallerLocation = null;
+    @Override
+    public void prepareLog(final String tag,
+                           final int level,
+                           @Nullable final Marker marker,
+                           @Nullable final Throwable throwable,
+                           @Nullable final StackTraceElement callerLocation,
+                           @NotNull final LogMessageFormatter formatter,
+                           @NotNull final String msg,
+                           @NotNull final Object... formatArgs) {
+      prepareLogInvoked = true;
+      prepareLogCallerLocation = callerLocation;
+    }
   }
 }

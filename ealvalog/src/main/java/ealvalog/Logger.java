@@ -29,7 +29,7 @@ import java.util.Formatter;
  * Created by Eric A. Snell on 2/28/17.
  */
 @SuppressWarnings({"unused", "SameParameterValue"})
-public interface Logger {
+public interface Logger extends LoggerFilter {
   /** Used when there are no formatArgs. Expected only use by eAlvaLog framework */
   Object[] NO_ARGUMENTS = new Object[0];
 
@@ -48,25 +48,24 @@ public interface Logger {
   void setMarker(@Nullable Marker marker);
 
   /**
-   * Will a log at this {@link LogLevel} result in an actual log statement
+   * Set if this logger should include call site location information in the log information. This is a relatively expensive operation and
+   * defaults to false.
+   * <p>
+   * The information passed to lower layers of the logging framework include: caller class, caller method, and caller file line number. This
+   * is obtained from the call stack. If calling code is obfuscated the results will also be obfuscated.
+   * <p>
+   * Also note that the underlying log statement formatter must be configured to include this information.
    *
-   * @param level the level to test, one of {@link LogLevel#TRACE}, {@link LogLevel#DEBUG}, {@link LogLevel#INFO}, {@link LogLevel#WARN}, {@link
-   *              LogLevel#ERROR}, {@link LogLevel#CRITICAL}
-   *
-   * @return true if a log statement will be produced at this level
+   * @param includeLocation set to true for call site information to be included
    */
-  boolean isLoggable(@NotNull LogLevel level);
+  void setIncludeLocation(boolean includeLocation);
 
   /**
-   * Will a log at this {@link LogLevel}, and with the given {@link Marker}, result in an actual log statement
+   * @return true if log calls include call site information
    *
-   * @param level  the level to test, one of {@link LogLevel#TRACE}, {@link LogLevel#DEBUG}, {@link LogLevel#INFO}, {@link LogLevel#WARN}, {@link
-   *               LogLevel#ERROR}, {@link LogLevel#CRITICAL}
-   * @param marker {@link Marker} to test
-   *
-   * @return true if a log statement will be produced at this level
+   * @see #setIncludeLocation(boolean)
    */
-  boolean isLoggable(@NotNull LogLevel level, @Nullable Marker marker);
+  boolean getIncludeLocation();
 
   void log(@NotNull LogLevel level, @NotNull String msg);
 
@@ -108,14 +107,16 @@ public interface Logger {
            @NotNull Object... remaining);
 
   /**
-   * Log without checking the the level and indicating where on the call chain the log is occurring ({@code stackDepth}). This method's
+   * Log without checking the the level and indicate where on the call chain the log is occurring ({@code stackDepth}). This method's
    * primary use is for this logging framework and it's not expected client's would typically use this method.
+   * <p>
+   * This method has a {@link Marker} parameter which will override any {@link Marker} in the Logger itself
    *
-   * @param level log level - will not be checked before logging
-   * @param marker an optional {@link Marker}
-   * @param throwable an optional {@link Throwable}
+   * @param level      log level - will not be checked before logging
+   * @param marker     an optional {@link Marker}
+   * @param throwable  an optional {@link Throwable}
    * @param stackDepth the level of indirection from the original "log" invocation. This must be 0 if a client invokes this method.
-   * @param msg the log message
+   * @param msg        the log message
    * @param formatArgs any formatting arguments if {@code msg} is a printf style format string (see {@link Formatter}
    */
   void logImmediate(@NotNull LogLevel level,
@@ -126,13 +127,13 @@ public interface Logger {
                     @NotNull Object... formatArgs);
 
   /**
-   * Log without checking the the level and indicating where on the call chain the log is occurring ({@code stackDepth}). This method's
+   * Log without checking the the level and indicate where on the call chain the log is occurring ({@code stackDepth}). This method's
    * primary use is for this logging framework and it's not expected client's would typically use this method.
    *
-   * @param level log level - will not be checked before logging
-   * @param throwable an optional {@link Throwable}
+   * @param level      log level - will not be checked before logging
+   * @param throwable  an optional {@link Throwable}
    * @param stackDepth the level of indirection from the original "log" invocation. This must be 0 if a client invokes this method.
-   * @param msg the log message
+   * @param msg        the log message
    * @param formatArgs any formatting arguments if {@code msg} is a printf style format string (see {@link Formatter}
    */
   void logImmediate(@NotNull LogLevel level,

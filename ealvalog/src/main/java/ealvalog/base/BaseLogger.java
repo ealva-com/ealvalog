@@ -25,8 +25,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * BaseLogger provides MessageFormatter, consolidates various logging methods to one method after checking log level and obtaining
- * optional info such as log() invocation site.
+ * BaseLogger consolidates various logging methods to one method after checking log level
  * <p>
  * Created by Eric A. Snell on 3/1/17.
  */
@@ -34,14 +33,21 @@ import org.jetbrains.annotations.Nullable;
 public abstract class BaseLogger implements Logger {
   private static final int STACK_DEPTH = 1;
 
+  @NotNull private final String name;
   @Nullable private Marker marker;
 
-  protected BaseLogger() {
-    this.marker = null;
+  @SuppressWarnings("unused")
+  protected BaseLogger(final @NotNull String name) {
+    this(name, null);
   }
 
-  protected BaseLogger(@Nullable final Marker marker) {
+  protected BaseLogger(final @NotNull String name, final @Nullable Marker marker) {
+    this.name = name;
     this.marker = marker;
+  }
+
+  @Override public @NotNull String getName() {
+    return name;
   }
 
   @Nullable @Override public Marker getMarker() {
@@ -53,23 +59,23 @@ public abstract class BaseLogger implements Logger {
   }
 
   @Override public boolean isLoggable(@NotNull final LogLevel level) {
-    return isLoggable(level, marker);
+    return isLoggable(level, null, null);
   }
 
   @Override public void log(@NotNull final LogLevel level, @NotNull final String msg) {
-    if (isLoggable(level, marker)) {
+    if (isLoggable(level, marker, null)) {
       logImmediate(level, marker, null, STACK_DEPTH, msg, NO_ARGUMENTS);
     }
   }
 
   @Override public void log(@NotNull final LogLevel level, @NotNull final Marker marker, @NotNull final String msg) {
-    if (isLoggable(level, marker)) {
+    if (isLoggable(level, marker, null)) {
       logImmediate(level, marker, null, STACK_DEPTH, msg, NO_ARGUMENTS);
     }
   }
 
   @Override public void log(@NotNull final LogLevel level, @NotNull final Throwable throwable, @NotNull final String msg) {
-    if (isLoggable(level, marker)) {
+    if (isLoggable(level, marker, throwable)) {
       logImmediate(level, marker, throwable, STACK_DEPTH, msg, NO_ARGUMENTS);
     }
   }
@@ -79,7 +85,7 @@ public abstract class BaseLogger implements Logger {
                   @NotNull final Marker marker,
                   @NotNull final Throwable throwable,
                   @NotNull final String msg) {
-    if (isLoggable(level, marker)) {
+    if (isLoggable(level, marker, throwable)) {
       logImmediate(level, marker, throwable, STACK_DEPTH, msg, NO_ARGUMENTS);
     }
   }
@@ -89,7 +95,7 @@ public abstract class BaseLogger implements Logger {
                   @NotNull final Marker marker,
                   @NotNull final String format,
                   @NotNull final Object... formatArgs) {
-    if (isLoggable(level, marker)) {
+    if (isLoggable(level, marker, null)) {
       logImmediate(level, marker, null, STACK_DEPTH, format, formatArgs);
     }
   }
@@ -99,7 +105,7 @@ public abstract class BaseLogger implements Logger {
                   @NotNull final Throwable throwable,
                   @NotNull final String format,
                   @NotNull final Object... formatArgs) {
-    if (isLoggable(level, marker)) {
+    if (isLoggable(level, marker, throwable)) {
       logImmediate(level, marker, throwable, STACK_DEPTH, format, formatArgs);
     }
   }
@@ -110,7 +116,7 @@ public abstract class BaseLogger implements Logger {
                   @NotNull final Throwable throwable,
                   @NotNull final String format,
                   @NotNull final Object... formatArgs) {
-    if (isLoggable(level, marker)) {
+    if (isLoggable(level, marker, throwable)) {
       logImmediate(level, marker, throwable, STACK_DEPTH, format, formatArgs);
     }
   }
@@ -118,7 +124,7 @@ public abstract class BaseLogger implements Logger {
   @Override public void log(@NotNull final LogLevel level,
                             @NotNull final String format,
                             @NotNull final Object arg1) {
-    if (isLoggable(level, marker)) {
+    if (isLoggable(level, marker, null)) {
       logImmediate(level, marker, null, STACK_DEPTH, format, arg1);
     }
   }
@@ -127,7 +133,7 @@ public abstract class BaseLogger implements Logger {
                             @NotNull final String format,
                             @NotNull final Object arg1,
                             @NotNull final Object arg2) {
-    if (isLoggable(level, marker)) {
+    if (isLoggable(level, marker, null)) {
       logImmediate(level, marker, null, STACK_DEPTH, format, arg1, arg2);
     }
   }
@@ -137,7 +143,7 @@ public abstract class BaseLogger implements Logger {
                             @NotNull final Object arg1,
                             @NotNull final Object arg2,
                             @NotNull final Object arg3) {
-    if (isLoggable(level, marker)) {
+    if (isLoggable(level, marker, null)) {
       logImmediate(level, marker, null, STACK_DEPTH, format, arg1, arg2, arg3);
     }
   }
@@ -148,7 +154,7 @@ public abstract class BaseLogger implements Logger {
                             @NotNull final Object arg2,
                             @NotNull final Object arg3,
                             @NotNull final Object arg4) {
-    if (isLoggable(level, marker)) {
+    if (isLoggable(level, marker, null)) {
       logImmediate(level, marker, null, STACK_DEPTH, format, arg1, arg2, arg3, arg4);
     }
   }
@@ -160,68 +166,56 @@ public abstract class BaseLogger implements Logger {
                             @NotNull final Object arg3,
                             @NotNull final Object arg4,
                             @NotNull final Object... remaining) {
-    if (isLoggable(level, marker)) {
+    if (isLoggable(level, marker, null)) {
       logImmediate(level, marker, null, STACK_DEPTH, format, LogUtil.combineArgs(remaining, arg1, arg2, arg3, arg4));
     }
   }
 
+  /**
+   * {@inheritDoc}
+   * <p>
+   * This version passes an optional marker through to the underlying logger. Even if this null, it will override any contained {@link
+   * Marker}
+   */
   @Override public void logImmediate(@NotNull final LogLevel level,
                                      @Nullable final Marker marker,
                                      @Nullable final Throwable throwable,
                                      final int stackDepth,
                                      @NotNull final String msg,
                                      @NotNull final Object... formatArgs) {
-    printLog(level, marker, throwable, getCallSite(stackDepth + 1, level, marker, throwable), msg, formatArgs);
+    printLog(level, marker, throwable, stackDepth + 1, msg, formatArgs);
   }
 
+  /**
+   * {@inheritDoc}
+   * <p>
+   * This version passes down any contained Marker
+   */
   @Override
   public void logImmediate(@NotNull final LogLevel level,
                            @Nullable final Throwable throwable,
                            final int stackDepth,
                            @NotNull final String msg,
                            final @NotNull Object... formatArgs) {
-    printLog(level, marker, throwable, getCallSite(stackDepth + 1, level, marker, throwable), msg, formatArgs);
+    printLog(level, marker, throwable, stackDepth + 1, msg, formatArgs);
   }
 
   /**
-   * All logging funnels through here. Subclasses implement this method to perform the actual concrete logging. Level has been checked so
-   * this method should proceed as logging will occur.
-   * <p>
-   * Note: even though a particular implementation of this class returns false from {@link #shouldIncludeLocation(LogLevel, Marker,
-   * Throwable)}, this method might still receive a valid {@link StackTraceElement} instance if another part of the framework required the
-   * information. So though unexpected, implementations may still wish to make use of the information if available.
+   * All logging funnels through here. Subclasses implement this method to perform the actual concrete logging. {@link #isLoggable(LogLevel,
+   * Marker, Throwable)} has been checked so this method should proceed as if logging should occur.
    *
-   * @param level          the log level
-   * @param marker         an optional {@link Marker}
-   * @param throwable      an optional {@link Throwable}
-   * @param callerLocation optional call site information
-   * @param msg            the message or format string passed by the client
-   * @param formatArgs     any format arguments passed by the client. Never null but may be zero length if no formatting is necessary
+   * @param level      the log level
+   * @param marker     an optional {@link Marker}
+   * @param throwable  an optional {@link Throwable}
+   * @param stackDepth depth from original log call
+   * @param msg        the message or format string passed by the client
+   * @param formatArgs any format arguments passed by the client. Never null but may be zero length if no formatting is necessary
    */
   protected abstract void printLog(@NotNull final LogLevel level,
                                    @Nullable final Marker marker,
                                    @Nullable final Throwable throwable,
-                                   @Nullable final StackTraceElement callerLocation,
+                                   final int stackDepth,
                                    @NotNull final String msg,
                                    @NotNull final Object... formatArgs);
-
-  /**
-   * Does this Logger implementation want information about where the log method was invoked. This may be a relatively expensive operation.
-   * If a Throwable is included in the log information it might be enough information, though the throw site may drastically differ from
-   * the log site.
-   *
-   * @return true if the log information should include a {@link StackTraceElement} indicating the call site of the log invocation.
-   */
-  protected abstract boolean shouldIncludeLocation(@NotNull LogLevel level, @Nullable Marker marker, @Nullable final Throwable throwable);
-
-  protected StackTraceElement getCallSite(final int currentStackDepthFromCallSite,
-                                          @NotNull final LogLevel level,
-                                          @Nullable final Marker marker,
-                                          @Nullable final Throwable throwable) {
-    if (shouldIncludeLocation(level, marker, throwable)) {
-      return LogUtil.getCallerLocation(currentStackDepthFromCallSite + 1);
-    }
-    return null;
-  }
 
 }

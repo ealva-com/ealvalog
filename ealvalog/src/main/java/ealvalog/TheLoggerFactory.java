@@ -44,6 +44,22 @@ public class TheLoggerFactory {
     return loggerFactory.get(LoggerFactory.ROOT_LOGGER_NAME);
   }
 
+  /**
+   * Convenience method to obtain a {@link Logger} for the current object's class. The follow are equivalent:
+   * <p>
+   * <pre>
+   * {@code
+   * class MyClass {
+   *   private static final Logger logger = TheLoggerFactory.get();
+   * }
+   * }
+   * class MyClass {
+   *   private static final Logger logger = TheLoggerFactory.get(MyClass.class);
+   * }
+   * </pre>
+   * <p>
+   * @return a logger for the current object's Class
+   */
   public static @NotNull Logger get() {
     return loggerFactory.get(LogUtil.getCallerLocation(STACK_DEPTH).getClassName());
   }

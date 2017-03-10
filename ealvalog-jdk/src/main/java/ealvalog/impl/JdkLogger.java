@@ -18,64 +18,38 @@
 
 package ealvalog.impl;
 
-import ealvalog.LogLevel;
+import ealvalog.LoggerFilter;
 import ealvalog.Marker;
-import ealvalog.base.BaseLogger;
+import ealvalog.core.CoreLogger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.logging.Logger;
 
 /**
  * Implementation that uses {@link java.util.logging.Logger}
  * <p>
  * Created by Eric A. Snell on 2/28/17.
  */
-public class JdkLogger extends BaseLogger {
+@SuppressWarnings("WeakerAccess")
+public class JdkLogger extends CoreLogger<JdkBridge> {
+  private JdkLoggerConfiguration config;
 
-  private java.util.logging.Logger jdkLogger;
-
-  JdkLogger(final String name) {
-    this(name, null);
+  JdkLogger(final String name, final boolean includeLocation, @Nullable final Marker marker, final JdkLoggerConfiguration config) {
+    super(name, config.getBridge(name), marker);
+    setIncludeLocation(includeLocation);
+    this.config = config;
   }
 
-  JdkLogger(final String name, final Marker marker) {
-    super(marker);
-    jdkLogger = Logger.getLogger(name);
+  protected @NotNull JdkBridge getBridge() {
+    return super.getBridge();
   }
 
-  @NotNull @Override public String getName() {
-    return jdkLogger.getName();
+  void update(final @NotNull JdkLoggerConfiguration configuration) {
+    this.config = configuration;
+    setBridge(configuration.getBridge(getName()));
   }
 
-  @Override public boolean isLoggable(@NotNull final LogLevel level, @Nullable final Marker marker) {
-    return jdkLogger.isLoggable(level.getLevel());
+  @Override public void setFilter(@NotNull final LoggerFilter filter) {
+    config.setLoggerFilter(this, filter);
   }
 
-  @Override
-  protected void printLog(final @NotNull LogLevel level,
-                          final @Nullable Marker marker,
-                          final @Nullable Throwable throwable,
-                          final @Nullable StackTraceElement callerLocation,
-                          final @NotNull String msg,
-                          final @NotNull Object[] formatArgs) {
-    if (isLoggable(level, marker)) {
-      ExtLogRecord logRecord = new ExtLogRecord(level, msg);
-      if (callerLocation != null) {
-        logRecord.setSourceClassName(callerLocation.getClassName());
-        logRecord.setSourceMethodName(callerLocation.getMethodName());
-        logRecord.setLineNumber(callerLocation.getLineNumber());
-      }
-      logRecord.setThrown(throwable);
-      logRecord.setParameters(formatArgs);
-      jdkLogger.log(logRecord);
-    }
-  }
-
-  /** @return true if there is not a throwable and if the level is {@link LogLevel#CRITICAL} or {@link LogLevel#ERROR} */
-  @Override protected boolean shouldIncludeLocation(final @NotNull LogLevel level,
-                                                    final @Nullable Marker marker,
-                                                    @Nullable final Throwable throwable) {
-    return throwable == null && (level == LogLevel.CRITICAL || level == LogLevel.ERROR);
-  }
 }

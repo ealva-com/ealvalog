@@ -79,8 +79,9 @@ import static ealvalog.base.LogUtil.combineArgs;
  * <p>
  * Created by Eric A. Snell on 3/3/17.
  */
-public class LoggerWrapper implements Logger {
-  @SuppressWarnings("WeakerAccess") protected final int STACK_DEPTH = 1;
+@SuppressWarnings("unused")
+public abstract class LoggerWrapper implements Logger {
+  @SuppressWarnings("WeakerAccess") protected final int STACK_DEPTH = 2;
   @SuppressWarnings("WeakerAccess") protected final Logger realLogger;
 
   public LoggerWrapper(final Logger realLogger) {this.realLogger = realLogger;}
@@ -98,11 +99,7 @@ public class LoggerWrapper implements Logger {
   }
 
   @Override public boolean isLoggable(@NotNull final LogLevel level) {
-    return realLogger.isLoggable(level, null);
-  }
-
-  @Override public boolean isLoggable(@NotNull final LogLevel level, @Nullable final Marker marker) {
-    return realLogger.isLoggable(level, marker);
+    return realLogger.isLoggable(level);
   }
 
   @Override public void log(@NotNull final LogLevel level, @NotNull final String msg) {
@@ -112,7 +109,7 @@ public class LoggerWrapper implements Logger {
   }
 
   @Override public void log(@NotNull final LogLevel level, @NotNull final Marker marker, @NotNull final String msg) {
-    if (realLogger.isLoggable(level, marker)) {
+    if (realLogger.isLoggable(level)) {
       realLogger.logImmediate(level, marker, null, STACK_DEPTH, msg, NO_ARGUMENTS);
     }
   }
@@ -125,7 +122,7 @@ public class LoggerWrapper implements Logger {
 
   @Override
   public void log(@NotNull final LogLevel level, @NotNull final Marker marker, @NotNull final Throwable throwable, @NotNull final String msg) {
-    if (realLogger.isLoggable(level, marker)) {
+    if (realLogger.isLoggable(level)) {
       realLogger.logImmediate(level, marker, throwable, STACK_DEPTH, msg, NO_ARGUMENTS);
     }
   }
@@ -135,7 +132,7 @@ public class LoggerWrapper implements Logger {
                   @NotNull final Marker marker,
                   @NotNull final String format,
                   @NotNull final Object... formatArgs) {
-    if (realLogger.isLoggable(level, marker)) {
+    if (realLogger.isLoggable(level)) {
       realLogger.logImmediate(level, marker, null, STACK_DEPTH, format, formatArgs);
     }
   }
@@ -156,7 +153,7 @@ public class LoggerWrapper implements Logger {
                   @NotNull final Throwable throwable,
                   @NotNull final String format,
                   @NotNull final Object[] formatArgs) {
-    if (realLogger.isLoggable(level, marker)) {
+    if (realLogger.isLoggable(level)) {
       realLogger.logImmediate(level, marker, throwable, STACK_DEPTH, format, formatArgs);
     }
   }
@@ -211,21 +208,26 @@ public class LoggerWrapper implements Logger {
     }
   }
 
+  /**
+   * @throws UnsupportedOperationException subclasses can change this, but this method is really only meant for framework use
+   */
   @Override public void logImmediate(@NotNull final LogLevel level,
                                      @Nullable final Marker marker,
                                      @Nullable final Throwable throwable,
                                      final int stackDepth,
                                      @NotNull final String msg,
                                      @NotNull final Object... formatArgs) {
-    realLogger.logImmediate(level, marker, throwable, stackDepth, msg, formatArgs);
+    throw new UnsupportedOperationException("Framework use only");
   }
 
-  @Override
-  public void logImmediate(@NotNull final LogLevel level,
+  /**
+   * @throws UnsupportedOperationException subclasses can change this, but this method is really only meant for framework use
+   */
+  @Override public void logImmediate(@NotNull final LogLevel level,
                            @Nullable final Throwable throwable,
                            final int stackDepth,
                            @NotNull final String msg,
                            final @NotNull Object[] formatArgs) {
-    realLogger.logImmediate(level, throwable, stackDepth, msg, formatArgs);
+    throw new UnsupportedOperationException("Framework use only");
   }
 }

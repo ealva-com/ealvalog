@@ -20,9 +20,12 @@ package ealvalog.base;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 /**
  * Various utility methods
- *
+ * <p>
  * Created by Eric A. Snell on 3/1/17.
  */
 @SuppressWarnings("WeakerAccess")
@@ -30,7 +33,7 @@ public final class LogUtil {
   /**
    * Make an Object[] from 2 original arrays. The first array was passed in by the client as original varargs. The second, our internal
    * varargs, should actually precede the original as they were listed first in the parameter list by the client.
-   *
+   * <p>
    * Note: the caller of this method could avoid an extra array creation. The caller knows the number of "extra" arguments and can avoid
    * the varargs array creation by "doing it yourself". Left as an exercise for the reader.
    *
@@ -46,7 +49,13 @@ public final class LogUtil {
     return result;
   }
 
-  /** Convenience for autoboxing primitives to an Object[] to pass to a {@link java.util.Formatter} */
+  /**
+   * Convenience for autoboxing primitives to an Object[] to pass to a {@link java.util.Formatter}
+   *
+   * @param primitivesOrObjects list to convert to array
+   *
+   * @return array for all the primitives or objects pass as parameters
+   */
   @NotNull public static Object[] convertToObjects(@NotNull Object... primitivesOrObjects) {
     return primitivesOrObjects;
   }
@@ -60,5 +69,11 @@ public final class LogUtil {
       throw new IllegalStateException("Not enough stack trace elements for given call depth. Possible optimizer/obfuscator?");
     }
     return stackTrace[currentStackDepthFromCallSite + 1];
+  }
+
+  public static String getStackTraceAsString(Throwable throwable) {
+    StringWriter stringWriter = new StringWriter();
+    throwable.printStackTrace(new PrintWriter(stringWriter));
+    return stringWriter.toString();
   }
 }

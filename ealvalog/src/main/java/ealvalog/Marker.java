@@ -37,11 +37,13 @@ public interface Marker extends Serializable, Iterable<Marker> {
   boolean removeChild(@NotNull Marker child);
 
   /**
+   * @param marker determine if this is a child
    * @return true if this instance is {@code marker} or this instance has {@code marker} as a child
    */
   boolean contains(@NotNull Marker marker);
 
   /**
+   * @param markerName see if there is a child with this name
    * @return true if this instance is named {@code markerName} or this instance has a child named {@code markName}
    */
   boolean contains(@NotNull String markerName);
@@ -52,13 +54,13 @@ public interface Marker extends Serializable, Iterable<Marker> {
   Iterator<Marker> iterator();
 
   /**
-   * Essentially the same as {@link #toString()} except the information is appended to the {@link StringBuilder} parameter. This is a
-   * {@link #toString()} variant that works with inheritance and contained objects that support this pattern.
+   * Essentially the same as {@code toString()} except the information is appended to the {@link StringBuilder} parameter. This is a
+   * {@code toString()} variant that works with inheritance and contained objects that support this pattern.
    *
    * This method's contract is that it accepts a non-null builder, appends information to it, and then returns the same StringBuilder it
    * was passed as a parameter.
    *
-   * @param builder the builder to append {@link #toString()} information to
+   * @param builder the builder to append {@code toString()} information to
    * @return the {@code builder} parameter to allow call chaining
    */
   @NotNull StringBuilder toStringBuilder(@NotNull StringBuilder builder);

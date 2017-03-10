@@ -44,7 +44,7 @@ public enum LogLevel {
     levelToLogLevelMap = new HashMap<>(8);
     final LogLevel[] logLevels = values();
     for (LogLevel logLevel : logLevels) {
-      levelToLogLevelMap.put(logLevel.getLevel(), logLevel);
+      levelToLogLevelMap.put(logLevel.getJdkLevel(), logLevel);
     }
   }
 
@@ -59,7 +59,7 @@ public enum LogLevel {
     this.level = level;
   }
 
-  public Level getLevel() {
+  public Level getJdkLevel() {
     return level;
   }
 }

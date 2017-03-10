@@ -21,6 +21,9 @@ package ealvalog.base;
 import ealvalog.Marker;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -32,11 +35,13 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 @SuppressWarnings("WeakerAccess")
 public class MarkerImpl implements Marker {
+  private static final long serialVersionUID = 445780917635303838L;
+
   private static final char OPEN = '[';
   private static final char SEPARATOR = ',';
   private static final char CLOSE = ']';
-  private final String name;
-  private final List<Marker> children;
+  private String name;
+  private List<Marker> children;
 
   public MarkerImpl(@NotNull final String name) {
     this.name = name;
@@ -98,4 +103,18 @@ public class MarkerImpl implements Marker {
     builder.append(CLOSE);
     return builder;
   }
+
+  private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+    in.defaultReadObject();
+    name = in.readUTF();
+    //noinspection unchecked
+    children = (List<Marker>)in.readObject();
+  }
+
+  private void writeObject(ObjectOutputStream out) throws IOException {
+    out.defaultWriteObject();
+    out.writeUTF(name);
+    out.writeObject(children);
+  }
+
 }

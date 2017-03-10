@@ -32,7 +32,15 @@ public enum NullLoggerFactory implements LoggerFactory {
     return NullLogger.INSTANCE;
   }
 
+  @NotNull @Override public Logger get(@NotNull final String name, final boolean includeLocation) {
+    return NullLogger.INSTANCE;
+  }
+
   @Override public @NotNull Logger get(@NotNull final String name, @NotNull final Marker marker) {
+    return NullLogger.INSTANCE;
+  }
+
+  @NotNull @Override public Logger get(@NotNull final String name, @NotNull final Marker marker, final boolean includeLocation) {
     return NullLogger.INSTANCE;
   }
 }

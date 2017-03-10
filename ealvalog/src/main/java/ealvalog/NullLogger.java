@@ -39,11 +39,19 @@ public enum NullLogger implements Logger {
 
   public void setMarker(@Nullable final Marker marker) {}
 
+  @Override public void setIncludeLocation(final boolean includeLocation) {
+
+  }
+
+  @Override public boolean getIncludeLocation() {
+    return false;
+  }
+
   public boolean isLoggable(@NotNull final LogLevel level) {
     return false;
   }
 
-  public boolean isLoggable(@NotNull final LogLevel level, @Nullable final Marker marker) {
+  @Override public boolean isLoggable(@NotNull final LogLevel level, @Nullable final Marker marker, @Nullable final Throwable throwable) {
     return false;
   }
 

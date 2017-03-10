@@ -66,7 +66,7 @@ public class BaseLoggerTest {
     assertThat(logger.level, is(nullValue()));
     assertThat(logger.marker, is(nullValue()));
     assertThat(logger.throwable, is(nullValue()));
-    assertThat(logger.callerLocation, is(nullValue()));
+    assertThat(logger.stackDepth, is(0));
     assertThat(logger.msg, is(nullValue()));
     assertThat(logger.formatArgs, is(nullValue()));
   }
@@ -83,7 +83,7 @@ public class BaseLoggerTest {
     assertThat(logger.level, is(LogLevel.CRITICAL));
     assertThat(logger.marker, is(nullValue()));
     assertThat(logger.throwable, is(nullValue()));
-    assertThat(logger.callerLocation, is(nullValue()));
+    assertThat(logger.stackDepth, is(2));
     assertThat(logger.msg, is(equalTo(SOME_MESSAGE)));
     assertNoFormatArgs(logger);
   }
@@ -102,7 +102,7 @@ public class BaseLoggerTest {
     assertThat(loggerWithMarker.marker, is(loggerMarker));
     assertThat(loggerWithMarker.level, is(LogLevel.CRITICAL));
     assertThat(loggerWithMarker.throwable, is(nullValue()));
-    assertThat(loggerWithMarker.callerLocation, is(nullValue()));
+    assertThat(loggerWithMarker.stackDepth, is(2));
     assertThat(loggerWithMarker.msg, is(equalTo(SOME_MESSAGE)));
     assertNoFormatArgs(loggerWithMarker);
   }
@@ -117,28 +117,9 @@ public class BaseLoggerTest {
     assertThat(loggerWithMarker.marker, is(markerParameter));
     assertThat(loggerWithMarker.level, is(LogLevel.CRITICAL));
     assertThat(loggerWithMarker.throwable, is(nullValue()));
-    assertThat(loggerWithMarker.callerLocation, is(nullValue()));
+    assertThat(loggerWithMarker.stackDepth, is(2));
     assertThat(loggerWithMarker.msg, is(equalTo(SOME_MESSAGE)));
     assertNoFormatArgs(loggerWithMarker);
-  }
-
-  @Test
-  public void testLocation() {
-    logger.setShouldLog();
-    logger.setShouldIncludeLocation();
-    logger.log(LogLevel.CRITICAL, SOME_MESSAGE);
-
-    assertThat(logger.isLoggableInvoked, is(true));
-    assertThat(logger.level, is(LogLevel.CRITICAL));
-    assertThat(logger.marker, is(nullValue()));
-    assertThat(logger.throwable, is(nullValue()));
-    assertThat(logger.msg, is(equalTo(SOME_MESSAGE)));
-    assertNoFormatArgs(logger);
-
-    assertThat(logger.callerLocation, is(notNullValue()));
-    assertThat(logger.callerLocation.getClassName(), is(equalTo(BaseLoggerTest.class.getName())));
-    assertThat(logger.callerLocation.getMethodName(), is(equalTo("testLocation")));
-
   }
 
   @Test
@@ -150,7 +131,7 @@ public class BaseLoggerTest {
     assertThat(logger.marker, is(markerParameter));
     assertThat(logger.level, is(LogLevel.CRITICAL));
     assertThat(logger.throwable, is(nullValue()));
-    assertThat(logger.callerLocation, is(nullValue()));
+    assertThat(logger.stackDepth, is(2));
     assertThat(logger.msg, is(equalTo(SOME_MESSAGE)));
     assertNoFormatArgs(logger);
   }
@@ -164,7 +145,7 @@ public class BaseLoggerTest {
     assertThat(logger.level, is(LogLevel.CRITICAL));
     assertThat(logger.marker, is(nullValue()));
     assertThat(logger.throwable, is(theThrowable));
-    assertThat(logger.callerLocation, is(nullValue()));
+    assertThat(logger.stackDepth, is(2));
     assertThat(logger.msg, is(equalTo(SOME_MESSAGE)));
     assertNoFormatArgs(logger);
 
@@ -179,7 +160,7 @@ public class BaseLoggerTest {
     assertThat(logger.marker, is(markerParameter));
     assertThat(logger.level, is(LogLevel.CRITICAL));
     assertThat(logger.throwable, is(theThrowable));
-    assertThat(logger.callerLocation, is(nullValue()));
+    assertThat(logger.stackDepth, is(2));
     assertThat(logger.msg, is(equalTo(SOME_MESSAGE)));
     assertNoFormatArgs(logger);
   }
@@ -193,7 +174,7 @@ public class BaseLoggerTest {
     assertThat(logger.marker, is(nullValue()));
     assertThat(logger.level, is(LogLevel.CRITICAL));
     assertThat(logger.throwable, is(nullValue()));
-    assertThat(logger.callerLocation, is(nullValue()));
+    assertThat(logger.stackDepth, is(2));
     assertThat(logger.msg, is(equalTo(FORMAT)));
     assertThat(logger.formatArgs.length, is(1));
     assertThat(logger.formatArgs[0].toString(), is(equalTo("1")));
@@ -208,7 +189,7 @@ public class BaseLoggerTest {
     assertThat(logger.marker, is(nullValue()));
     assertThat(logger.level, is(LogLevel.CRITICAL));
     assertThat(logger.throwable, is(nullValue()));
-    assertThat(logger.callerLocation, is(nullValue()));
+    assertThat(logger.stackDepth, is(2));
     assertThat(logger.msg, is(equalTo(FORMAT)));
     assertThat(logger.formatArgs.length, is(2));
     assertThat(logger.formatArgs[0].toString(), is(equalTo("1")));
@@ -224,7 +205,7 @@ public class BaseLoggerTest {
     assertThat(logger.marker, is(nullValue()));
     assertThat(logger.level, is(LogLevel.CRITICAL));
     assertThat(logger.throwable, is(nullValue()));
-    assertThat(logger.callerLocation, is(nullValue()));
+    assertThat(logger.stackDepth, is(2));
     assertThat(logger.msg, is(equalTo(FORMAT)));
     assertThat(logger.formatArgs.length, is(3));
     assertThat(logger.formatArgs[0].toString(), is(equalTo("1")));
@@ -241,7 +222,7 @@ public class BaseLoggerTest {
     assertThat(logger.marker, is(nullValue()));
     assertThat(logger.level, is(LogLevel.CRITICAL));
     assertThat(logger.throwable, is(nullValue()));
-    assertThat(logger.callerLocation, is(nullValue()));
+    assertThat(logger.stackDepth, is(2));
     assertThat(logger.msg, is(equalTo(FORMAT)));
     assertThat(logger.formatArgs.length, is(4));
     assertThat(logger.formatArgs[0].toString(), is(equalTo("1")));
@@ -259,7 +240,7 @@ public class BaseLoggerTest {
     assertThat(logger.marker, is(nullValue()));
     assertThat(logger.level, is(LogLevel.CRITICAL));
     assertThat(logger.throwable, is(nullValue()));
-    assertThat(logger.callerLocation, is(nullValue()));
+    assertThat(logger.stackDepth, is(2));
     assertThat(logger.msg, is(equalTo(FORMAT)));
     assertThat(logger.formatArgs.length, is(5));
     assertThat(logger.formatArgs[0].toString(), is(equalTo("1")));
@@ -278,7 +259,7 @@ public class BaseLoggerTest {
     assertThat(logger.marker, is(markerParameter));
     assertThat(logger.level, is(LogLevel.CRITICAL));
     assertThat(logger.throwable, is(nullValue()));
-    assertThat(logger.callerLocation, is(nullValue()));
+    assertThat(logger.stackDepth, is(2));
     assertThat(logger.msg, is(equalTo(FORMAT)));
     assertThat(logger.formatArgs.length, is(2));
     assertThat(logger.formatArgs[0].toString(), is(equalTo("1")));
@@ -294,7 +275,7 @@ public class BaseLoggerTest {
     assertThat(logger.marker, is(nullValue()));
     assertThat(logger.level, is(LogLevel.CRITICAL));
     assertThat(logger.throwable, is(theThrowable));
-    assertThat(logger.callerLocation, is(nullValue()));
+    assertThat(logger.stackDepth, is(2));
     assertThat(logger.msg, is(equalTo(FORMAT)));
     assertThat(logger.formatArgs.length, is(2));
     assertThat(logger.formatArgs[0].toString(), is(equalTo("1")));
@@ -310,7 +291,7 @@ public class BaseLoggerTest {
     assertThat(logger.marker, is(markerParameter));
     assertThat(logger.level, is(LogLevel.CRITICAL));
     assertThat(logger.throwable, is(theThrowable));
-    assertThat(logger.callerLocation, is(nullValue()));
+    assertThat(logger.stackDepth, is(2));
     assertThat(logger.msg, is(equalTo(FORMAT)));
     assertThat(logger.formatArgs.length, is(2));
     assertThat(logger.formatArgs[0].toString(), is(equalTo("1")));
@@ -323,11 +304,10 @@ public class BaseLoggerTest {
     logger.logImmediate(LogLevel.CRITICAL, markerParameter, theThrowable, 1, FORMAT, 1, 2);
 
     assertThat(logger.isLoggableInvoked, is(false));
-    assertThat(logger.shouldIncludeLocationInvoked, is(true));
     assertThat(logger.marker, is(markerParameter));
     assertThat(logger.level, is(LogLevel.CRITICAL));
     assertThat(logger.throwable, is(theThrowable));
-    assertThat(logger.callerLocation, is(nullValue()));
+    assertThat(logger.stackDepth, is(2));
     assertThat(logger.msg, is(equalTo(FORMAT)));
     assertThat(logger.formatArgs.length, is(2));
     assertThat(logger.formatArgs[0].toString(), is(equalTo("1")));
@@ -340,11 +320,10 @@ public class BaseLoggerTest {
     loggerWithMarker.logImmediate(LogLevel.CRITICAL, theThrowable, 1, FORMAT, 1, 2);
 
     assertThat(loggerWithMarker.isLoggableInvoked, is(false));
-    assertThat(loggerWithMarker.shouldIncludeLocationInvoked, is(true));
     assertThat(loggerWithMarker.marker, is(loggerMarker));
     assertThat(loggerWithMarker.level, is(LogLevel.CRITICAL));
     assertThat(loggerWithMarker.throwable, is(theThrowable));
-    assertThat(loggerWithMarker.callerLocation, is(nullValue()));
+    assertThat(loggerWithMarker.stackDepth, is(2));
     assertThat(loggerWithMarker.msg, is(equalTo(FORMAT)));
     assertThat(loggerWithMarker.formatArgs.length, is(2));
     assertThat(loggerWithMarker.formatArgs[0].toString(), is(equalTo("1")));
@@ -354,22 +333,24 @@ public class BaseLoggerTest {
 
   class LoggerImpl extends BaseLogger {
 
-    private String name = "";
+    private static final String NAME = "";
+
+    private String name = NAME;
     private boolean shouldLog = false;
-    private boolean shouldIncludeLocation = false;
     private LogLevel level = null;
     private Marker marker = null;
     private Throwable throwable = null;
-    private StackTraceElement callerLocation = null;
+    private int stackDepth = 0;
     private String msg = null;
     private Object[] formatArgs = null;
+    private boolean includeLocation = false;
 
     LoggerImpl() {
       this(null);
     }
 
     LoggerImpl(final @Nullable Marker marker) {
-      super(marker);
+      super(NAME, marker);
 
     }
 
@@ -377,16 +358,20 @@ public class BaseLoggerTest {
       this.shouldLog = true;
     }
 
-    void setShouldIncludeLocation() {
-      this.shouldIncludeLocation = true;
-    }
-
     @Override public @NotNull String getName() {
       return name;
     }
 
+    @Override public void setIncludeLocation(final boolean includeLocation) {
+      this.includeLocation = includeLocation;
+    }
+
+    @Override public boolean getIncludeLocation() {
+      return includeLocation;
+    }
+
     boolean isLoggableInvoked;
-    @Override public boolean isLoggable(@NotNull final LogLevel level, @Nullable final Marker marker) {
+    @Override public boolean isLoggable(@NotNull final LogLevel level, final @Nullable Marker marker, final @Nullable Throwable throwable) {
       isLoggableInvoked = true;
       return shouldLog;
     }
@@ -395,24 +380,16 @@ public class BaseLoggerTest {
     protected void printLog(final @NotNull LogLevel level,
                             final @Nullable Marker marker,
                             final @Nullable Throwable throwable,
-                            final @Nullable StackTraceElement callerLocation,
+                            final int stackDepth,
                             final @NotNull String msg,
                             final @NotNull Object[] formatArgs) {
 
       this.level = level;
       this.marker = marker;
       this.throwable = throwable;
-      this.callerLocation = callerLocation;
+      this.stackDepth = stackDepth;
       this.msg = msg;
       this.formatArgs = formatArgs;
-    }
-
-    boolean shouldIncludeLocationInvoked;
-    @Override protected boolean shouldIncludeLocation(@NotNull final LogLevel level,
-                                                      @Nullable final Marker marker,
-                                                      @Nullable final Throwable throwable) {
-      shouldIncludeLocationInvoked = true;
-      return shouldIncludeLocation;
     }
   }
 }
