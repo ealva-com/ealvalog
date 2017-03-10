@@ -1,3 +1,21 @@
+/*
+ * Copyright 2017 Eric A. Snell
+ *
+ * This file is part of eAlvaLog.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package ealvalog.impl;
 
 
@@ -13,22 +31,20 @@ import java.util.logging.LogRecord;
 
 /**
  * This formatter formats log record based on a String with {@link java.util.Formatter} style positional parameter. In order these
- * parameters are (argument index - example - type - name ):
- * <p>
- * <list>
- * <li>1$ - "%1$s" - String - Message</li>
- * <li>2$ - "%2$d" - Integer - Thread Id</li>
- * <li>3$ - "%3$s" - String - Logger Name</li>
- * <li>4$ - "%4$s" - LogLevel - Level</li>
- * <li>5$ - "%5$tF %5$tT.%5$tL" - Long - Date</li>
- * <li>6$ - "%6$s" or "%6$#s" - FormattableThrowable - Thrown (use alternative to get stack trace - # flag)</li>
- * <li>7$ - "%7$s" - String - Class Name (log site)</li>
- * <li>8$ - "%8$s" - String - Method Name (log site)</li>
- * <li>9$ - "%9$d" - Integer - Line Number (log site)</li>
- * <li>10$ - "%10$s" String - Thread Name</li>
- * <li>11$ - "%11$s"Marker - Marker</li>
- * </list>
- * <p>
+ * parameters are <br/>(argument index - example - type - name ):
+ * <p> <ul>
+ * <li>1$ - "%1$s" - String - Message
+ * <li>2$ - "%2$d" - Integer - Thread Id
+ * <li>3$ - "%3$s" - String - Logger Name
+ * <li>4$ - "%4$s" - LogLevel - Level
+ * <li>5$ - "%5$tF %5$tT.%5$tL" - Long - Date
+ * <li>6$ - "%6$s" or "%6$#s" - FormattableThrowable - Thrown (use alternative to get stack trace - # flag)
+ * <li>7$ - "%7$s" - String - Class Name (log site)
+ * <li>8$ - "%8$s" - String - Method Name (log site)
+ * <li>9$ - "%9$d" - Integer - Line Number (log site)
+ * <li>10$ - "%10$s" String - Thread Name
+ * <li>11$ - "%11$s"Marker - Marker
+ * </ul> <p>
  * Created by Eric A. Snell on 3/4/17.
  */
 @SuppressWarnings({"WeakerAccess", "unused"})
