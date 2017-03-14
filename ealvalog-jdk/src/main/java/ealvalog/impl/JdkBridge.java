@@ -18,19 +18,22 @@
 
 package ealvalog.impl;
 
-import ealvalog.AlwaysYesFilter;
+import ealvalog.filter.AlwaysNeutralFilter;
+import ealvalog.FilterResult;
 import ealvalog.LogLevel;
 import ealvalog.LoggerFilter;
 import ealvalog.Marker;
-import ealvalog.util.LogUtil;
+import ealvalog.NullMarker;
 import ealvalog.core.Bridge;
 import ealvalog.core.CoreLogger;
+import ealvalog.util.LogUtil;
+import ealvalog.util.NullThrowable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.logging.Handler;
+import static ealvalog.FilterResult.ACCEPT;
+import static ealvalog.FilterResult.DENY;
+
 import java.util.logging.Logger;
 
 /**
@@ -42,28 +45,14 @@ public class JdkBridge implements Bridge {
   private volatile JdkBridge parent;  // root bridge will have a null parent
   private final @NotNull java.util.logging.Logger jdkLogger;
   private volatile LoggerFilter filter;
-  private volatile List<LoggerHandler> handlerList;
-  private boolean jdkLoggerHasHandlers;
   private boolean includeLocation;
 
 
   JdkBridge(final @NotNull String name) {
     parent = null;
     jdkLogger = Logger.getLogger(name);
-    filter = AlwaysYesFilter.INSTANCE;
-    handlerList = new CopyOnWriteArrayList<>();
-    jdkLoggerHasHandlers = false;
+    filter = AlwaysNeutralFilter.INSTANCE;
     includeLocation = false;
-    final Handler[] handlers = jdkLogger.getHandlers();
-    if (handlers != null) {
-      for (int i = 0; i < handlers.length; i++) {
-        jdkLoggerHasHandlers = true;
-        final Handler handler = handlers[i];
-        if (handler instanceof LoggerHandler) {
-          handlerList.add((LoggerHandler)handler);
-        }
-      }
-    }
   }
 
   @Nullable JdkBridge getParent() {
@@ -79,7 +68,7 @@ public class JdkBridge implements Bridge {
   }
 
   void setFilter(final @Nullable LoggerFilter filter) {
-    this.filter = AlwaysYesFilter.nullToAlwaysYes(filter);
+    this.filter = AlwaysNeutralFilter.nullToAlwaysNeutral(filter);
   }
 
   /** @return the include location flag */
@@ -92,33 +81,40 @@ public class JdkBridge implements Bridge {
     this.includeLocation = includeLocation;
   }
 
+  @Override public boolean shouldLogToParent() {
+    return jdkLogger.getUseParentHandlers();
+  }
+
+  @Override public void setLogToParent(final boolean logToParent) {
+    jdkLogger.setUseParentHandlers(logToParent);
+  }
+
   private boolean shouldIncludeLocation() {
     return includeLocation || (parent != null && parent.includeLocation);
+  }
+
+  @Override public FilterResult isLoggable(@NotNull final ealvalog.Logger logger, @NotNull final LogLevel level) {
+    return isLoggable(logger, level, NullMarker.INSTANCE, NullThrowable.INSTANCE);
   }
 
   /**
    * {@inheritDoc}
    * <p>
-   * This method checks against the level in the Jdk logger, any contained filter, and Jdk logger {@link Handler}s of the type
-   * {@link LoggerHandler}. If the real Jdk logger does not contain any handlers, the parent, if any, of this bridge is checked.
+   * If the level check passes and any contained filter does not deny, then accepted
    */
-  @Override public boolean isLoggable(final @NotNull LogLevel level, final @Nullable Marker marker, final @Nullable Throwable throwable) {
+  @Override
+  public FilterResult isLoggable(@NotNull final ealvalog.Logger logger,
+                                 @NotNull final LogLevel level,
+                                 @NotNull final Marker marker,
+                                 @NotNull final Throwable throwable) {
     if (!jdkLogger.isLoggable(level.getJdkLevel())) {
-      return false;
+      return DENY;
     }
-    if (!filter.isLoggable(level, marker, throwable)) {
-      return false;
+    final FilterResult filterResult = filter.isLoggable(logger, level, marker, throwable);
+    if (filterResult == DENY) {
+      return DENY;
     }
-    if (jdkLoggerHasHandlers) {
-      for (LoggerHandler loggerHandler : handlerList) {
-        if (!loggerHandler.isLoggable(level, marker, throwable)) {
-          return false;
-        }
-      }
-    } else if (parent != null && !parent.isLoggable(level, marker, throwable)) {
-      return false;
-    }
-    return true;
+    return ACCEPT;
   }
 
   @Override
@@ -155,7 +151,7 @@ public class JdkBridge implements Bridge {
     return jdkLogger.getName();
   }
 
-  void addLoggerHandler(final LoggerHandler loggerHandler) {
-    handlerList.add(loggerHandler);
+  void addLoggerHandler(final BaseLoggerHandler loggerHandler) {
+    jdkLogger.addHandler(loggerHandler);
   }
 }

@@ -58,15 +58,15 @@ public class FileHandlerBuilderTest {
   public void testNoPattern() throws Exception {
     FileHandlerBuilder builder = new FileHandlerBuilder();
     //noinspection unused
-    final LoggerHandler handler = builder.build();
+    final HandlerWrapper handler = builder.build();
   }
 
   @Test
   public void testWithPattern() throws Exception {
     final File root = folder.getRoot();
     final String fileNamePattern = new File(root, "ealvalog.%g.%u.log").getAbsolutePath();
-    final LoggerHandler handler = new FileHandlerBuilder().fileNamePattern(fileNamePattern)
-                                                          .build();
+    final HandlerWrapper handler = new FileHandlerBuilder().fileNamePattern(fileNamePattern)
+                                                           .build();
     handler.publish(record);
 
     final String[] array = root.list();

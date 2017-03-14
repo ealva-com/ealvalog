@@ -62,6 +62,7 @@ dependencies {
 
     compile project(path: ':ealvalog')
     compile project(path: ':ealvalog-core')
+    compile project(path: ':ealvalog-jdk')
 }
 
 

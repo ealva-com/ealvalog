@@ -16,7 +16,18 @@
  * limitations under the License.
  */
 
-include ':ealvalog', ':ealvalog-core', ':ealvalog-jdk', ':ealvalog-android', ':ealvalog-jdk-android'
+package ealvalog;
 
-rootProject.name = 'ealvalog-parent'
+/**
+ * Filter results are used to determine if logging passes various thresholds. Because filtering may include several factors, some filters
+ * may respond with NONE to allow processing to continue to further checks. An example would be a composite filter where contained filters
+ * need to allow processing to move down the chain rather than ACCEPT or DENY.
+ * <p>
+ * Created by Eric A. Snell on 3/13/17.
+ */
+public enum FilterResult {
+  ACCEPT,
+  DENY,
+  NEUTRAL
 
+}

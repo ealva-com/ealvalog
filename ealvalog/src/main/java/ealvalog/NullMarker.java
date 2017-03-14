@@ -36,19 +36,19 @@ public enum NullMarker implements Marker {
     return "";
   }
 
-  public boolean addChild(@NotNull final Marker child) {
+  public boolean add(@NotNull final Marker marker) {
     return false;
   }
 
-  public boolean removeChild(@NotNull final Marker child) {
+  public boolean remove(@NotNull final Marker marker) {
     return false;
   }
 
-  public boolean contains(@NotNull final Marker marker) {
+  public boolean isOrContains(@NotNull final Marker marker) {
     return false;
   }
 
-  public boolean contains(@NotNull final String markerName) {
+  public boolean isOrContains(@NotNull final String markerName) {
     return false;
   }
 

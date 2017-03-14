@@ -29,8 +29,6 @@ import org.jetbrains.annotations.Nullable;
 import android.util.Log;
 
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Logger implementation for Android
@@ -54,10 +52,7 @@ public class AndroidLogger extends BaseLogger {
         }
       };
 
-  private static final int MAX_TAG_LENGTH = 23;
-  private static final Pattern ANONYMOUS_CLASS = Pattern.compile("(\\$\\d+)+$");
-
-  private static AtomicReference<LogHandler> logHandler = new AtomicReference<>();
+  private static AtomicReference<LogHandler> logHandler = new AtomicReference<>(NullLogHandler.INSTANCE);
 
   public static void setHandler(@NotNull final LogHandler handler) {
     logHandler.set(handler);
@@ -73,18 +68,8 @@ public class AndroidLogger extends BaseLogger {
 
   AndroidLogger(final String name, final boolean includeLocation, final @Nullable Marker marker) {
     super(name, marker);
-    tag = tagFromName(name);
+    tag = LogUtil.tagFromName(name);
     this.includeLocation = includeLocation;
-  }
-
-  private String tagFromName(final String name) {
-    String tag = name;
-    Matcher m = ANONYMOUS_CLASS.matcher(tag);
-    if (m.find()) {
-      tag = m.replaceAll("");
-    }
-    tag = tag.substring(tag.lastIndexOf('.') + 1);
-    return tag.length() > MAX_TAG_LENGTH ? tag.substring(0, MAX_TAG_LENGTH) : tag;
   }
 
   @Override public boolean isLoggable(final @NotNull LogLevel level, final @Nullable Marker marker, final @Nullable Throwable throwable) {
@@ -116,7 +101,8 @@ public class AndroidLogger extends BaseLogger {
     return null;
   }
 
-  protected int levelToAndroidLevel(@NotNull final LogLevel level) {
+  @SuppressWarnings("Duplicates")  // same as ealvalog-jdk-android, but don't want to factor out a lib with only this
+  private static int levelToAndroidLevel(@NotNull final LogLevel level) {
     switch (level) {
       case TRACE:
         return Log.VERBOSE;

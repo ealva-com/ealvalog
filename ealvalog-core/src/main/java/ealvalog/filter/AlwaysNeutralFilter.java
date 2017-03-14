@@ -16,17 +16,24 @@
  * limitations under the License.
  */
 
-package ealvalog;
+package ealvalog.filter;
 
+import ealvalog.FilterResult;
+import ealvalog.LogLevel;
+import ealvalog.Logger;
+import ealvalog.LoggerFilter;
+import ealvalog.Marker;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import static ealvalog.FilterResult.NEUTRAL;
+
 /**
  * A filter that always responds true. Helps avoid null.
- *
+ * <p>
  * Created by Eric A. Snell on 3/8/17.
  */
-public enum AlwaysYesFilter implements LoggerFilter {
+public enum AlwaysNeutralFilter implements LoggerFilter {
   INSTANCE;
 
   /**
@@ -34,27 +41,22 @@ public enum AlwaysYesFilter implements LoggerFilter {
    *
    * @param filter optional filter
    *
-   * @return the filter parameter if not null, else {@link AlwaysYesFilter#INSTANCE}
+   * @return the filter parameter if not null, else {@link AlwaysNeutralFilter#INSTANCE}
    */
-  public static @NotNull LoggerFilter nullToAlwaysYes(final @Nullable LoggerFilter filter) {
+  public static @NotNull LoggerFilter nullToAlwaysNeutral(final @Nullable LoggerFilter filter) {
     return filter == null ? INSTANCE : filter;
   }
 
-  /**
-   * {@inheritDoc}
 
-   * @return always true
-   */
-  @Override public boolean isLoggable(@NotNull final LogLevel level) {
-    return true;
+  @Override public FilterResult isLoggable(@NotNull final Logger logger, @NotNull final LogLevel level) {
+    return NEUTRAL;
   }
 
-  /**
-   * {@inheritDoc}
-   * @return always returns true
-   */
-  @Override public boolean isLoggable(final @NotNull LogLevel level, final @Nullable Marker marker, final @Nullable Throwable throwable) {
-    return true;
+  @Override
+  public FilterResult isLoggable(@NotNull final Logger logger,
+                                 @NotNull final LogLevel level,
+                                 @NotNull final Marker marker,
+                                 @NotNull final Throwable throwable) {
+    return NEUTRAL;
   }
-
 }

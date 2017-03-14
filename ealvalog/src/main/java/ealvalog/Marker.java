@@ -32,21 +32,21 @@ import java.util.Iterator;
 public interface Marker extends Serializable, Iterable<Marker> {
   @NotNull String getName();
 
-  boolean addChild(@NotNull Marker child);
+  boolean add(@NotNull Marker marker);
 
-  boolean removeChild(@NotNull Marker child);
+  boolean remove(@NotNull Marker marker);
 
   /**
    * @param marker determine if this is a child
    * @return true if this instance is {@code marker} or this instance has {@code marker} as a child
    */
-  boolean contains(@NotNull Marker marker);
+  boolean isOrContains(@NotNull Marker marker);
 
   /**
    * @param markerName see if there is a child with this name
    * @return true if this instance is named {@code markerName} or this instance has a child named {@code markName}
    */
-  boolean contains(@NotNull String markerName);
+  boolean isOrContains(@NotNull String markerName);
 
   /**
    * @return an iterator over child markers

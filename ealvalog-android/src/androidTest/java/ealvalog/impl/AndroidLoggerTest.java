@@ -18,87 +18,94 @@
 
 package ealvalog.impl;
 
-
 import ealvalog.LogLevel;
 import ealvalog.Logger;
+import ealvalog.Loggers;
 import ealvalog.Marker;
-import ealvalog.TheLoggerFactory;
 import ealvalog.util.LogMessageFormatter;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.ArgumentMatchers.same;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.when;
 
 import android.support.test.runner.AndroidJUnit4;
+import android.util.Log;
 
-
-/**
- * Instrumentation test, which will execute on an Android device.
- *
- * @see <a href="http://d.android.com/tools/testing">Testing documentation</a>
- */
-@RunWith(AndroidJUnit4.class)
+@SuppressWarnings("deprecation") @RunWith(AndroidJUnit4.class)
 public class AndroidLoggerTest {
-  private MockLogHandler handler;
+  private static final String TAG = "AndroidLoggerTest";
+  @SuppressWarnings("WeakerAccess") @Mock LogHandler mockHandler;
 
   @Before
   public void setup() {
-    handler = new MockLogHandler();
-    AndroidLogger.setHandler(handler);
-    TheLoggerFactory.setFactory(new AndroidLoggerFactory());
+    MockitoAnnotations.initMocks(this);
+    AndroidLogger.setHandler(mockHandler);
+    Loggers.setFactory(new AndroidLoggerFactory());
   }
 
   @Test
-  public void testDebugHandler() {
-    final Logger logger = TheLoggerFactory.get();
-    logger.log(LogLevel.CRITICAL, "The msg");
-    assertThat(handler.prepareLogInvoked, is(true));
-    assertThat(handler.prepareLogCallerLocation.getClassName(), is(equalTo(AndroidLoggerTest.class.getName())));
+  public void testPrintLog() {
+    when(mockHandler.isLoggable(TAG, Log.ASSERT)).thenReturn(true);
+
+    //given
+    final Logger logger = Loggers.get();
+    final String msg = "The msg";
+    logger.log(LogLevel.CRITICAL, msg);
+
+    then(mockHandler).should(atLeastOnce()).prepareLog(eq("AndroidLoggerTest"),
+                                                       same(Log.ASSERT),
+                                                       isNull(Marker.class),
+                                                       isNull(Throwable.class),
+                                                       isNull(StackTraceElement.class),
+                                                       any(LogMessageFormatter.class),
+                                                       eq(msg));
   }
 
-  @SuppressWarnings("WeakerAccess")
-  public static final class MockLogHandler implements LogHandler {
+  @Test
+  public void testPrintLogHandlerWantsLocation() {
+    when(mockHandler.shouldIncludeLocation(TAG, Log.ASSERT, null, null)).thenReturn(true);
+    when(mockHandler.isLoggable(TAG, Log.ASSERT)).thenReturn(true);
 
-    public boolean isLoggableInvoked = false;
-    public String isLoggableTag = null;
-    public int isLoggableLevel = 0;
-    public boolean isLoggableReturn = true;
-    @Override public boolean isLoggable(@NotNull final String tag, final int level) {
-      isLoggableInvoked = true;
-      isLoggableTag = tag;
-      isLoggableLevel = level;
-      return isLoggableReturn;
-    }
+    //given
+    final Logger logger = Loggers.get();
+    final String msg = "The msg";
+    logger.log(LogLevel.CRITICAL, msg);
 
-    public boolean shouldIncludeLocationInvoked = false;
-    public boolean shouldIncludeLocatoinReturn = true;
-    @Override
-    public boolean shouldIncludeLocation(@NotNull final String tag,
-                                         final int level,
-                                         @Nullable final Marker marker,
-                                         @Nullable final Throwable throwable) {
-      shouldIncludeLocationInvoked = true;
-      return shouldIncludeLocatoinReturn;
-    }
-
-    public boolean prepareLogInvoked = false;
-    public StackTraceElement prepareLogCallerLocation = null;
-    @Override
-    public void prepareLog(final String tag,
-                           final int level,
-                           @Nullable final Marker marker,
-                           @Nullable final Throwable throwable,
-                           @Nullable final StackTraceElement callerLocation,
-                           @NotNull final LogMessageFormatter formatter,
-                           @NotNull final String msg,
-                           @NotNull final Object... formatArgs) {
-      prepareLogInvoked = true;
-      prepareLogCallerLocation = callerLocation;
-    }
+    then(mockHandler).should(atLeastOnce()).prepareLog(eq("AndroidLoggerTest"),
+                                                       same(Log.ASSERT),
+                                                       isNull(Marker.class),
+                                                       isNull(Throwable.class),
+                                                       any(StackTraceElement.class),
+                                                       any(LogMessageFormatter.class),
+                                                       eq(msg));
   }
+
+  @Test
+  public void testPrintLogSetIncludeLocation() {
+    when(mockHandler.isLoggable(TAG, Log.ASSERT)).thenReturn(true);
+
+    //given
+    final Logger logger = Loggers.get();
+    logger.setIncludeLocation(true);
+    final String msg = "The msg";
+    logger.log(LogLevel.CRITICAL, msg);
+
+    then(mockHandler).should(atLeastOnce()).prepareLog(eq("AndroidLoggerTest"),
+                                                       same(Log.ASSERT),
+                                                       isNull(Marker.class),
+                                                       isNull(Throwable.class),
+                                                       any(StackTraceElement.class),
+                                                       any(LogMessageFormatter.class),
+                                                       eq(msg));
+  }
+
 }

@@ -24,12 +24,12 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Formatter;
 
 /**
- * It's expected all logging occurs through concrete implementations of this interface which are obtained via {@link TheLoggerFactory}
+ * It's expected all logging occurs through concrete implementations of this interface which are obtained via {@link Loggers}
  * <p>
  * Created by Eric A. Snell on 2/28/17.
  */
 @SuppressWarnings({"unused", "SameParameterValue"})
-public interface Logger extends LoggerFilter {
+public interface Logger {
   /** Used when there are no formatArgs. Expected only use by eAlvaLog framework */
   Object[] NO_ARGUMENTS = new Object[0];
 
@@ -67,23 +67,100 @@ public interface Logger extends LoggerFilter {
    */
   boolean getIncludeLocation();
 
+  /**
+   * Determine if a log call at this {@link LogLevel} will result in an actual log statement. Typically this is only a level check, unless
+   * the Logger instance contains a {@link Marker}. In that case the contained Marker is also checked to promote fast short-circuiting
+   *
+   * @param level the level to test, one of {@link LogLevel#TRACE}, {@link LogLevel#DEBUG}, {@link LogLevel#INFO}, {@link LogLevel#WARN},
+   *              {@link LogLevel#ERROR}, {@link LogLevel#CRITICAL}
+   *
+   * @return true if a log statement will be produced at this level
+   */
+  boolean isLoggable(@NotNull LogLevel level);
+
+  /**
+   * Will a log at this {@link LogLevel}, with the given (optional) {@link Marker} and (optional) {@link Throwable}, result in an actual log
+   * statement
+   *
+   * @param level     the level to test, one of {@link LogLevel#TRACE}, {@link LogLevel#DEBUG}, {@link LogLevel#INFO}, {@link
+   *                  LogLevel#WARN}, {@link LogLevel#ERROR}, {@link LogLevel#CRITICAL}
+   * @param marker    optional marker to test
+   * @param throwable optional throwable to test
+   *
+   * @return true if a log statement will be produced at this level
+   */
+  boolean isLoggable(@NotNull LogLevel level, @Nullable Marker marker, @Nullable Throwable throwable);
+
+  /**
+   * If isLoggable, log at the {@code msg} at {@code level}
+   *
+   * @param level log level to use
+   * @param msg   log msg which is unaltered
+   */
   void log(@NotNull LogLevel level, @NotNull String msg);
 
+  /**
+   * If isLoggable, log at the {@code msg} at {@code level} using the {@code marker}
+   *
+   * @param level  log level to use
+   * @param marker marker to include
+   * @param msg    log msg which is unaltered
+   */
   void log(@NotNull LogLevel level, @NotNull Marker marker, @NotNull String msg);
 
+  /**
+   * If isLoggable, log at the {@code msg} at {@code level} with the given {@code throwable}
+   *
+   * @param level     log level to use
+   * @param throwable throwable to include
+   * @param msg       log msg which is unaltered
+   */
   void log(@NotNull LogLevel level, @NotNull Throwable throwable, @NotNull String msg);
 
+  /**
+   * If isLoggable, log at the {@code msg} at {@code level} using the {@code marker} and {@code throwable}
+   *
+   * @param level     log level to use
+   * @param marker    marker to include
+   * @param throwable throwable to include
+   * @param msg       log msg which is unaltered
+   */
   void log(@NotNull LogLevel level, @NotNull Marker marker, @NotNull Throwable throwable, @NotNull String msg);
 
+  /**
+   * If isLoggable, log at the {@code msg} at {@code level} using the {@code marker}
+   *
+   * @param level      log level to use
+   * @param marker     marker to include
+   * @param format     a format string in the form required by {@link Formatter}
+   * @param formatArgs arguments passed to {@link Formatter#format(String, Object...)}
+   */
   void log(@NotNull LogLevel level, @NotNull Marker marker, @NotNull String format, @NotNull Object... formatArgs);
 
+  /**
+   * If isLoggable, log at the {@code msg} at {@code level} using the {@code throwable}
+   *
+   * @param level      log level to use
+   * @param throwable  throwable to include
+   * @param format     a format string in the form required by {@link Formatter}
+   * @param formatArgs arguments passed to {@link Formatter#format(String, Object...)}
+   */
   void log(@NotNull LogLevel level, @NotNull Throwable throwable, @NotNull String format, @NotNull Object... formatArgs);
 
+  /**
+   * If isLoggable, log at the {@code msg} at {@code level} using the {@code marker} and {@code throwable}
+   *
+   * @param level      log level to use
+   * @param marker     marker to include
+   * @param throwable  throwable to include
+   * @param format     a format string in the form required by {@link Formatter}
+   * @param formatArgs arguments passed to {@link Formatter#format(String, Object...)}
+   */
   void log(@NotNull LogLevel level,
            @NotNull Marker marker,
            @NotNull Throwable throwable,
            @NotNull String format,
-           @NotNull Object... arg);
+           @NotNull Object... formatArgs);
 
   void log(@NotNull LogLevel level, @NotNull String format, @NotNull Object arg1);
 

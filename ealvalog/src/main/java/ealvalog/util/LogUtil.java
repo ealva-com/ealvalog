@@ -28,7 +28,28 @@ import java.util.Iterator;
  * Created by Eric A. Snell on 3/1/17.
  */
 public final class LogUtil {
-  private LogUtil() {
+  private static final int MAX_TAG_LENGTH = 23;
+
+  /**
+   * For Android, convert a class name to an acceptable Android Log tag, removing any inner class suffixes
+   *
+   * @param className class name
+   *
+   * @return a name acceptable in length for Android Log
+   */
+  public static @NotNull String tagFromName(final String className) {
+    String tag = className.substring(className.lastIndexOf('.') + 1);
+    tag = stripInnerClassesFromName(tag);
+    return tag.length() > MAX_TAG_LENGTH ? tag.substring(0, MAX_TAG_LENGTH) : tag;
+  }
+
+  /** Visible for test */
+  static @NotNull String stripInnerClassesFromName(String className) {
+    final int lastIndexOf = className.indexOf('$');
+    if (lastIndexOf > 0) {
+      className = className.substring(0, lastIndexOf);
+    }
+    return className;
   }
 
   /**
@@ -97,14 +118,27 @@ public final class LogUtil {
     return stackTrace[currentStackDepthFromCallSite + 1];
   }
 
+  public static String getCallerClassName(final int currentStackDepthFromCallSite) {
+    return getCallerLocation(currentStackDepthFromCallSite + 1).getClassName();
+  }
+
+  public static String getCallerClassNameStripInner(final int currentStackDepthFromCallSite) {
+    return stripInnerClassesFromName(getCallerLocation(currentStackDepthFromCallSite + 1).getClassName());
+  }
+
   /**
    * Early Android doesn't provide Collections.emptyIterator(), so we will.
+   *
    * @param <T> type to iterate over
+   *
    * @return an Iterator over type T which is empty
    */
   public static <T> Iterator<T> emptyIterator() {
     //noinspection unchecked
     return (Iterator<T>)EmptyIterator.EMPTY_ITERATOR;
+  }
+
+  private LogUtil() {
   }
 
 }

@@ -16,7 +16,22 @@
  * limitations under the License.
  */
 
-include ':ealvalog', ':ealvalog-core', ':ealvalog-jdk', ':ealvalog-android', ':ealvalog-jdk-android'
+package ealvalog.util;
 
-rootProject.name = 'ealvalog-parent'
+import org.jetbrains.annotations.Nullable;
 
+/**
+ * Place holder throwable
+ * <p>
+ * Created by Eric A. Snell on 3/13/17.
+ */
+public final class NullThrowable extends Throwable {
+  public static final Throwable INSTANCE = new NullThrowable();
+
+  public static Throwable nullToNullInstance(final @Nullable Throwable throwable) {
+    return throwable == null ? INSTANCE : throwable;
+  }
+
+  private NullThrowable(){}
+
+}

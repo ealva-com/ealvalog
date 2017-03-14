@@ -129,7 +129,7 @@ public class JdkLoggerFactory implements LoggerFactory, JdkLoggerConfiguration {
   }
 
 
-  @Override public void addLoggerHandler(final @NotNull Logger logger, final @NotNull LoggerHandler loggerHandler) {
+  @Override public void addLoggerHandler(final @NotNull Logger logger, final @NotNull BaseLoggerHandler loggerHandler) {
     bridgeTreeLock.lock();
     try {
       final String loggerName = logger.getName();

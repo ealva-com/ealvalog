@@ -20,10 +20,13 @@ package ealvalog.core;
 
 import ealvalog.LogLevel;
 import ealvalog.Marker;
+import ealvalog.MarkerFactory;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
@@ -46,12 +49,14 @@ public class BaseLoggerTest {
   private Marker loggerMarker;
   private LoggerImpl loggerWithMarker;
   private Throwable theThrowable;
+  @SuppressWarnings("WeakerAccess") @Mock MarkerFactory markerFactory;
 
   @Before
   public void setup() {
+    MockitoAnnotations.initMocks(this);
     logger = new LoggerImpl();
-    markerParameter = new ealvalog.core.MarkerImpl("Marker");
-    loggerMarker = new MarkerImpl("Marker");
+    markerParameter = new MarkerImpl("Marker", markerFactory);
+    loggerMarker = new MarkerImpl("Marker", markerFactory);
     loggerWithMarker = new LoggerImpl(loggerMarker);
     theThrowable = new Throwable();
   }

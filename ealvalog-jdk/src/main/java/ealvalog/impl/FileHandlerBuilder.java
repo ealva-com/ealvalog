@@ -18,7 +18,7 @@
 
 package ealvalog.impl;
 
-import ealvalog.AlwaysYesFilter;
+import ealvalog.filter.AlwaysNeutralFilter;
 import ealvalog.LoggerFilter;
 import org.jetbrains.annotations.NotNull;
 
@@ -48,7 +48,7 @@ public final class FileHandlerBuilder {
     append = false;
     formatterPattern = ExtRecordFormatter.TYPICAL_FORMAT;
     formatterLogErrors = true;
-    filter = AlwaysYesFilter.INSTANCE;
+    filter = AlwaysNeutralFilter.INSTANCE;
     errorManager = new ErrorManager();
   }
 
@@ -94,13 +94,13 @@ public final class FileHandlerBuilder {
   }
 
   @SuppressWarnings("WeakerAccess")
-  public LoggerHandler build() throws IOException, IllegalStateException {
+  public HandlerWrapper build() throws IOException, IllegalStateException {
     if (pattern == null) {
       throw new IllegalStateException("File name pattern required");
     }
     final FileHandler fileHandler = new FileHandler(pattern, limit, count, append);
     fileHandler.setErrorManager(errorManager);
     fileHandler.setFormatter(new ExtRecordFormatter(formatterPattern, formatterLogErrors));
-    return new LoggerHandler(fileHandler, filter);
+    return new HandlerWrapper(fileHandler, filter);
   }
 }

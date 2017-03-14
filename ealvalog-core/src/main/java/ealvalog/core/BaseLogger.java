@@ -59,7 +59,7 @@ public abstract class BaseLogger implements Logger {
   }
 
   @Override public boolean isLoggable(@NotNull final LogLevel level) {
-    return isLoggable(level, null, null);
+    return isLoggable(level, marker, null);
   }
 
   @Override public void log(@NotNull final LogLevel level, @NotNull final String msg) {

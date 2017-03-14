@@ -18,9 +18,13 @@
 
 package ealvalog.impl;
 
+import ealvalog.FilterResult;
+import ealvalog.LogLevel;
 import ealvalog.LoggerFilter;
 import ealvalog.Marker;
+import ealvalog.NullMarker;
 import ealvalog.core.CoreLogger;
+import ealvalog.util.NullThrowable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -37,6 +41,13 @@ public class JdkLogger extends CoreLogger<JdkBridge> {
     super(name, config.getBridge(name), marker);
     setIncludeLocation(includeLocation);
     this.config = config;
+  }
+
+  @Override public boolean isLoggable(final @NotNull LogLevel level, @Nullable final Marker marker, @Nullable final Throwable throwable) {
+    return getBridge().isLoggable(this,
+                                  level,
+                                  NullMarker.nullToNullInstance(marker),
+                                  NullThrowable.nullToNullInstance(throwable)) != FilterResult.DENY;
   }
 
   protected @NotNull JdkBridge getBridge() {

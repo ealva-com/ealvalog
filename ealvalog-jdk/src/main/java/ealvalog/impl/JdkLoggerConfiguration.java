@@ -29,7 +29,7 @@ import org.jetbrains.annotations.NotNull;
 interface JdkLoggerConfiguration {
   void setLoggerFilter(@NotNull Logger logger, @NotNull LoggerFilter filter);
 
-  void addLoggerHandler(@NotNull Logger logger, @NotNull LoggerHandler loggerHandler);
+  void addLoggerHandler(@NotNull Logger logger, @NotNull BaseLoggerHandler loggerHandler);
 
   JdkBridge getBridge(String loggerClassName);
 }

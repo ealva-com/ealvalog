@@ -40,7 +40,7 @@ public class MarkerFactoryImpl implements MarkerFactory {
   @NotNull public Marker get(@NotNull final String name) {
     Marker marker = nameMarkerMap.get(name);
     if (marker == null) {
-      marker = new MarkerImpl(name);
+      marker = new MarkerImpl(name, this);
       Marker oldMarker = nameMarkerMap.putIfAbsent(name, marker);
       if (oldMarker != null) {
         marker = oldMarker;
@@ -58,6 +58,6 @@ public class MarkerFactoryImpl implements MarkerFactory {
   }
 
   @NotNull public Marker makeOrphan(@NotNull final String name) {
-    return new MarkerImpl(name);
+    return new MarkerImpl(name, this);
   }
 }

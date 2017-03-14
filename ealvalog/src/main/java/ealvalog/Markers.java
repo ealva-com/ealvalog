@@ -30,10 +30,10 @@ import org.jetbrains.annotations.NotNull;
  * Created by Eric A. Snell on 2/28/17.
  */
 @SuppressWarnings("unused")
-public final class TheMarkerFactory {
+public final class Markers {
   private static MarkerFactory markerFactory = NullMarkerFactory.INSTANCE;
 
-  private TheMarkerFactory() {
+  private Markers() {
   }
 
   public static Marker get(@NotNull final String name) {

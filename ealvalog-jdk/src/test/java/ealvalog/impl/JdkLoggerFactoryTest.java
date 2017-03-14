@@ -18,14 +18,11 @@
 
 package ealvalog.impl;
 
-import ealvalog.LogLevel;
 import ealvalog.Logger;
 import ealvalog.LoggerFactory;
 import ealvalog.LoggerFilter;
-import ealvalog.Marker;
-import ealvalog.TheLoggerFactory;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import ealvalog.Loggers;
+import ealvalog.filter.AlwaysAcceptFilter;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -49,17 +46,17 @@ public class JdkLoggerFactoryTest {
     final JdkLoggerFactory loggerFactory = JdkLoggerFactory.instance();
     theRootLogger = JdkLoggerFactory.instance().get(LoggerFactory.ROOT_LOGGER_NAME);
     theRootBridge = theRootLogger.getBridge();
-    TheLoggerFactory.setFactory(loggerFactory);
+    Loggers.setFactory(loggerFactory);
   }
 
   @Test
   public void testGetRootLogger() {
-    final Logger rootByName = TheLoggerFactory.get("");
+    final Logger rootByName = Loggers.get("");
     assertThat(rootByName, is(notNullValue()));
     assertThat(theRootLogger, is(rootByName));
     assertThat(theRootLogger.getBridge(), is(theRootBridge));
 
-    final Logger root = TheLoggerFactory.getRoot();
+    final Logger root = Loggers.getRoot();
     assertThat(root, is(notNullValue()));
 
     assertThat(root, is(rootByName));
@@ -86,7 +83,7 @@ public class JdkLoggerFactoryTest {
 
   @Test
   public void testBridgeIsRoot() {
-    final Logger logger = TheLoggerFactory.get();
+    final Logger logger = Loggers.get();
 
     final JdkLogger jdkLogger = JdkLoggerFactory.instance().get(this.getClass().getName());
     assertThat(jdkLogger, is(logger));
@@ -97,7 +94,7 @@ public class JdkLoggerFactoryTest {
 
   @Test
   public void testSetFilter() {
-    final Logger logger = TheLoggerFactory.get();
+    final Logger logger = Loggers.get();
 
     final JdkLogger jdkLogger = JdkLoggerFactory.instance().get(this.getClass().getName());
     assertThat(jdkLogger, is(logger));
@@ -105,16 +102,7 @@ public class JdkLoggerFactoryTest {
     JdkBridge bridge = jdkLogger.getBridge();
     assertThat(bridge, is(theRootBridge));  // no filter set so will be the root
 
-    LoggerFilter dummy = new LoggerFilter() {
-      @Override public boolean isLoggable(@NotNull final LogLevel level) {
-        return true;
-      }
-
-      @Override
-      public boolean isLoggable(@NotNull final LogLevel level, @Nullable final Marker marker, @Nullable final Throwable throwable) {
-        return true;
-      }
-    };
+    LoggerFilter dummy = AlwaysAcceptFilter.INSTANCE;
     jdkLogger.setFilter(dummy);
 
     bridge = jdkLogger.getBridge();
@@ -132,16 +120,7 @@ public class JdkLoggerFactoryTest {
     JdkBridge bridge = jdkLogger.getBridge();
     assertThat(bridge, is(theRootBridge));  // no filter set so will be the root
 
-    LoggerFilter dummy = new LoggerFilter() {
-      @Override public boolean isLoggable(@NotNull final LogLevel level) {
-        return true;
-      }
-
-      @Override
-      public boolean isLoggable(@NotNull final LogLevel level, @Nullable final Marker marker, @Nullable final Throwable throwable) {
-        return true;
-      }
-    };
+    LoggerFilter dummy = AlwaysAcceptFilter.INSTANCE;
     jdkLogger.setFilter(dummy);
     bridge = jdkLogger.getBridge();
     assertThat(bridge, is(not(theRootBridge)));  // should have a new bridge

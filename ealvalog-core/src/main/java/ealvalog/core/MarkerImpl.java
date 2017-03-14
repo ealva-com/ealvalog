@@ -19,6 +19,7 @@
 package ealvalog.core;
 
 import ealvalog.Marker;
+import ealvalog.MarkerFactory;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -33,55 +34,48 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * <p>
  * Created by Eric A. Snell on 2/28/17.
  */
-@SuppressWarnings("WeakerAccess")
 public class MarkerImpl implements Marker {
   private static final long serialVersionUID = 445780917635303838L;
 
   private static final char OPEN = '[';
   private static final char SEPARATOR = ',';
   private static final char CLOSE = ']';
-  private String name;
-  private List<Marker> children;
+  private @NotNull String name;
+  private @NotNull final MarkerFactory markerFactory;
+  private @NotNull List<Marker> containedMarkers;
 
-  public MarkerImpl(@NotNull final String name) {
+  public MarkerImpl(final @NotNull String name, final @NotNull MarkerFactory markerFactory) {
     this.name = name;
-    children = new CopyOnWriteArrayList<>();
+    this.markerFactory = markerFactory;
+    containedMarkers = new CopyOnWriteArrayList<>();
   }
 
   @NotNull public String getName() {
     return name;
   }
 
-  public boolean addChild(@NotNull final Marker child) {
-    return children.add(child);
+  public boolean add(@NotNull final Marker marker) {
+    return containedMarkers.add(marker);
   }
 
-  public boolean removeChild(@NotNull final Marker child) {
-    return children.remove(child);
+  public boolean remove(@NotNull final Marker marker) {
+    return containedMarkers.remove(marker);
   }
 
-  public boolean contains(@NotNull final Marker marker) {
-    return this.equals(marker) || children.contains(marker);
+  public boolean isOrContains(@NotNull final Marker marker) {
+    return this.equals(marker) || containedMarkers.contains(marker);
   }
 
-  public boolean contains(@NotNull final String markerName) {
-    if (this.name.equals(markerName)) {
-      return true;
-    }
-    for (Marker marker : children) {
-      if (marker.contains(markerName)) {
-        return true;
-      }
-    }
-    return false;
+  public boolean isOrContains(@NotNull final String markerName) {
+    return isOrContains(markerFactory.get(markerName));
   }
 
   public Iterator<Marker> iterator() {
-    return children.iterator();
+    return containedMarkers.iterator();
   }
 
   @Override public String toString() {
-    if (children.isEmpty()) {
+    if (containedMarkers.isEmpty()) {
       return name;
     }
     return toStringBuilder(new StringBuilder()).toString();
@@ -89,16 +83,16 @@ public class MarkerImpl implements Marker {
 
   @Override public @NotNull StringBuilder toStringBuilder(@NotNull final StringBuilder builder) {
     // subclasses would typically invoke super.toStringBuilder(builder) first
-    if (children.isEmpty()) {
+    if (containedMarkers.isEmpty()) {
       return builder.append(name);
     }
 
     builder.append(name).append(OPEN);
-    for (int i = 0, size = children.size(); i < size; i++) {
+    for (int i = 0, size = containedMarkers.size(); i < size; i++) {
       if (i != 0) {
         builder.append(SEPARATOR);
       }
-      children.get(i).toStringBuilder(builder);
+      containedMarkers.get(i).toStringBuilder(builder);
     }
     builder.append(CLOSE);
     return builder;
@@ -108,13 +102,29 @@ public class MarkerImpl implements Marker {
     in.defaultReadObject();
     name = in.readUTF();
     //noinspection unchecked
-    children = (List<Marker>)in.readObject();
+    containedMarkers = (List<Marker>)in.readObject();
   }
 
   private void writeObject(ObjectOutputStream out) throws IOException {
     out.defaultWriteObject();
     out.writeUTF(name);
-    out.writeObject(children);
+    out.writeObject(containedMarkers);
   }
 
+  /**
+   * @param o other marker
+   * @return true if the same instance or the names are equal
+   */
+  @Override public boolean equals(final Object o) {
+    if (this == o) { return true; }
+    if (o == null || getClass() != o.getClass()) { return false; }
+
+    final MarkerImpl markers = (MarkerImpl)o;
+
+    return name.equals(markers.name);
+  }
+
+  @Override public int hashCode() {
+    return name.hashCode();
+  }
 }

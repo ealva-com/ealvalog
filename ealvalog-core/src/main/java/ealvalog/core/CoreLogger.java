@@ -41,10 +41,15 @@ public abstract class CoreLogger<T extends Bridge> extends BaseLogger {
   protected CoreLogger(final @NotNull String name, final @NotNull T bridge, @Nullable final Marker marker) {
     super(name, marker);
     this.bridge = bridge;
+    this.bridge.setLogToParent(true);
   }
 
-  @Override public boolean isLoggable(final @NotNull LogLevel level, @Nullable final Marker marker, @Nullable final Throwable throwable) {
-    return bridge.isLoggable(level, marker, throwable);
+  public void setLogToParent(final boolean logToParent) {
+    bridge.setLogToParent(logToParent);
+  }
+
+  public boolean shouldLogToParent() {
+    return bridge.shouldLogToParent();
   }
 
   @Override

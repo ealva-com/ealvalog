@@ -18,7 +18,7 @@
 
 package ealvalog.impl;
 
-import ealvalog.AlwaysYesFilter;
+import ealvalog.filter.AlwaysNeutralFilter;
 import ealvalog.LoggerFilter;
 import org.jetbrains.annotations.NotNull;
 
@@ -41,7 +41,7 @@ public final class ConsoleHandlerBuilder {
   ConsoleHandlerBuilder() {
     formatterPattern = ExtRecordFormatter.TYPICAL_FORMAT;
     formatterLogErrors = true;
-    filter = AlwaysYesFilter.INSTANCE;
+    filter = AlwaysNeutralFilter.INSTANCE;
     errorManager = new ErrorManager();
   }
 
@@ -65,10 +65,10 @@ public final class ConsoleHandlerBuilder {
     return this;
   }
 
-  public LoggerHandler build() throws IOException, IllegalStateException {
+  public HandlerWrapper build() throws IOException, IllegalStateException {
     final ConsoleHandler confileHandler = new ConsoleHandler();
     confileHandler.setErrorManager(errorManager);
     confileHandler.setFormatter(new ExtRecordFormatter(formatterPattern, formatterLogErrors));
-    return new LoggerHandler(confileHandler, filter);
+    return new HandlerWrapper(confileHandler, filter);
   }
 }

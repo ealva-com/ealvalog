@@ -19,11 +19,14 @@
 package ealvalog.impl;
 
 import ealvalog.LogLevel;
-import ealvalog.util.LogUtil;
+import ealvalog.MarkerFactory;
 import ealvalog.core.MarkerImpl;
+import ealvalog.util.LogUtil;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -44,9 +47,11 @@ public class ExtRecordFormatterTest {
   private static final IllegalArgumentException THROWABLE = new IllegalArgumentException("Dummy");
   private static final String MESSAGE_ARG = "The Message";
   private ExtLogRecord record;
+  @SuppressWarnings("WeakerAccess") @Mock MarkerFactory markerFactory;
 
   @Before
   public void setup() {
+    MockitoAnnotations.initMocks(this);
     record = ExtLogRecord.get(LOG_LEVEL,
                               MESSAGE_FORMAT,
                               LOGGER_NAME,
@@ -184,7 +189,7 @@ public class ExtRecordFormatterTest {
   public void testMarker() {
     ExtRecordFormatter formatter = new ExtRecordFormatter("%11$s");
     final String markerName = "MarkerName";
-    final MarkerImpl marker = new MarkerImpl(markerName);
+    final MarkerImpl marker = new MarkerImpl(markerName, markerFactory);
     record.setMarker(marker);
     assertThat(formatter.format(record), is(equalTo(markerName)));
   }

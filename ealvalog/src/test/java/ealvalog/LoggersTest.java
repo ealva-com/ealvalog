@@ -28,6 +28,7 @@ import static org.hamcrest.core.Is.is;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.only;
 
 
 /**
@@ -36,26 +37,37 @@ import static org.mockito.Mockito.atLeastOnce;
  * Created by Eric A. Snell on 3/5/17.
  */
 @SuppressWarnings("WeakerAccess")
-public class TheLoggerFactoryTest {
+public class LoggersTest {
   @Mock LoggerFactory mockFactory;
   @Mock Logger mockLogger;
 
   @Before
   public void setup() {
     MockitoAnnotations.initMocks(this);
-    TheLoggerFactory.setFactory(mockFactory);
+    Loggers.setFactory(mockFactory);
   }
 
   @Test
   public void testUnspecifiedLoggerName() {
-    given(mockFactory.get(TheLoggerFactoryTest.class.getName())).willReturn(mockLogger);
+    given(mockFactory.get(LoggersTest.class.getName())).willReturn(mockLogger);
 
     // when
-    final Logger logger = TheLoggerFactory.get();
+    final Logger logger = Loggers.get();
 
-    then(mockFactory).should(atLeastOnce()).get(TheLoggerFactoryTest.class.getName());
+    then(mockFactory).should(only()).get(LoggersTest.class.getName());
     assertThat(logger, is(mockLogger));  // not really testing anything, but using that variable
   }
 
+  @Test
+  public void testConvenienceLog() {
+    given(mockFactory.get(LoggersTest.class.getName())).willReturn(mockLogger);
+
+    // when
+    final String msg = "The message";
+    Loggers.log(LogLevel.CRITICAL, msg);
+
+    then(mockFactory).should(only()).get(LoggersTest.class.getName());
+    then(mockLogger).should(only()).log(LogLevel.CRITICAL, msg);
+  }
 
 }
