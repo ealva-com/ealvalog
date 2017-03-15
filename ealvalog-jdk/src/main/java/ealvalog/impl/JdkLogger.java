@@ -43,6 +43,18 @@ public class JdkLogger extends CoreLogger<JdkBridge> {
     this.config = config;
   }
 
+  @Nullable @Override public LogLevel getLogLevel() {
+    return null;
+  }
+
+  @Override public void setLogLevel(@Nullable final LogLevel logLevel) {
+
+  }
+
+  @NotNull @Override public LogLevel getEffectLogLevel() {
+    return LogLevel.NONE;
+  }
+
   @Override public boolean isLoggable(final @NotNull LogLevel level, @Nullable final Marker marker, @Nullable final Throwable throwable) {
     return getBridge().isLoggable(this,
                                   level,
@@ -63,4 +75,11 @@ public class JdkLogger extends CoreLogger<JdkBridge> {
     config.setLoggerFilter(this, filter);
   }
 
+  public void addHandler(final @NotNull BaseLoggerHandler handler) {
+    config.addLoggerHandler(this, handler);
+  }
+
+  public void setLevel(final @NotNull LogLevel logLevel) {
+    getBridge().setLogLevel(logLevel);
+  }
 }

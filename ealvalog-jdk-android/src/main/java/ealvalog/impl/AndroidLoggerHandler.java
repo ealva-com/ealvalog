@@ -23,6 +23,7 @@ import ealvalog.LogLevel;
 import ealvalog.Logger;
 import ealvalog.LoggerFilter;
 import ealvalog.Marker;
+import ealvalog.util.Levels;
 import org.jetbrains.annotations.NotNull;
 
 import static ealvalog.FilterResult.DENY;
@@ -52,7 +53,7 @@ public class AndroidLoggerHandler extends BaseLoggerHandler {
                                  @NotNull final LogLevel level,
                                  @NotNull final Marker marker,
                                  @NotNull final Throwable throwable) {
-    if (isLoggable(tagFromName(logger.getName()), levelToAndroidLevel(level))) {
+    if (isLoggable(tagFromName(logger.getName()), Levels.toAndroidLevel(level))) {
       return getLoggerFilter().isLoggable(logger, level, marker, throwable);
     }
     return DENY;
@@ -64,7 +65,7 @@ public class AndroidLoggerHandler extends BaseLoggerHandler {
   }
 
   @Override public void publish(final LogRecord record) {
-    final int androidLevel = levelToAndroidLevel(LogLevel.fromLevel(record.getLevel()));
+    final int androidLevel = Levels.toAndroidLevel(LogLevel.fromLevel(record.getLevel()));
     final String tag = tagFromName(record.getLoggerName());
     if (isLoggable(tag, androidLevel)) {
       final String msg = getFormatter().format(record);
@@ -95,23 +96,4 @@ public class AndroidLoggerHandler extends BaseLoggerHandler {
 
   @Override public void close() {}
 
-  @SuppressWarnings("Duplicates") // same as in ealvalog-android, but we don't want a dependency or to factor out a lib with only this
-  private static int levelToAndroidLevel(@NotNull final LogLevel level) {
-    switch (level) {
-      case TRACE:
-        return Log.VERBOSE;
-      case DEBUG:
-        return Log.DEBUG;
-      case INFO:
-        return Log.INFO;
-      case WARN:
-        return Log.WARN;
-      case ERROR:
-        return Log.ERROR;
-      case CRITICAL:
-        return Log.ASSERT;
-      default:
-        throw new IllegalArgumentException("Illegal Level to map to Android");
-    }
-  }
 }

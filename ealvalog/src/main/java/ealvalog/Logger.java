@@ -48,6 +48,29 @@ public interface Logger {
   void setMarker(@Nullable Marker marker);
 
   /**
+   * Get the {@link LogLevel} for this Logger. If no LogLevel has been set, null is returned
+   *
+   * @return the current level or null
+   */
+  @Nullable LogLevel getLogLevel();
+
+  /**
+   * Set an optional LogLevel. If null the nearest ancestor LogLevel will be used as the level for this logger
+   *
+   * If null is passed to the root logger, it sets the level to {@link LogLevel#NONE}
+   *
+   * @param logLevel the new level for this logger or removed if null
+   */
+  void setLogLevel(@Nullable LogLevel logLevel);
+
+  /**
+   * Gets the level set for this logger or, if that it has not been set, get the nearest ancestor log level
+   *
+   * @return the log level at which this logger is operating
+   */
+  @NotNull LogLevel getEffectLogLevel();
+
+  /**
    * Set if this logger should include call site location information in the log information. This is a relatively expensive operation and
    * defaults to false.
    * <p>

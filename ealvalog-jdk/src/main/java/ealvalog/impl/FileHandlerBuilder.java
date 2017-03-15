@@ -94,13 +94,13 @@ public final class FileHandlerBuilder {
   }
 
   @SuppressWarnings("WeakerAccess")
-  public HandlerWrapper build() throws IOException, IllegalStateException {
+  public FileHandlerWrapper build() throws IOException, IllegalStateException {
     if (pattern == null) {
       throw new IllegalStateException("File name pattern required");
     }
     final FileHandler fileHandler = new FileHandler(pattern, limit, count, append);
     fileHandler.setErrorManager(errorManager);
     fileHandler.setFormatter(new ExtRecordFormatter(formatterPattern, formatterLogErrors));
-    return new HandlerWrapper(fileHandler, filter);
+    return new FileHandlerWrapper(fileHandler, filter);
   }
 }

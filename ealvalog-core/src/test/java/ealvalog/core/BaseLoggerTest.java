@@ -368,6 +368,18 @@ public class BaseLoggerTest {
       return name;
     }
 
+    @Nullable @Override public LogLevel getLogLevel() {
+      return null;
+    }
+
+    @Override public void setLogLevel(@Nullable final LogLevel logLevel) {
+
+    }
+
+    @NotNull @Override public LogLevel getEffectLogLevel() {
+      return LogLevel.NONE;
+    }
+
     @Override public void setIncludeLocation(final boolean includeLocation) {
       this.includeLocation = includeLocation;
     }

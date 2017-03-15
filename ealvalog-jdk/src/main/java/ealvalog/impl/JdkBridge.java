@@ -154,4 +154,8 @@ public class JdkBridge implements Bridge {
   void addLoggerHandler(final BaseLoggerHandler loggerHandler) {
     jdkLogger.addHandler(loggerHandler);
   }
+
+  void setLogLevel(final LogLevel logLevel) {
+    jdkLogger.setLevel(logLevel.getJdkLevel());
+  }
 }

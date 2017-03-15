@@ -30,14 +30,14 @@ import java.util.logging.Level;
  * Created by Eric A. Snell on 2/28/17.
  */
 public enum LogLevel {
-  ALL(java.util.logging.Level.ALL),
-  TRACE(java.util.logging.Level.FINEST),
-  DEBUG(java.util.logging.Level.FINE),
-  INFO(java.util.logging.Level.CONFIG),
-  WARN(java.util.logging.Level.INFO),
-  ERROR(java.util.logging.Level.WARNING),
-  CRITICAL(java.util.logging.Level.SEVERE),
-  NONE(java.util.logging.Level.OFF);
+  ALL(Integer.MIN_VALUE, java.util.logging.Level.ALL),
+  TRACE(1000, java.util.logging.Level.FINEST),
+  DEBUG(2000,java.util.logging.Level.FINE),
+  INFO(3000, java.util.logging.Level.CONFIG),
+  WARN(4000, java.util.logging.Level.INFO),
+  ERROR(5000, java.util.logging.Level.WARNING),
+  CRITICAL(6000, java.util.logging.Level.SEVERE),
+  NONE(Integer.MAX_VALUE, java.util.logging.Level.OFF);
 
   private static final Map<Level, LogLevel> levelToLogLevelMap;
   static {
@@ -53,13 +53,19 @@ public enum LogLevel {
     return logLevel == null ? NONE : logLevel;
   }
 
+  private final int value;
   private final Level level;
 
-  LogLevel(final Level level) {
+  LogLevel(final int value, final Level level) {
+    this.value = value;
     this.level = level;
   }
 
   public Level getJdkLevel() {
     return level;
+  }
+
+  public boolean isAtLeast(final @NotNull LogLevel level) {
+    return value >= level.value;
   }
 }
