@@ -18,6 +18,7 @@
 
 package ealvalog.impl;
 
+import ealvalog.LogLevel;
 import ealvalog.Logger;
 import ealvalog.LoggerFactory;
 import ealvalog.LoggerFilter;
@@ -75,22 +76,22 @@ public class JdkLoggerFactory implements LoggerFactory, JdkLoggerConfiguration {
   }
 
   @Override public @NotNull JdkLogger get(@NotNull final String name) {
-    return get(name, false, null);
+    return getJdkLogger(name, null, false);
   }
 
   @Override public @NotNull JdkLogger get(@NotNull final String name, final boolean includeLocation) {
-    return get(name, includeLocation, null);
+    return getJdkLogger(name, null, includeLocation);
   }
 
   @Override public @NotNull JdkLogger get(@NotNull final String name, @NotNull final Marker marker) {
-    return get(name, false, marker);
+    return getJdkLogger(name, marker, false);
   }
 
-  @NotNull @Override public Logger get(@NotNull final String name, @NotNull final Marker marker, final boolean includeLocation) {
-    return get(name, includeLocation, marker);
+  @NotNull @Override public JdkLogger get(@NotNull final String name, @NotNull final Marker marker, final boolean includeLocation) {
+    return getJdkLogger(name, marker, includeLocation);
   }
 
-  private @NotNull JdkLogger get(@NotNull final String name, final boolean includeLocation, final @Nullable Marker marker) {
+  private JdkLogger getJdkLogger(final @NotNull String name, final @Nullable Marker marker, final boolean includeLocation) {
     if (ROOT_LOGGER_NAME.equals(name)) {
       return jdkRootLogger;
     }
@@ -139,6 +140,26 @@ public class JdkLoggerFactory implements LoggerFactory, JdkLoggerConfiguration {
       } else {
         final JdkBridge newBridge = new JdkBridge(loggerName);
         newBridge.addLoggerHandler(loggerHandler);
+        newBridge.setParent(bridge);
+        bridgeMap.putIfAbsent(loggerName, newBridge);
+        setParents();
+        updateLoggers();
+      }
+    } finally {
+      bridgeTreeLock.unlock();
+    }
+  }
+
+  @Override public void setLogLevel(@NotNull final Logger logger, @NotNull final LogLevel logLevel) {
+    bridgeTreeLock.lock();
+    try {
+      final String loggerName = logger.getName();
+      final JdkBridge bridge = getBridge(loggerName);
+      if (bridge.getName().equals(loggerName)) {
+        bridge.setLogLevel(logLevel);
+      } else {
+        final JdkBridge newBridge = new JdkBridge(loggerName);
+        bridge.setLogLevel(logLevel);
         newBridge.setParent(bridge);
         bridgeMap.putIfAbsent(loggerName, newBridge);
         setParents();

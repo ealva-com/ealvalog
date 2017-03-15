@@ -131,7 +131,7 @@ public class ExtRecordFormatter extends Formatter {
   /** Of the form: "Sun 2017-03-05 14:33:15.098" */
   public static final String DAY_DATE_TIME_FORMAT = "%5$ta " + DATE_TIME_FORMAT;
 
-  public static final String TYPICAL_FORMAT = DATE_TIME_FORMAT + " %4$s [%10$s] %3$s - %1$s %6$#s";
+  public static final String TYPICAL_FORMAT = DATE_TIME_FORMAT + " %4$s [%10$s] %3$s - %1$s %6$#s%n";
 
   private static final ThreadLocal<ExtLogMessageFormatter> threadLocalFormatter =
       new ThreadLocal<ExtLogMessageFormatter>() {

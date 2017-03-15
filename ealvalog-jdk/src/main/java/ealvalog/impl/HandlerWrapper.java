@@ -43,10 +43,6 @@ import java.util.logging.LogRecord;
  */
 @SuppressWarnings("unused")
 public class HandlerWrapper extends BaseLoggerHandler {
-  public static ConsoleHandlerBuilder consoleBuilder() {
-    return new ConsoleHandlerBuilder();
-  }
-
   private final Handler realHandler;
 
   HandlerWrapper(final @NotNull Handler realHandler, final @NotNull LoggerFilter filter) {

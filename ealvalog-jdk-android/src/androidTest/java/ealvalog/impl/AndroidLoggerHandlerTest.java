@@ -49,7 +49,7 @@ public class AndroidLoggerHandlerTest {
   public void testIsLoggableNoFilter() throws Exception {
     when(logger.getName()).thenReturn(AndroidLoggerHandlerTest.class.getName());
 
-    AndroidLoggerHandler handler = new AndroidLoggerHandler();
+    AndroidLoggerHandler handler = AndroidLoggerHandler.builder().build();
     assertThat(handler.isLoggable(logger, CRITICAL, NullMarker.INSTANCE, NullThrowable.INSTANCE),
                is(FilterResult.NEUTRAL));
   }
@@ -58,7 +58,9 @@ public class AndroidLoggerHandlerTest {
   public void testIsLoggableAlwaysAcceptFilter() throws Exception {
     when(logger.getName()).thenReturn(AndroidLoggerHandlerTest.class.getName());
 
-    AndroidLoggerHandler handler = new AndroidLoggerHandler(AlwaysAcceptFilter.INSTANCE);
+    AndroidLoggerHandler handler = AndroidLoggerHandler.builder()
+                                                       .filter(AlwaysAcceptFilter.INSTANCE)
+                                                       .build();
     assertThat(handler.isLoggable(logger, CRITICAL, NullMarker.INSTANCE, NullThrowable.INSTANCE),
                is(FilterResult.ACCEPT));
   }

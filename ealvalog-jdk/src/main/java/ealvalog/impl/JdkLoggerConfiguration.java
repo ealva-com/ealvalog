@@ -18,6 +18,7 @@
 
 package ealvalog.impl;
 
+import ealvalog.LogLevel;
 import ealvalog.Logger;
 import ealvalog.LoggerFilter;
 import org.jetbrains.annotations.NotNull;
@@ -30,6 +31,8 @@ interface JdkLoggerConfiguration {
   void setLoggerFilter(@NotNull Logger logger, @NotNull LoggerFilter filter);
 
   void addLoggerHandler(@NotNull Logger logger, @NotNull BaseLoggerHandler loggerHandler);
+
+  void setLogLevel(@NotNull Logger logger, @NotNull LogLevel logLevel);
 
   JdkBridge getBridge(String loggerClassName);
 }

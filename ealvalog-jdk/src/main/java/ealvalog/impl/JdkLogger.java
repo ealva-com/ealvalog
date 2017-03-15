@@ -48,7 +48,7 @@ public class JdkLogger extends CoreLogger<JdkBridge> {
   }
 
   @Override public void setLogLevel(@Nullable final LogLevel logLevel) {
-
+    getBridge().setLogLevel(logLevel);
   }
 
   @NotNull @Override public LogLevel getEffectLogLevel() {
@@ -80,6 +80,6 @@ public class JdkLogger extends CoreLogger<JdkBridge> {
   }
 
   public void setLevel(final @NotNull LogLevel logLevel) {
-    getBridge().setLogLevel(logLevel);
+    config.setLogLevel(this, logLevel);
   }
 }

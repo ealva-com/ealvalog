@@ -23,6 +23,7 @@ import ealvalog.LogLevel;
 import ealvalog.Logger;
 import ealvalog.LoggerFilter;
 import ealvalog.Marker;
+import ealvalog.filter.AlwaysNeutralFilter;
 import ealvalog.util.Levels;
 import org.jetbrains.annotations.NotNull;
 
@@ -31,6 +32,8 @@ import static ealvalog.util.LogUtil.tagFromName;
 
 import android.util.Log;
 
+import java.util.logging.ErrorManager;
+import java.util.logging.Formatter;
 import java.util.logging.LogRecord;
 
 /**
@@ -39,13 +42,60 @@ import java.util.logging.LogRecord;
  * Created by Eric A. Snell on 3/10/17.
  */
 public class AndroidLoggerHandler extends BaseLoggerHandler {
+  public static final class Builder {
+    private @NotNull String formatterPattern;
+    private boolean formatterLogErrors;
+    private @NotNull LoggerFilter filter;
+    private @NotNull ErrorManager errorManager;
+
+    Builder() {
+      formatterPattern = ExtRecordFormatter.TYPICAL_FORMAT;
+      formatterLogErrors = true;
+      filter = AlwaysNeutralFilter.INSTANCE;
+      errorManager = new ErrorManager();
+    }
+
+    public Builder extRecordFormatterPattern(final @NotNull String pattern) {
+      this.formatterPattern = pattern;
+      return this;
+    }
+
+    public Builder formatterLogErrors(final boolean logErrors) {
+      this.formatterLogErrors = logErrors;
+      return this;
+    }
+
+    @SuppressWarnings("WeakerAccess")
+    public Builder filter(final @NotNull LoggerFilter filter) {
+      this.filter = filter;
+      return this;
+    }
+
+    public Builder errorManager(final @NotNull ErrorManager errorManager) {
+      this.errorManager = errorManager;
+      return this;
+    }
+
+    @SuppressWarnings("WeakerAccess")
+    public AndroidLoggerHandler build() throws IllegalStateException {
+      return new AndroidLoggerHandler(new ExtRecordFormatter(formatterPattern, formatterLogErrors),
+                                      filter,
+                                      errorManager);
+    }
+  }
 
   @SuppressWarnings("WeakerAccess")
-  public AndroidLoggerHandler() {}
+  public static Builder builder() {
+    return new Builder();
+  }
 
   @SuppressWarnings("WeakerAccess")
-  public AndroidLoggerHandler(@NotNull final LoggerFilter filter) {
+  protected AndroidLoggerHandler(final @NotNull Formatter formatter,
+                              final @NotNull LoggerFilter filter,
+                              final @NotNull ErrorManager errorManager) {
     super(filter);
+    setFormatter(formatter);
+    setErrorManager(errorManager);
   }
 
   @Override
