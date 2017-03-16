@@ -34,6 +34,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.startsWith;
 
 import java.util.IllegalFormatConversionException;
+import java.util.Locale;
 
 /**
  * Test LogRecord formatting
@@ -169,12 +170,26 @@ public class ExtRecordFormatterTest {
     assertThat(formatter.format(record), is(equalTo(methodName)));
   }
 
+  private static final String DECLARING_CLASS = "DeclaringClass";
+  private static final String METHOD_NAME = "MethodName";
+  private static final String FILE_NAME_JAVA = "FileName.java";
+  private static final int LINE_NUMBER = 100;
+
+  private static final String EXPECTED = String.format(Locale.getDefault(), "(%s:%d)", METHOD_NAME, LINE_NUMBER);
+  private static final String EXPECTED_ALT = String.format(Locale.getDefault(), "(%s.%s:%d)", DECLARING_CLASS, METHOD_NAME, LINE_NUMBER);
+
   @Test
-  public void testLineNumber() {
-    ExtRecordFormatter formatter = new ExtRecordFormatter("%9$d");
-    final int lineNumber = 101;
-    record.setLineNumber(lineNumber);
-    assertThat(formatter.format(record), is(equalTo(Integer.toString(lineNumber))));
+  public void testLocation() {
+    ExtRecordFormatter formatter = new ExtRecordFormatter("%9$s");
+    record.setLocation(new StackTraceElement(DECLARING_CLASS, METHOD_NAME, FILE_NAME_JAVA, LINE_NUMBER));
+    assertThat(formatter.format(record), is(equalTo(EXPECTED)));
+  }
+
+  @Test
+  public void testLocationAlt() {
+    ExtRecordFormatter formatter = new ExtRecordFormatter("%9$#s");
+    record.setLocation(new StackTraceElement(DECLARING_CLASS, METHOD_NAME, FILE_NAME_JAVA, LINE_NUMBER));
+    assertThat(formatter.format(record), is(equalTo(EXPECTED_ALT)));
   }
 
   @Test

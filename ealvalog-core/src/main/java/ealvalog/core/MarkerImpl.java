@@ -22,9 +22,14 @@ import ealvalog.Marker;
 import ealvalog.MarkerFactory;
 import org.jetbrains.annotations.NotNull;
 
+import static java.util.FormattableFlags.ALTERNATE;
+import static java.util.FormattableFlags.LEFT_JUSTIFY;
+import static java.util.FormattableFlags.UPPERCASE;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.Formatter;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -78,23 +83,26 @@ public class MarkerImpl implements Marker {
     if (containedMarkers.isEmpty()) {
       return name;
     }
-    return toStringBuilder(new StringBuilder()).toString();
+    return toStringBuilder(new StringBuilder(), true).toString();
   }
 
-  @Override public @NotNull StringBuilder toStringBuilder(@NotNull final StringBuilder builder) {
+  @Override public @NotNull StringBuilder toStringBuilder(@NotNull final StringBuilder builder, final boolean includeContained) {
     // subclasses would typically invoke super.toStringBuilder(builder) first
     if (containedMarkers.isEmpty()) {
       return builder.append(name);
     }
 
-    builder.append(name).append(OPEN);
-    for (int i = 0, size = containedMarkers.size(); i < size; i++) {
-      if (i != 0) {
-        builder.append(SEPARATOR);
+    if (includeContained) {
+      builder.append(name).append(OPEN);
+      for (int i = 0, size = containedMarkers.size(); i < size; i++) {
+        if (i != 0) {
+          builder.append(SEPARATOR);
+        }
+        containedMarkers.get(i).toStringBuilder(builder, true);
       }
-      containedMarkers.get(i).toStringBuilder(builder);
+      builder.append(CLOSE);
     }
-    builder.append(CLOSE);
+
     return builder;
   }
 
@@ -126,5 +134,35 @@ public class MarkerImpl implements Marker {
 
   @Override public int hashCode() {
     return name.hashCode();
+  }
+
+  @Override public void formatTo(final Formatter formatter, final int flags, final int width, final int precision) {
+    final boolean useAlternate = (flags & ALTERNATE) == ALTERNATE;
+    final boolean leftJustify = (flags & LEFT_JUSTIFY) == LEFT_JUSTIFY;
+    final boolean upperCase = (flags & UPPERCASE) == UPPERCASE;
+    final StringBuilder builder = getStringBuilder();
+    toStringBuilder(builder, useAlternate);
+    if (precision != -1 && builder.length() > precision) {
+      builder.setLength(precision - 1);
+      builder.append('…');
+    }
+    if (width != -1 && width > builder.length()) {
+      builder.ensureCapacity(width);
+      final int padAmount = width - builder.length();
+      if (leftJustify) {
+        for (int i = 0; i < padAmount; i++) {
+          builder.append(' ');
+        }
+      } else {
+        for (int i = 0; i < padAmount; i++) {
+          builder.insert(0, ' ');  // could possibly be more efficient to insert from long string of spaces, but Knuth would not approve
+        }
+      }
+    }
+    formatter.format(upperCase ? builder.toString().toUpperCase() : builder.toString());
+  }
+
+  private StringBuilder getStringBuilder() {
+    return new StringBuilder(); // threadLocalStringBuilder.get(); Not thread local builder until we know we're logging markers a lot
   }
 }

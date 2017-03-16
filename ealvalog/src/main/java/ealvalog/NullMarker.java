@@ -22,6 +22,7 @@ import ealvalog.util.LogUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Formatter;
 import java.util.Iterator;
 
 /**
@@ -56,7 +57,7 @@ public enum NullMarker implements Marker {
     return LogUtil.emptyIterator();
   }
 
-  @NotNull @Override public StringBuilder toStringBuilder(@NotNull final StringBuilder builder) {
+  @NotNull @Override public StringBuilder toStringBuilder(@NotNull final StringBuilder builder, final boolean includeContained) {
     return builder;
   }
 
@@ -64,4 +65,5 @@ public enum NullMarker implements Marker {
     return marker == null ? NullMarker.INSTANCE : marker;
   }
 
+  @Override public void formatTo(final Formatter formatter, final int flags, final int width, final int precision) {}
 }

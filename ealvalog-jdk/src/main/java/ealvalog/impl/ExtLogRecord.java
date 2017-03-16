@@ -21,7 +21,6 @@ package ealvalog.impl;
 import ealvalog.LogLevel;
 import ealvalog.Marker;
 import ealvalog.NullMarker;
-import ealvalog.util.FormattableThrowable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -47,7 +46,7 @@ public class ExtLogRecord extends LogRecord implements Closeable { // not AutoCl
   private LogLevel logLevel;
   private @NotNull String threadName;
   private @NotNull Marker marker;
-  private int lineNumber;
+  private StackTraceElement location;
   private int parameterCount;   // actual number of parameters, array might be oversized
   private transient boolean reserved;
 
@@ -93,7 +92,7 @@ public class ExtLogRecord extends LogRecord implements Closeable { // not AutoCl
     if (callerLocation != null) {
       logRecord.setSourceClassName(callerLocation.getClassName());
       logRecord.setSourceMethodName(callerLocation.getMethodName());
-      logRecord.setLineNumber(callerLocation.getLineNumber());
+      logRecord.setLocation(callerLocation);
     }
     logRecord.setThrown(throwable);
     logRecord.setParameters(formatArgs);
@@ -110,7 +109,7 @@ public class ExtLogRecord extends LogRecord implements Closeable { // not AutoCl
     logLevel = level;
     threadName = Thread.currentThread().getName();
     marker = NullMarker.INSTANCE;
-    lineNumber = 0;
+    location = null;
     parameterCount = 0;
     reserved = false;
   }
@@ -163,13 +162,12 @@ public class ExtLogRecord extends LogRecord implements Closeable { // not AutoCl
     this.marker = NullMarker.nullToNullInstance(marker);
   }
 
-  /** @return the line number of the log call site, 0 if not available */
-  public int getLineNumber() {
-    return lineNumber;
+  public StackTraceElement getCallLocation() {
+    return location;
   }
 
-  public void setLineNumber(final int lineNumber) {
-    this.lineNumber = lineNumber;
+  public void setLocation(final @Nullable StackTraceElement location) {
+    this.location = location;
   }
 
   /** @return the number of parameters passed to {@link #setParameters(Object[])} */
@@ -192,20 +190,6 @@ public class ExtLogRecord extends LogRecord implements Closeable { // not AutoCl
     }
   }
 
-  /**
-   * If we've already set a {@link FormattableThrowable} reuse it, otherwise wrap the original {@link Throwable} {@code thrown}
-   *
-   * @param thrown {@link Throwable} passed to log method
-   */
-  @Override public void setThrown(final Throwable thrown) {
-    final Throwable throwable = getThrown();
-    if (throwable != null && throwable instanceof FormattableThrowable) {
-      super.setThrown(((FormattableThrowable)throwable).setRealThrowable(thrown));
-    } else {
-      super.setThrown(new FormattableThrowable(thrown));
-    }
-  }
-
   public void setThreadName(@NotNull final String threadName) {
     this.threadName = threadName;
   }
@@ -219,7 +203,7 @@ public class ExtLogRecord extends LogRecord implements Closeable { // not AutoCl
     logLevel = (LogLevel)in.readObject();
     threadName = in.readUTF();
     marker = (Marker)in.readObject();
-    lineNumber = in.readInt();
+    location = (StackTraceElement)in.readObject();
     parameterCount = in.readInt();
     reserved = false;
   }
@@ -229,7 +213,7 @@ public class ExtLogRecord extends LogRecord implements Closeable { // not AutoCl
     out.writeObject(logLevel);
     out.writeUTF(threadName);
     out.writeObject(marker);
-    out.writeInt(lineNumber);
+    out.writeObject(location);
     out.writeInt(parameterCount);
   }
 }

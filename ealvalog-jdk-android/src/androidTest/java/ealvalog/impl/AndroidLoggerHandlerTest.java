@@ -64,4 +64,16 @@ public class AndroidLoggerHandlerTest {
     assertThat(handler.isLoggable(logger, CRITICAL, NullMarker.INSTANCE, NullThrowable.INSTANCE),
                is(FilterResult.ACCEPT));
   }
+
+  @Test
+  public void testLogOutput() throws Exception {
+    AndroidLoggerHandler handler = AndroidLoggerHandler.builder()
+                                                       .filter(AlwaysAcceptFilter.INSTANCE)
+                                                       .build();
+    handler.publish(ExtLogRecord.get(CRITICAL,
+                                     "Message",
+                                     getClass().getName(),
+                                     null,
+                                     null));
+  }
 }

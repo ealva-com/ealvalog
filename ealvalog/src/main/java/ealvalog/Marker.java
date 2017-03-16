@@ -21,6 +21,7 @@ package ealvalog;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
+import java.util.Formattable;
 import java.util.Iterator;
 
 /**
@@ -29,7 +30,7 @@ import java.util.Iterator;
  *
  * Created by Eric A. Snell on 2/28/17.
  */
-public interface Marker extends Serializable, Iterable<Marker> {
+public interface Marker extends Serializable, Iterable<Marker>, Formattable {
   @NotNull String getName();
 
   boolean add(@NotNull Marker marker);
@@ -61,7 +62,8 @@ public interface Marker extends Serializable, Iterable<Marker> {
    * was passed as a parameter.
    *
    * @param builder the builder to append {@code toString()} information to
+   * @param includeContained if string should include contained Markers
    * @return the {@code builder} parameter to allow call chaining
    */
-  @NotNull StringBuilder toStringBuilder(@NotNull StringBuilder builder);
+  @NotNull StringBuilder toStringBuilder(@NotNull StringBuilder builder, final boolean includeContained);
 }

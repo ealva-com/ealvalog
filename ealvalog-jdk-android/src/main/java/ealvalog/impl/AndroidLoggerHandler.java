@@ -49,7 +49,7 @@ public class AndroidLoggerHandler extends BaseLoggerHandler {
     private @NotNull ErrorManager errorManager;
 
     Builder() {
-      formatterPattern = ExtRecordFormatter.TYPICAL_FORMAT;
+      formatterPattern = ExtRecordFormatter.TYPICAL_ANDROID_FORMAT;
       formatterLogErrors = true;
       filter = AlwaysNeutralFilter.INSTANCE;
       errorManager = new ErrorManager();
@@ -91,8 +91,8 @@ public class AndroidLoggerHandler extends BaseLoggerHandler {
 
   @SuppressWarnings("WeakerAccess")
   protected AndroidLoggerHandler(final @NotNull Formatter formatter,
-                              final @NotNull LoggerFilter filter,
-                              final @NotNull ErrorManager errorManager) {
+                                 final @NotNull LoggerFilter filter,
+                                 final @NotNull ErrorManager errorManager) {
     super(filter);
     setFormatter(formatter);
     setErrorManager(errorManager);

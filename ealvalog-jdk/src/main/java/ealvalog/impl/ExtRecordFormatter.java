@@ -21,6 +21,7 @@ package ealvalog.impl;
 
 import ealvalog.LogLevel;
 import ealvalog.NullMarker;
+import ealvalog.util.FormattableStackTraceElement;
 import ealvalog.util.FormattableThrowable;
 import ealvalog.util.LogMessageFormatter;
 import org.jetbrains.annotations.NotNull;
@@ -79,9 +80,9 @@ import java.util.logging.LogRecord;
  *   <td align="center" valign="top">Method Name <sup>2</sup>
  * <p><tr>
  *   <td align="center" valign="top">9$
- *   <td align="center" valign="top">"%9$d"
- *   <td align="center" valign="top">Integer
- *   <td align="center" valign="top">Line Number <sup>2</sup>
+ *   <td align="center" valign="top">"%9$s"
+ *   <td align="center" valign="top">FormattableStackTraceElement
+ *   <td align="center" valign="top">Location <sup>2</sup>
  * <p><tr>
  *   <td align="center" valign="top">10$
  *   <td align="center" valign="top">"%10$s"
@@ -109,21 +110,21 @@ public class ExtRecordFormatter extends Formatter {
   private static final int THROWN_INDEX = 5;
   private static final int CLASS_NAME_INDEX = 6;
   private static final int METHOD_NAME_INDEX = 7;
-  private static final int LINE_NUMBER_INDEX = 8;
+  private static final int LOCATION_INDEX = 8;
   private static final int THREAD_NAME_INDEX = 9;
   private static final int MARKER_INDEX = 10;
 
-  public static final int MESSAGE_POSITION = MESSAGE_INDEX + 1;
-  public static final int THREAD_ID_POSITION = THREAD_ID_INDEX + 1;
-  public static final int LOGGER_NAME_POSITION = LOGGER_NAME_INDEX + 1;
-  public static final int LOG_LEVEL_POSITION = LOG_LEVEL_INDEX + 1;
-  public static final int DATE_POSITION = DATE_INDEX + 1;
-  public static final int THROWN_POSITION = THROWN_INDEX + 1;
-  public static final int CLASS_NAME_POSITION = CLASS_NAME_INDEX + 1;
-  public static final int METHOD_NAME_POSITION = METHOD_NAME_INDEX + 1;
-  public static final int LINE_NUMBER_POSITION = LINE_NUMBER_INDEX + 1;
-  public static final int THREAD_NAME_POSITION = THREAD_NAME_INDEX + 1;
-  public static final int MARKER_POSITION = MARKER_INDEX + 1;
+  public static final String MESSAGE_POSITION = "%" + Integer.toString(MESSAGE_INDEX + 1);
+  public static final String THREAD_ID_POSITION = "%" + Integer.toString(THREAD_ID_INDEX + 1);
+  public static final String LOGGER_NAME_POSITION = "%" + Integer.toString(LOGGER_NAME_INDEX + 1);
+  public static final String LOG_LEVEL_POSITION = "%" + Integer.toString(LOG_LEVEL_INDEX + 1);
+  public static final String DATE_POSITION = "%" + Integer.toString(DATE_INDEX + 1);
+  public static final String THROWN_POSITION = "%" + Integer.toString(THROWN_INDEX + 1);
+  public static final String CLASS_NAME_POSITION = "%" + Integer.toString(CLASS_NAME_INDEX + 1);
+  public static final String METHOD_NAME_POSITION = "%" + Integer.toString(METHOD_NAME_INDEX + 1);
+  public static final String LOCATION_POSITION = "%" + Integer.toString(LOCATION_INDEX + 1);
+  public static final String THREAD_NAME_POSITION = "%" + Integer.toString(THREAD_NAME_INDEX + 1);
+  public static final String MARKER_POSITION = "%" + Integer.toString(MARKER_INDEX + 1);
 
   /** Of the form: "2017-03-05 14:33:15.098" */
   public static final String DATE_TIME_FORMAT = "%5$tF %5$tT.%5$tL";
@@ -131,7 +132,23 @@ public class ExtRecordFormatter extends Formatter {
   /** Of the form: "Sun 2017-03-05 14:33:15.098" */
   public static final String DAY_DATE_TIME_FORMAT = "%5$ta " + DATE_TIME_FORMAT;
 
+  public static final String MESSAGE_ARG = MESSAGE_POSITION + "$s";
+  public static final String THREAD_ID_ARG = THREAD_ID_POSITION + "$d";
+  public static final String LOGGER_NAME_ARG = LOGGER_NAME_POSITION + "$s";
+  public static final String LOG_LEVEL_ARG = LOG_LEVEL_POSITION + "$s";
+  public static final String DATE_ARG = DATE_TIME_FORMAT;
+  public static final String THROWN_ARG = THROWN_POSITION + "$s";
+  public static final String CLASS_NAME_ARG = CLASS_NAME_POSITION + "$s";
+  public static final String METHOD_NAME_ARG = METHOD_NAME_POSITION + "$s";
+  public static final String LOCATION_ARG = LOCATION_POSITION + "$s";
+  public static final String THREAD_NAME_ARG = THREAD_NAME_POSITION  + "$s";
+  public static final String MARKER_ARG = MARKER_POSITION + "$s";
+
+  public static final String THROWN_STACKTRACE_ARG = THROWN_POSITION + "$#s";
+  public static final String LOCATION_WITH_CLASS_NAME_ARG = LOCATION_POSITION + "$#s";
+
   public static final String TYPICAL_FORMAT = DATE_TIME_FORMAT + " %4$s [%10$s] %3$s - %1$s %6$#s%n";
+  public static final String TYPICAL_ANDROID_FORMAT = "[%10$s]%9$s %1$s";
 
   private static final ThreadLocal<ExtLogMessageFormatter> threadLocalFormatter =
       new ThreadLocal<ExtLogMessageFormatter>() {
@@ -147,6 +164,7 @@ public class ExtRecordFormatter extends Formatter {
           return lmf;
         }
       };
+  private static final int ARG_COUNT = 11;
 
   private String format;
   private boolean logErrors;
@@ -223,14 +241,14 @@ public class ExtRecordFormatter extends Formatter {
 
   private void setArgs(final ExtLogRecord record, final String msg, final Object[] formatterArgs) {
     setBaseArgs(record, msg, formatterArgs);
-    formatterArgs[LINE_NUMBER_INDEX] = Integer.valueOf(record.getLineNumber());
+    ((FormattableStackTraceElement)formatterArgs[LOCATION_INDEX]).setElement(record.getCallLocation());
     formatterArgs[THREAD_NAME_INDEX] = record.getThreadName();
     formatterArgs[MARKER_INDEX] = record.getMarker();
   }
 
   private void setArgs(final LogRecord record, final String msg, final Object[] formatterArgs) {
     setBaseArgs(record, msg, formatterArgs);
-    formatterArgs[LINE_NUMBER_INDEX] = Integer.valueOf(0);
+    ((FormattableStackTraceElement)formatterArgs[LOCATION_INDEX]).setElement(null);
     formatterArgs[THREAD_NAME_INDEX] = "";
     formatterArgs[MARKER_INDEX] = NullMarker.INSTANCE;
   }
@@ -241,14 +259,19 @@ public class ExtRecordFormatter extends Formatter {
     formatterArgs[LOGGER_NAME_INDEX] = record.getLoggerName();
     formatterArgs[LOG_LEVEL_INDEX] = LogLevel.fromLevel(record.getLevel());
     formatterArgs[DATE_INDEX] = Long.valueOf(record.getMillis());
-    formatterArgs[THROWN_INDEX] = FormattableThrowable.throwableToFormattable(record.getThrown());
+    ((FormattableThrowable)formatterArgs[THROWN_INDEX]).setRealThrowable(record.getThrown());
     formatterArgs[CLASS_NAME_INDEX] = record.getSourceClassName();
     formatterArgs[METHOD_NAME_INDEX] = record.getSourceMethodName();
   }
 
   private static class ExtLogMessageFormatter extends LogMessageFormatter {
-    final Object[] formatterArgs = new Object[11];
+    final Object[] formatterArgs = new Object[ARG_COUNT];
 
-    ExtLogMessageFormatter() {}
+
+    ExtLogMessageFormatter() {
+      // we want to prefill certain indices and then do sets
+      formatterArgs[THROWN_INDEX] = FormattableThrowable.make(null);
+      formatterArgs[LOCATION_INDEX] = FormattableStackTraceElement.make(null);
+    }
   }
 }
