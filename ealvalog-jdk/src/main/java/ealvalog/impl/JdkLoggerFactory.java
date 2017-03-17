@@ -31,6 +31,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.logging.Handler;
 import java.util.logging.LogManager;
 
 /**
@@ -62,17 +63,33 @@ public class JdkLoggerFactory implements LoggerFactory, JdkLoggerConfiguration {
     bridgeMap = new ConcurrentHashMap<>();
     loggerMap = new ConcurrentHashMap<>();
     jdkBridgeRoot = new JdkBridge(ROOT_LOGGER_NAME);
-    jdkRootLogger = new JdkLogger(ROOT_LOGGER_NAME, false, null, this);
+    jdkRootLogger = new JdkLogger(ROOT_LOGGER_NAME, null, this);
   }
 
   /**
-   * Resets all loggers, removing filters and underlying handlers from the java util logging Loggers
+   * Resets all loggers, removing filters and underlying handlers from the java.util.logging Loggers
    */
   @SuppressWarnings("WeakerAccess") public void reset() {
     LogManager.getLogManager().reset();
+    final java.util.logging.Logger root = LogManager.getLogManager().getLogger("");
+    final Handler[] handlers = root.getHandlers();
+    for (Handler handler : handlers) {
+      root.removeHandler(handler);
+      handler.close();
+    }
+
+    for (JdkBridge bridge : bridgeMap.values()) {
+      bridge.setToDefault();
+    }
+
     bridgeMap.clear();
     setParents();
     updateLoggers();
+  }
+
+  @SuppressWarnings("WeakerAccess")
+  public JdkLogger getRoot() {
+    return jdkRootLogger;
   }
 
   @Override public @NotNull JdkLogger get(@NotNull final String name) {
@@ -99,9 +116,12 @@ public class JdkLoggerFactory implements LoggerFactory, JdkLoggerConfiguration {
     try {
       JdkLogger jdkLogger = loggerMap.get(name);
       if (jdkLogger == null) {
-        jdkLogger = new JdkLogger(name, includeLocation, marker, this);
+        jdkLogger = new JdkLogger(name, marker, this);
         loggerMap.put(name, jdkLogger);
         setParents();
+        if (includeLocation) {
+          jdkLogger.setIncludeLocation(true);
+        }
       }
       return jdkLogger;
     } finally {
@@ -117,12 +137,7 @@ public class JdkLoggerFactory implements LoggerFactory, JdkLoggerConfiguration {
       if (bridge.getName().equals(loggerName)) {
         bridge.setFilter(filter);
       } else {
-        final JdkBridge newBridge = new JdkBridge(loggerName);
-        newBridge.setFilter(filter);
-        newBridge.setParent(bridge);
-        bridgeMap.putIfAbsent(loggerName, newBridge);
-        setParents();
-        updateLoggers();
+        makeNewBridge(bridge, loggerName, filter, null, null);
       }
     } finally {
       bridgeTreeLock.unlock();
@@ -138,12 +153,7 @@ public class JdkLoggerFactory implements LoggerFactory, JdkLoggerConfiguration {
       if (bridge.getName().equals(loggerName)) {
         bridge.addLoggerHandler(loggerHandler);
       } else {
-        final JdkBridge newBridge = new JdkBridge(loggerName);
-        newBridge.addLoggerHandler(loggerHandler);
-        newBridge.setParent(bridge);
-        bridgeMap.putIfAbsent(loggerName, newBridge);
-        setParents();
-        updateLoggers();
+        makeNewBridge(bridge, loggerName, null, loggerHandler, null);
       }
     } finally {
       bridgeTreeLock.unlock();
@@ -158,16 +168,54 @@ public class JdkLoggerFactory implements LoggerFactory, JdkLoggerConfiguration {
       if (bridge.getName().equals(loggerName)) {
         bridge.setLogLevel(logLevel);
       } else {
-        final JdkBridge newBridge = new JdkBridge(loggerName);
-        bridge.setLogLevel(logLevel);
-        newBridge.setParent(bridge);
-        bridgeMap.putIfAbsent(loggerName, newBridge);
-        setParents();
-        updateLoggers();
+        makeNewBridge(bridge, loggerName, null, null, logLevel);
       }
     } finally {
       bridgeTreeLock.unlock();
     }
+  }
+
+  @Override public void setLogToParent(final Logger logger, final boolean logToParent) {
+    bridgeTreeLock.lock();
+    try {
+      final String loggerName = logger.getName();
+      final JdkBridge bridge = getBridge(loggerName);
+      if (bridge.getName().equals(loggerName)) {
+        bridge.setLogToParent(logToParent);
+      } else {
+        makeNewBridge(bridge, loggerName, null, null, null).setLogToParent(logToParent);
+      }
+    } finally {
+      bridgeTreeLock.unlock();
+    }
+  }
+
+  @Override public void setIncludeLocation(final Logger logger, final boolean includeLocation) {
+    bridgeTreeLock.lock();
+    try {
+      final String loggerName = logger.getName();
+      final JdkBridge bridge = getBridge(loggerName);
+      if (bridge.getName().equals(loggerName)) {
+        bridge.setIncludeLocation(true);
+      } else {
+        makeNewBridge(bridge, loggerName, null, null, null).setIncludeLocation(includeLocation);
+      }
+    } finally {
+      bridgeTreeLock.unlock();
+    }
+  }
+
+  private JdkBridge makeNewBridge(final @NotNull JdkBridge parent,
+                                  final @NotNull String loggerName,
+                                  final @Nullable LoggerFilter filter,
+                                  final @Nullable BaseLoggerHandler handler,
+                                  final @Nullable LogLevel logLevel) {
+    final JdkBridge newBridge = new JdkBridge(loggerName, filter, handler, logLevel);
+    newBridge.setParent(parent);
+    bridgeMap.putIfAbsent(loggerName, newBridge);
+    setParents();
+    updateLoggers();
+    return newBridge;
   }
 
   private void updateLoggers() {
@@ -218,5 +266,4 @@ public class JdkLoggerFactory implements LoggerFactory, JdkLoggerConfiguration {
       }
     }
   }
-
 }

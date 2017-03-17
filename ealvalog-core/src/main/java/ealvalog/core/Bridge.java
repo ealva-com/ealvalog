@@ -36,7 +36,7 @@ public interface Bridge extends LoggerFilter {
 
   void setIncludeLocation(boolean includeLocation);
 
-  boolean shouldLogToParent();
+  boolean shouldLogToParent(final Logger jdkLogger);
 
   void setLogToParent(boolean logToParent);
 
@@ -44,6 +44,7 @@ public interface Bridge extends LoggerFilter {
    * Proceed with logging. It's expected the framework has already invoked {@link #isLoggable(Logger, LogLevel, Marker, Throwable)} and this
    * method need not check level or filter. Lover levels of the framework may still discard the log message.
    *
+   * @param logger     the logger invoking this method
    * @param level      client log level
    * @param marker     optional {@link Marker}
    * @param throwable  optional {@link Throwable}
@@ -51,7 +52,8 @@ public interface Bridge extends LoggerFilter {
    * @param msg        log message
    * @param formatArgs arguments to format the msg
    */
-  void log(@NotNull LogLevel level,
+  void log(@NotNull Logger logger,
+           @NotNull LogLevel level,
            @Nullable Marker marker,
            @Nullable Throwable throwable,
            int stackDepth,
@@ -64,4 +66,22 @@ public interface Bridge extends LoggerFilter {
    * @return Bridge implementation name
    */
   String getName();
+
+  /**
+   * If this bridge is for {@code logger}, then return any set level. Otherwise, this bridge is for a parent and null will be returned.
+   *
+   * @param logger logger invoking method
+   *
+   * @return set level or null if no level set or this is not the bridge for the given logger.
+   */
+  @Nullable LogLevel getLevelForLogger(Logger logger);
+
+  boolean bridgeIsLoggerPeer(Logger logger);
+
+  /**
+   * Get the level for this Bridge instance. Will be the level of the underlying logging framework
+   *
+   * @return current LogLevel
+   */
+  LogLevel getLogLevel();
 }

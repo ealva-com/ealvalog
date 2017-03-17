@@ -28,6 +28,8 @@ import ealvalog.util.NullThrowable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import static ealvalog.LogLevel.NONE;
+
 /**
  * Implementation that uses {@link java.util.logging.Logger}
  * <p>
@@ -37,22 +39,29 @@ import org.jetbrains.annotations.Nullable;
 public class JdkLogger extends CoreLogger<JdkBridge> {
   private JdkLoggerConfiguration config;
 
-  JdkLogger(final String name, final boolean includeLocation, @Nullable final Marker marker, final JdkLoggerConfiguration config) {
+  JdkLogger(final String name, @Nullable final Marker marker, final JdkLoggerConfiguration config) {
     super(name, config.getBridge(name), marker);
-    setIncludeLocation(includeLocation);
     this.config = config;
   }
 
   @Nullable @Override public LogLevel getLogLevel() {
-    return null;
+    return getBridge().getLevelForLogger(this);
   }
 
   @Override public void setLogLevel(@Nullable final LogLevel logLevel) {
-    getBridge().setLogLevel(logLevel);
+    config.setLogLevel(this, logLevel == null ? NONE : logLevel);
   }
 
   @NotNull @Override public LogLevel getEffectLogLevel() {
-    return LogLevel.NONE;
+    return getBridge().getLogLevel();
+  }
+
+  @Override public void setIncludeLocation(final boolean includeLocation) {
+    config.setIncludeLocation(this, includeLocation);
+  }
+
+  @Override public boolean getIncludeLocation() {
+    return getBridge().getIncludeLocation();
   }
 
   @Override public boolean isLoggable(final @NotNull LogLevel level, @Nullable final Marker marker, @Nullable final Throwable throwable) {
@@ -60,6 +69,18 @@ public class JdkLogger extends CoreLogger<JdkBridge> {
                                   level,
                                   NullMarker.nullToNullInstance(marker),
                                   NullThrowable.nullToNullInstance(throwable)) != FilterResult.DENY;
+  }
+
+  @Override public void setLogToParent(final boolean logToParent) {
+    config.setLogToParent(this, logToParent);
+  }
+
+  @Override public boolean getLogToParent() {
+    return getBridge().getLogToParent();
+  }
+
+  @Override public boolean shouldLogToParent() {
+    return getBridge().shouldLogToParent(this);
   }
 
   protected @NotNull JdkBridge getBridge() {
@@ -79,7 +100,4 @@ public class JdkLogger extends CoreLogger<JdkBridge> {
     config.addLoggerHandler(this, handler);
   }
 
-  public void setLevel(final @NotNull LogLevel logLevel) {
-    config.setLogLevel(this, logLevel);
-  }
 }

@@ -34,5 +34,9 @@ interface JdkLoggerConfiguration {
 
   void setLogLevel(@NotNull Logger logger, @NotNull LogLevel logLevel);
 
+  void setLogToParent(Logger logger, boolean logToParent);
+
+  void setIncludeLocation(Logger logger, boolean includeLocation);
+
   JdkBridge getBridge(String loggerClassName);
 }

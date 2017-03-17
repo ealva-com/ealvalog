@@ -18,7 +18,6 @@
 
 package ealvalog.impl;
 
-import ealvalog.filter.AlwaysNeutralFilter;
 import ealvalog.FilterResult;
 import ealvalog.LogLevel;
 import ealvalog.LoggerFilter;
@@ -26,13 +25,14 @@ import ealvalog.Marker;
 import ealvalog.NullMarker;
 import ealvalog.core.Bridge;
 import ealvalog.core.CoreLogger;
+import ealvalog.filter.AlwaysNeutralFilter;
 import ealvalog.util.LogUtil;
 import ealvalog.util.NullThrowable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static ealvalog.FilterResult.ACCEPT;
 import static ealvalog.FilterResult.DENY;
+import static ealvalog.FilterResult.NEUTRAL;
 
 import java.util.logging.Logger;
 
@@ -47,12 +47,25 @@ public class JdkBridge implements Bridge {
   private volatile LoggerFilter filter;
   private boolean includeLocation;
 
-
   JdkBridge(final @NotNull String name) {
     parent = null;
     jdkLogger = Logger.getLogger(name);
     filter = AlwaysNeutralFilter.INSTANCE;
     includeLocation = false;
+  }
+
+  JdkBridge(final String loggerName,
+            final @Nullable LoggerFilter filter,
+            final @Nullable BaseLoggerHandler handler,
+            final @Nullable LogLevel level) {
+    this(loggerName);
+    setFilter(filter);
+    if (handler != null) {
+      addLoggerHandler(handler);
+    }
+    if (level != null) {
+      setLogLevel(level);
+    }
   }
 
   @Nullable JdkBridge getParent() {
@@ -81,16 +94,16 @@ public class JdkBridge implements Bridge {
     this.includeLocation = includeLocation;
   }
 
-  @Override public boolean shouldLogToParent() {
-    return jdkLogger.getUseParentHandlers();
+  private boolean shouldIncludeLocation() {
+    return includeLocation || (parent != null && parent.shouldIncludeLocation());
+  }
+
+  @Override public boolean shouldLogToParent(final ealvalog.Logger logger) {
+    return !bridgeIsLoggerPeer(logger) || jdkLogger.getUseParentHandlers();
   }
 
   @Override public void setLogToParent(final boolean logToParent) {
     jdkLogger.setUseParentHandlers(logToParent);
-  }
-
-  private boolean shouldIncludeLocation() {
-    return includeLocation || (parent != null && parent.includeLocation);
   }
 
   @Override public FilterResult isLoggable(@NotNull final ealvalog.Logger logger, @NotNull final LogLevel level) {
@@ -114,11 +127,12 @@ public class JdkBridge implements Bridge {
     if (filterResult == DENY) {
       return DENY;
     }
-    return ACCEPT;
+    return NEUTRAL;
   }
 
   @Override
-  public void log(final @NotNull LogLevel level,
+  public void log(final @NotNull ealvalog.Logger logger,
+                  final @NotNull LogLevel level,
                   final @Nullable Marker marker,
                   final @Nullable Throwable throwable,
                   final int stackDepth,
@@ -129,7 +143,7 @@ public class JdkBridge implements Bridge {
     // We're not using try with resources here due to warnings about early Android versions.
     ExtLogRecord logRecord = ExtLogRecord.get(level,
                                               msg,
-                                              getName(),
+                                              logger.getName(),
                                               shouldIncludeLocation() ? LogUtil.getCallerLocation(stackDepth + 1)
                                                                       : null,
                                               throwable,
@@ -151,11 +165,34 @@ public class JdkBridge implements Bridge {
     return jdkLogger.getName();
   }
 
-  void addLoggerHandler(final BaseLoggerHandler loggerHandler) {
+  @Nullable @Override public LogLevel getLevelForLogger(final ealvalog.Logger logger) {
+    if (bridgeIsLoggerPeer(logger)) {
+      return LogLevel.fromLevel(jdkLogger.getLevel());
+    }
+    return null;
+  }
+
+  @Override public boolean bridgeIsLoggerPeer(final ealvalog.Logger logger) {
+    return getName().equals(logger.getName());
+  }
+
+  @Override public LogLevel getLogLevel() {
+    return LogLevel.fromLevel(jdkLogger.getLevel());
+  }
+
+  void addLoggerHandler(final @NotNull BaseLoggerHandler loggerHandler) {
     jdkLogger.addHandler(loggerHandler);
   }
 
   void setLogLevel(final LogLevel logLevel) {
     jdkLogger.setLevel(logLevel.getJdkLevel());
+  }
+
+  boolean getLogToParent() {
+    return jdkLogger.getUseParentHandlers();
+  }
+
+  void setToDefault() {
+    jdkLogger.setUseParentHandlers(true);
   }
 }

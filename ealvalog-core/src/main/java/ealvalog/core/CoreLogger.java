@@ -33,24 +33,18 @@ import org.jetbrains.annotations.Nullable;
 public abstract class CoreLogger<T extends Bridge> extends BaseLogger {
   private volatile @NotNull T bridge;
 
-  @SuppressWarnings("unused")
-  protected CoreLogger(final @NotNull String name, final @NotNull T bridge) {
-    this(name, bridge, null);
-  }
-
   protected CoreLogger(final @NotNull String name, final @NotNull T bridge, @Nullable final Marker marker) {
     super(name, marker);
     this.bridge = bridge;
-    this.bridge.setLogToParent(true);
   }
 
-  public void setLogToParent(final boolean logToParent) {
-    bridge.setLogToParent(logToParent);
-  }
+  @SuppressWarnings("SameParameterValue")
+  public abstract void setLogToParent(final boolean logToParent);
 
-  public boolean shouldLogToParent() {
-    return bridge.shouldLogToParent();
-  }
+  @SuppressWarnings("unused")
+  public abstract boolean getLogToParent();
+
+  public abstract boolean shouldLogToParent();
 
   @Override
   protected void printLog(@NotNull final LogLevel level,
@@ -60,7 +54,7 @@ public abstract class CoreLogger<T extends Bridge> extends BaseLogger {
                           @NotNull final String msg,
                           @NotNull final Object... formatArgs) {
     // isLoggable() should have already been called
-    bridge.log(level, marker, throwable, stackDepth + 1, msg, formatArgs);
+    bridge.log(this, level, marker, throwable, stackDepth + 1, msg, formatArgs);
   }
 
   protected void setBridge(@NotNull final T bridge) {
@@ -72,12 +66,4 @@ public abstract class CoreLogger<T extends Bridge> extends BaseLogger {
   }
 
   public abstract void setFilter(@NotNull LoggerFilter filter);
-
-  @Override public void setIncludeLocation(final boolean includeLocation) {
-    bridge.setIncludeLocation(includeLocation);
-  }
-
-  @Override public boolean getIncludeLocation() {
-    return bridge.getIncludeLocation();
-  }
 }
