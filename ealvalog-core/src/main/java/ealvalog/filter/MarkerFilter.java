@@ -27,6 +27,9 @@ import ealvalog.util.NullThrowable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import static ealvalog.FilterResult.DENY;
+import static ealvalog.FilterResult.NEUTRAL;
+
 /**
  * Filter which checks Marker equality
  *
@@ -35,11 +38,43 @@ import org.jetbrains.annotations.Nullable;
 public class MarkerFilter extends BaseFilter {
   @NotNull private final Marker marker;
 
-  protected MarkerFilter() {
-    marker = NullMarker.INSTANCE;
+  public static Builder builder() {
+    return new Builder();
   }
 
-  protected MarkerFilter(final @NotNull Marker marker, @NotNull final FilterResult whenMatched, @NotNull final FilterResult whenDiffer) {
+  public static final class Builder {
+    private @Nullable Marker marker;
+    private @NotNull FilterResult whenMatched = NEUTRAL;
+    private @NotNull FilterResult whenDiffer = DENY;
+
+    public Builder marker(@Nullable final Marker marker) {
+      this.marker = marker;
+      return this;
+    }
+
+    public Builder whenMatched(@NotNull final FilterResult whenMatched) {
+      this.whenMatched = whenMatched;
+      return this;
+    }
+
+    public Builder whenDiffer(@NotNull final FilterResult whenDiffer) {
+      this.whenDiffer = whenDiffer;
+      return this;
+    }
+
+    /**
+     * @throws IllegalStateException if Marker has not been set
+     */
+    public @NotNull MarkerFilter build() throws IllegalStateException {
+      if (marker == null) {
+        throw new IllegalStateException("Marker required");
+      }
+      return new MarkerFilter(marker, whenMatched, whenDiffer);
+    }
+
+  }
+
+  MarkerFilter(final @NotNull Marker marker, @NotNull final FilterResult whenMatched, @NotNull final FilterResult whenDiffer) {
     super(whenMatched, whenDiffer);
     this.marker = marker;
   }
