@@ -3,13 +3,117 @@ eAlvaLog
 
 *eAlvaLog* is a Java logging facade and implementation inspired by various other logging implementations
 
+Libraries
+=========
+- ealvalog
+
+Facade API only. Used by library writers to defer all logging setup and handling to the library client
+    
+- ealvalog-core
+    
+Base implementation used by Facade implementation developer. Depends on ealvalog library
+    
+- ealvalog-android
+
+Android only implementation used in Android applications. Depends on ealvalog and ealvalog-core.
+    
+- ealvalog-jdk
+
+Facade implementation that logs to the JDK java.util.logging logger framework. Depends on ealvalog and ealvalog-core
+
+- ealvalog-jdk-android
+
+Contains a Handler for ealvalog-jdk client that also wants to log to the Android logger. Used with ealvalog-jdk on Android. Depends on 
+ealvalog, ealvalog-core, and ealvalog-jdk 
+
+Quick Start
+===========
+- Android Setup
+```java
+public class MyApp extends Application {
+  public void onCreate() {
+    AndroidLogger.setHandler(new DebugLogHandler());
+    Loggers.setFactory(new AndroidLoggerFactory());
+  }
+}  
+```  
+    
+- Facade Over java.util.logging Setup (example also contains Android code)
+```java
+public class MyApp extends Application {
+  public void onCreate() {
+    final JdkLoggerFactory jdkLoggerFactory = JdkLoggerFactory.instance();
+    jdkLoggerFactory.reset(); // completely resets java.util.logging Loggers and Handlers
+    Loggers.setFactory(jdkLoggerFactory);
+    
+    final JdkLogger rootLogger = jdkLoggerFactory.get("");
+    if (BuildConfig.DEBUG) {
+      // Set up Crashlytics, disabled for debug builds
+      Fabric.with(this, new CrashlyticsCore.Builder().disabled(BuildConfig.DEBUG).build());
+      rootLogger.addHandler(AndroidLoggerHandler.builder()
+                                                .build());
+      rootLogger.setLogLevel(LogLevel.ALL);
+      rootLogger.setIncludeLocation(true);
+    } else {
+      Fabric.with(this, new CrashlyticsCore(), new Answers(), new Crashlytics());
+      rootLogger.addHandler(new CrashlyticsLogHandler());
+      rootLogger.setLogLevel(LogLevel.ERROR);
+    }
+  }
+}
+  
+class CrashlyticsLogHandler extends BaseLoggerHandler {
+  private ExtRecordFormatter formatter;
+
+  CrashlyticsLogHandler() {
+    formatter = new ExtRecordFormatter();
+  }
+
+  @Override
+  public FilterResult isLoggable(@NotNull final Logger logger,
+                                 @NotNull final LogLevel level,
+                                 @NotNull final Marker marker,
+                                 @NotNull final Throwable throwable) {
+    if (level.isAtLeast(LogLevel.ERROR)) {
+      return FilterResult.ACCEPT;
+    } else {
+      return FilterResult.DENY;
+    }
+  }
+
+  @Override public void publish(final LogRecord record) {
+    Crashlytics.log(Levels.toAndroidLevel(record.getLogLevel()),
+                    "MyApplicationTag",
+                    formatter.format(record));
+    final Throwable thrown = record.getThrown();
+    if (thrown != null) {
+      Crashlytics.logException(thrown);
+    }
+  }
+
+  @Override public void flush() {}
+
+  @Override public void close() throws SecurityException {}
+}
+```  
+- Logger use (canonical)
+```java
+public class NowPlayingActivity extends Activity  {
+  private static final Logger LOG = Loggers.get();
+  
+  public void someMethod() {
+    LOG.log(LogLevel.ERROR, "Widget %s too large, height=%d", widget, heightCentimeters); 
+  }
+}     
+```     
+
 Why?
 ----
 
  In developing both a general purpose library (eAlvaTag), forked from an older library, and an Android application, we used 2 
  different loggers. The Android specific logger was a very thin veneer over String.format() and android.util.log. The general purpose 
  library used java.util.logging and was very heavy: lots of string concatenation even when logging was never occurring, string-number 
- formatting when nothing was being logged, enormous number of StringBuilder instances being created - many totally unnecessary.
+ formatting when nothing was being logged, enormous number of StringBuilder instances being created - many totally unnecessary...
  
  We know of 3 very good logging frameworks, 1 Android specific and 2 general purpose. None of these provided what we wanted. The Android 
  specific lib is very nice in both API and implementation, but does not provide anything close to our requirements. The 2 general purpose 
@@ -34,7 +138,7 @@ Why?
   logging primitives as format arguments will create zero objects unless the logging passes level checks and filters. A LoggerWrapper 
   subclass requires minimal code and is entirely optional.
   2. eAlvaLog provides filtering using LogLevel, Throwable, and Markers at the most outer layer to short-circuit logging as quickly as 
-  possible. If the statement will not ultimately be logged objects are not created. 
+  possible. If the statement will not ultimately be logged, objects are not created. 
   3. Object creation inside the framework is minimized via thread local Formatter/StringBuilder/log records.
   4. Android clients may use the eAlvaLog-android library alone, which is a very thin facade over Android logging. It handles such 
   things as tag creation, log statement formatting, call site location... A debug log handler is provided along with an example of 
