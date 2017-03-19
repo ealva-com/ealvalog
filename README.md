@@ -4,31 +4,28 @@ eAlvaLog
 *eAlvaLog* is a Java logging facade and implementation inspired by various other logging implementations
 
 Libraries
-=========
-- ealvalog
+---------
 
-Facade API only. Used by library writers to defer all logging setup and handling to the library client
-    
-- ealvalog-core
-    
-Base implementation used by Facade implementation developer. Depends on ealvalog library
-    
-- ealvalog-android
-
-Android only implementation used in Android applications. Depends on ealvalog and ealvalog-core.
-    
-- ealvalog-jdk
-
-Facade implementation that logs to the JDK java.util.logging logger framework. Depends on ealvalog and ealvalog-core
-
-- ealvalog-jdk-android
-
-Contains a Handler for ealvalog-jdk client that also wants to log to the Android logger. Used with ealvalog-jdk on Android. Depends on 
-ealvalog, ealvalog-core, and ealvalog-jdk 
+  - elavalog             - the API and some framework functionality. Used by library developers. Required for all clients
+  - ealvalog-core        - adds a little more as a base for some facade implementations. Required for all clients
+  - ealvalog-android     - very thin facade over the Android logger. Requires ealvalog and ealvalog-core libs
+  - ealvalog-jdk         - facade implementation using java.util.logging. Requires ealvalog and ealvalog-core libs
+  - ealvalog-jdk-android - adds an Android handler to be used with ealvalog-jdk when more functionality is required over ealvalog-android
+  
+  If you wish to create another facade implementation, it's recommended you start at the ealvalog-core level. We also hope you'd 
+  contribute it back to this library.
 
 Quick Start
 ===========
+
 - Android Setup
+```groovy
+dependencies {
+    compile 'com.ealva:ealvalog:0.0.9'
+    compile 'com.ealva:ealvalog-core:0.0.9'
+    compile 'com.ealva:ealvalog-android:0.0.9'
+}
+```
 ```java
 public class MyApp extends Application {
   public void onCreate() {
@@ -39,6 +36,14 @@ public class MyApp extends Application {
 ```  
     
 - Facade Over java.util.logging Setup (example also contains Android code)
+```groovy
+dependencies {
+    compile 'com.ealva:ealvalog:0.0.9'
+    compile 'com.ealva:ealvalog-core:0.0.9'
+    compile 'com.ealva:ealvalog-jdk:0.0.9'
+    compile 'com.ealva:ealvalog-jdk-android:0.0.9'
+}
+```
 ```java
 public class MyApp extends Application {
   public void onCreate() {
@@ -106,6 +111,7 @@ public class NowPlayingActivity extends Activity  {
   }
 }     
 ```     
+Ensure you have the most recent version by checking [here](https://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.ealva%22%20AND%20a%3A%22ealvalog%22)
 
 Why?
 ----
@@ -160,14 +166,3 @@ Why?
   as it moves formatting off to another thread, process, or computer.
   9. The resulting libraries are very small.
  
-Libraries
----------
-
-  - elavalog             - the API and some framework functionality. Required for all clients
-  - ealvalog-core        - adds a little more as a base for some facade implementations. Required for clients using the following
-  - ealvalog-android     - very thin facade over the Android logger. Requires ealvalog and ealvalog-core libs
-  - ealvalog-jdk         - facade implementation using java.util.logging. Requires ealvalog and ealvalog-core libs
-  - ealvalog-jdk-android - adds an Android handler to be used with ealvalog-jdk when more functionality is required over ealvalog-android
-  
-  If you wish to create another facade implementation, it's recommended you start at the ealvalog-core level. We also hope you'd 
-  contribute it back to this library.
