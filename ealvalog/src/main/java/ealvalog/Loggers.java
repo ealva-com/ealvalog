@@ -159,6 +159,41 @@ public class Loggers {
     loggerFactory.get(LogUtil.getCallerClassNameStripInner(STACK_DEPTH)).log(level, msg);
   }
 
+  public static void log(@NotNull LogLevel level, @NotNull String format, @NotNull Object arg1) {
+    loggerFactory.get(LogUtil.getCallerClassNameStripInner(STACK_DEPTH)).log(level, format, arg1);
+  }
+
+  public static void log(@NotNull LogLevel level, @NotNull String format, @NotNull Object arg1, @NotNull Object arg2) {
+    loggerFactory.get(LogUtil.getCallerClassNameStripInner(STACK_DEPTH)).log(level, format, arg1, arg2);
+  }
+
+  public static void log(@NotNull LogLevel level,
+                         @NotNull String format,
+                         @NotNull Object arg1,
+                         @NotNull Object arg2,
+                         @NotNull Object arg3) {
+    loggerFactory.get(LogUtil.getCallerClassNameStripInner(STACK_DEPTH)).log(level, format, arg1, arg2, arg3);
+  }
+
+  public static void log(@NotNull LogLevel level,
+                         @NotNull String format,
+                         @NotNull Object arg1,
+                         @NotNull Object arg2,
+                         @NotNull Object arg3,
+                         @NotNull Object arg4) {
+    loggerFactory.get(LogUtil.getCallerClassNameStripInner(STACK_DEPTH)).log(level, format, arg1, arg2, arg3, arg4);
+  }
+
+  public static void log(@NotNull LogLevel level,
+                         @NotNull String format,
+                         @NotNull Object arg1,
+                         @NotNull Object arg2,
+                         @NotNull Object arg3,
+                         @NotNull Object arg4,
+                         @NotNull Object... remaining) {
+    loggerFactory.get(LogUtil.getCallerClassNameStripInner(STACK_DEPTH)).log(level, format, arg1, arg2, arg3, arg4, remaining);
+  }
+
   /**
    * If isLoggable, log at the {@code msg} at {@code level} using the {@code marker}
    * <p>

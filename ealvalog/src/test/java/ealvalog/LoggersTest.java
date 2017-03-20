@@ -18,6 +18,7 @@
 
 package ealvalog;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -27,13 +28,12 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.only;
 
 
 /**
  * Simple tests for logger factory singleton
- *
+ * <p>
  * Created by Eric A. Snell on 3/5/17.
  */
 @SuppressWarnings("WeakerAccess")
@@ -45,6 +45,11 @@ public class LoggersTest {
   public void setup() {
     MockitoAnnotations.initMocks(this);
     Loggers.setFactory(mockFactory);
+  }
+
+  @After
+  public void tearDown() {
+    Loggers.setFactory(NullLoggerFactory.INSTANCE);
   }
 
   @Test
@@ -69,5 +74,4 @@ public class LoggersTest {
     then(mockFactory).should(only()).get(LoggersTest.class.getName());
     then(mockLogger).should(only()).log(LogLevel.CRITICAL, msg);
   }
-
 }

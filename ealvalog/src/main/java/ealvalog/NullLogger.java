@@ -34,13 +34,13 @@ public enum NullLogger implements Logger {
   }
 
   @Nullable public Marker getMarker() {
-    return null;
+    return NullMarker.INSTANCE;
   }
 
   public void setMarker(@Nullable final Marker marker) {}
 
   @Nullable @Override public LogLevel getLogLevel() {
-    return null;
+    return LogLevel.NONE;
   }
 
   @Override public void setLogLevel(@Nullable final LogLevel logLevel) {

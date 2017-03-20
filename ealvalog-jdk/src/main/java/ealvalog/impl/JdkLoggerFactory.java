@@ -108,7 +108,7 @@ public class JdkLoggerFactory implements LoggerFactory, JdkLoggerConfiguration {
     return getJdkLogger(name, marker, includeLocation);
   }
 
-  private JdkLogger getJdkLogger(final @NotNull String name, final @Nullable Marker marker, final boolean includeLocation) {
+  private @NotNull JdkLogger getJdkLogger(final @NotNull String name, final @Nullable Marker marker, final boolean includeLocation) {
     if (ROOT_LOGGER_NAME.equals(name)) {
       return jdkRootLogger;
     }
