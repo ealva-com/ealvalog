@@ -33,12 +33,14 @@ public enum NullLogger implements Logger {
     return "";
   }
 
+  @SuppressWarnings("ConstantConditions")
   @Nullable public Marker getMarker() {
     return NullMarker.INSTANCE;
   }
 
   public void setMarker(@Nullable final Marker marker) {}
 
+  @SuppressWarnings("ConstantConditions")
   @Nullable @Override public LogLevel getLogLevel() {
     return LogLevel.NONE;
   }
@@ -116,6 +118,8 @@ public enum NullLogger implements Logger {
                   @NotNull final Object arg3,
                   @NotNull final Object arg4,
                   final @NotNull Object[] remaining) {}
+
+  @Override public void caught(@NotNull final LogLevel level, @NotNull final Throwable throwable) {}
 
   @Override
   public void logImmediate(@NotNull final LogLevel level,

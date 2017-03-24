@@ -58,7 +58,7 @@ public class BaseLoggerTest {
     markerParameter = new MarkerImpl("Marker", markerFactory);
     loggerMarker = new MarkerImpl("Marker", markerFactory);
     loggerWithMarker = new LoggerImpl(loggerMarker);
-    theThrowable = new Throwable();
+    theThrowable = new Throwable(SOME_MESSAGE);
   }
 
   /**
@@ -154,7 +154,6 @@ public class BaseLoggerTest {
     assertThat(logger.stackDepth, is(2));
     assertThat(logger.msg, is(equalTo(SOME_MESSAGE)));
     assertNoFormatArgs(logger);
-
   }
 
   @Test
@@ -336,6 +335,20 @@ public class BaseLoggerTest {
     assertThat(loggerWithMarker.formatArgs[1].toString(), is(equalTo("2")));
   }
 
+
+  @Test
+  public void testCaught() {
+    logger.setShouldLog();
+    logger.caught(LogLevel.CRITICAL, theThrowable);
+
+    assertThat(logger.isLoggableInvoked, is(true));
+    assertThat(logger.level, is(LogLevel.CRITICAL));
+    assertThat(logger.marker, is(nullValue()));
+    assertThat(logger.throwable, is(theThrowable));
+    assertThat(logger.stackDepth, is(2));
+    assertThat(logger.msg, is(equalTo(SOME_MESSAGE)));
+    assertNoFormatArgs(logger);
+  }
 
   class LoggerImpl extends ealvalog.core.BaseLogger {
 

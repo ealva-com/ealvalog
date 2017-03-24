@@ -206,6 +206,8 @@ public interface Logger {
            @NotNull Object arg4,
            @NotNull Object... remaining);
 
+  void caught(@NotNull LogLevel level, @NotNull Throwable throwable);
+
   /**
    * Log without checking the the level and indicate where on the call chain the log is occurring ({@code stackDepth}). This method's
    * primary use is for this logging framework and it's not expected client's would typically use this method.
