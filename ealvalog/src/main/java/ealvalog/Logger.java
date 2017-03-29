@@ -56,7 +56,7 @@ public interface Logger {
 
   /**
    * Set an optional LogLevel. If null the nearest ancestor LogLevel will be used as the level for this logger
-   *
+   * <p>
    * If null is passed to the root logger, it sets the level to {@link LogLevel#NONE}
    *
    * @param logLevel the new level for this logger or removed if null
@@ -206,7 +206,27 @@ public interface Logger {
            @NotNull Object arg4,
            @NotNull Object... remaining);
 
+  /**
+   * Used to log an exception being caught where no message is needed
+   *
+   * @param level     log level to use
+   * @param throwable the throwable that was caught
+   */
   void caught(@NotNull LogLevel level, @NotNull Throwable throwable);
+
+  /**
+   * Log a throwable being thrown at the log site.
+   * <p>
+   * {@code
+   * throw LOG.throwing(LogLevel.ERROR, new MyException("Important Info"));
+   * }
+   *
+   * @param level     level at which to log
+   * @param throwable the Throwable/Exception/Error to log
+   *
+   * @return returns the throwable for convenience
+   */
+  Throwable throwing(@NotNull LogLevel level, @NotNull Throwable throwable);
 
   /**
    * Log without checking the the level and indicate where on the call chain the log is occurring ({@code stackDepth}). This method's

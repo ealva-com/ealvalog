@@ -281,4 +281,16 @@ public class Loggers {
     loggerFactory.get(LogUtil.getCallerClassNameStripInner(STACK_DEPTH)).log(level, marker, throwable, format, formatArgs);
   }
 
+  /**
+   * Used to log an exception being caught where no message is needed
+   * <p>
+   * Determine which logger to use from call stack and log. Convenience method but slower - don't use in critical path
+   *
+   * @param level     log level to use
+   * @param throwable the throwable that was caught
+   */
+  void caught(@NotNull LogLevel level, @NotNull Throwable throwable) {
+    loggerFactory.get(LogUtil.getCallerClassNameStripInner(STACK_DEPTH)).caught(level, throwable);
+  }
+
 }

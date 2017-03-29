@@ -121,6 +121,11 @@ public enum NullLogger implements Logger {
 
   @Override public void caught(@NotNull final LogLevel level, @NotNull final Throwable throwable) {}
 
+  @Override public Throwable throwing(@NotNull final LogLevel level, @NotNull final Throwable throwable) {
+    return throwable;
+  }
+
+
   @Override
   public void logImmediate(@NotNull final LogLevel level,
                            @Nullable final Marker marker,

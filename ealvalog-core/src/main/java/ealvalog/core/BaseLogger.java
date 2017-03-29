@@ -177,6 +177,13 @@ public abstract class BaseLogger implements Logger {
     }
   }
 
+  @Override public Throwable throwing(@NotNull final LogLevel level, @NotNull final Throwable throwable) {
+    if (isLoggable(level, marker, throwable)) {
+      logImmediate(level, marker, throwable, STACK_DEPTH, throwable.getLocalizedMessage());
+    }
+    return throwable;
+  }
+
   /**
    * {@inheritDoc}
    * <p>
