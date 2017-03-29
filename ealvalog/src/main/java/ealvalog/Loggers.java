@@ -289,7 +289,7 @@ public class Loggers {
    * @param level     log level to use
    * @param throwable the throwable that was caught
    */
-  void caught(@NotNull LogLevel level, @NotNull Throwable throwable) {
+  public static void caught(@NotNull LogLevel level, @NotNull Throwable throwable) {
     loggerFactory.get(LogUtil.getCallerClassNameStripInner(STACK_DEPTH)).caught(level, throwable);
   }
 
