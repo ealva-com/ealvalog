@@ -217,27 +217,21 @@ public abstract class LoggerWrapper implements Logger {
     }
   }
 
-  /**
-   * @throws UnsupportedOperationException subclasses can change this, but this method is really only meant for framework use
-   */
   @Override public void logImmediate(@NotNull final LogLevel level,
                                      @Nullable final Marker marker,
                                      @Nullable final Throwable throwable,
                                      final int stackDepth,
                                      @NotNull final String msg,
                                      @NotNull final Object... formatArgs) {
-    throw new UnsupportedOperationException("Framework use only");
+    realLogger.logImmediate(level, marker, throwable, stackDepth, msg, formatArgs);
   }
 
-  /**
-   * @throws UnsupportedOperationException subclasses can change this, but this method is really only meant for framework use
-   */
   @Override public void logImmediate(@NotNull final LogLevel level,
                                      @Nullable final Throwable throwable,
                                      final int stackDepth,
                                      @NotNull final String msg,
                                      final @NotNull Object[] formatArgs) {
-    throw new UnsupportedOperationException("Framework use only");
+    realLogger.logImmediate(level, throwable, stackDepth, msg, formatArgs);
   }
 
   @Nullable @Override public LogLevel getLogLevel() {
