@@ -16,6 +16,6 @@
   ~ limitations under the License.
   -->
 
-<manifest package="ealvalog">
+<manifest package="com.ealva.ealvalog">
     <application/>
 </manifest>
