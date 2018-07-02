@@ -230,7 +230,13 @@ public class ExtRecordFormatter extends Formatter {
 
   protected String formatClientMessage(final LogRecord record, final ExtLogMessageFormatter formatter) {
     try {
-      return formatter.append(record.getMessage(), record.getParameters()).toString();
+      // Any logging client can send a LogRecord so make sure check the parameters
+      final Object[] parameters = record.getParameters();
+      if (parameters != null && parameters.length > 0) {
+        return formatter.append(record.getMessage(), parameters).toString();
+      } else {
+        return formatter.append(record.getMessage()).toString();
+      }
     } catch (Exception e) {
       if (logErrors) {
         return e.getMessage();

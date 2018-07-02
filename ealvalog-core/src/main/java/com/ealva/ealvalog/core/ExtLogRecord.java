@@ -130,8 +130,10 @@ public class ExtLogRecord extends LogRecord
     record.release();
   }
 
+  private static final Object[] EMPTY_PARAMS = new Object[0];
   private ExtLogRecord() {
     super(Level.OFF, "");
+    setParameters(EMPTY_PARAMS);
   }
 
   @NotNull
