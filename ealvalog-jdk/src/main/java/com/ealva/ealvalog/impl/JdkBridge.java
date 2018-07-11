@@ -148,6 +148,7 @@ public class JdkBridge implements Bridge {
                                               logger.getName(),
                                               shouldIncludeLocation() ? LogUtil.getCallerLocation(stackDepth + 1)
                                                                       : null,
+                                              marker,
                                               throwable,
                                               formatArgs);
     try {

@@ -21,10 +21,11 @@ package com.ealva.ealvalog.core;
 import com.ealva.ealvalog.LogLevel;
 import com.ealva.ealvalog.Marker;
 import com.ealva.ealvalog.NullMarker;
-import com.ealva.ealvalog.util.LogMessageFormatter;
 import com.ealva.ealvalog.util.LogUtil;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.TestOnly;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -41,11 +42,11 @@ import java.util.logging.LogRecord;
  * Subclass of LogRecord adding the extra info we need. Not thread safe.
  * <p>
  * Use {@link #getRecord()} to obtain an ExtLogRecord which is associated with a thread and needs
- * to be {@link #release()}ed to be properly reused. Lower lowers of the logging framework
+ * to be {@link #release()}ed to be properly reused. Lower layers of the logging framework
  * need to copy this ExtLogRecord if it's to be passed to another thread.
  * <p>
- * Don't use the {@link #getParameters()} array length as the actual number of parameters. Use {@link #getParameterCount()} instead.
- * There might be nulls at the end of the array due to reuse
+ * Don't use the {@link #getParameters()} array length as the actual number of parameters. Use
+ * {@link #getParameterCount()} instead. There might be nulls at the end of the array due to reuse
  * <p>
  * Created by Eric A. Snell on 3/4/17.
  */
@@ -55,25 +56,42 @@ public class ExtLogRecord extends LogRecord
                LogRecordBuilder {
   private static final long serialVersionUID = 936230097973648802L;
   private static final AtomicLong sequenceNumber = new AtomicLong(1);
-
-  private LogLevel logLevel = LogLevel.NONE;
-  private @NotNull String threadName = Thread.currentThread().getName();
-  private @NotNull Marker marker = NullMarker.INSTANCE;
-  private StackTraceElement location = null;
-  private int parameterCount = 0;   // actual number of parameters, array might be over-sized
-  private transient boolean reserved = false;
-  private transient StringBuilder builder = null;
-  private transient Formatter formatter = null;
-
+  private static final Object[] EMPTY_PARAMS = new Object[0];
   private static ThreadLocal<ExtLogRecord> threadLocalRecord = new ThreadLocal<>();
+  /** The default, and minimum, size of cached string builders. This is a per thread cost */
+  public static final int DEFAULT_STRING_BUILDER_SIZE = 1024;
+  /** The default maximum size of cached string builders */
+  public static final int DEFAULT_MAX_STRING_BUILDER_SIZE = 2048;
+  private static int maxBuilderSize = DEFAULT_MAX_STRING_BUILDER_SIZE;
 
-  private static ExtLogRecord getRecord() {
-    ExtLogRecord result = threadLocalRecord.get();
-    if (result == null) {
-      result = new ExtLogRecord();
-      threadLocalRecord.set(result);
-    }
-    return result.isReserved() ? new ExtLogRecord().reserve() : result.reserve();
+  // Everything is transient as we will handle read/write during serialization
+  private transient @NotNull LogLevel logLevel;
+  private transient @NotNull String threadName;
+  private transient @NotNull Marker marker;
+  private transient @Nullable StackTraceElement location;
+  private transient int parameterCount;   // actual number of parameters, array might be over-sized
+  private transient boolean reserved;
+  private transient @NotNull StringBuilder builder;
+  private transient @NotNull Formatter formatter;
+
+  /**
+   * Sets the maximum size in bytes of the StringBuilder used to build log messages. If necessary,
+   * a builder will be trimmed sometime after it's used but before it's is reused.
+   * @param max the maximum size of the cached thread builder. Don't set this too high as you'll
+   *            this much memory for every thread that logs
+   * @return the new max size which is maximum of DEFAULT_STRING_BUILDER_SIZE and max
+   */
+  public static int setMaxStringBuilderSize(final int max) {
+    maxBuilderSize = Math.max(DEFAULT_STRING_BUILDER_SIZE, max);
+    return maxBuilderSize;
+  }
+
+  /**
+   *
+   * @return the current maximum cached string builder size
+   */
+  public static int getMaxStringBuilderSize() {
+    return maxBuilderSize;
   }
 
   /**
@@ -97,9 +115,10 @@ public class ExtLogRecord extends LogRecord
                                  final @NotNull String msg,
                                  final @NotNull String loggerName,
                                  final @Nullable StackTraceElement callerLocation,
+                                 final @Nullable Marker marker,
                                  final @Nullable Throwable throwable,
                                  final @NotNull Object... formatArgs) {
-    final ExtLogRecord logRecord = get(level, loggerName, null, throwable);
+    final ExtLogRecord logRecord = get(level, loggerName, marker, throwable);
     logRecord.setMessage(msg);
     logRecord.setParameters(formatArgs);
     if (callerLocation != null) {
@@ -130,37 +149,32 @@ public class ExtLogRecord extends LogRecord
     record.release();
   }
 
-  private static final Object[] EMPTY_PARAMS = new Object[0];
+  private static ExtLogRecord getRecord() {
+    ExtLogRecord result = threadLocalRecord.get();
+    if (result == null) {
+      result = new ExtLogRecord();
+      threadLocalRecord.set(result);
+    }
+    return result.isReserved() ? new ExtLogRecord().reserve() : result.reserve();
+  }
+
+  @TestOnly
+  static void clearCachedRecord() {
+    threadLocalRecord.set(null);
+  }
+
+
   private ExtLogRecord() {
     super(Level.OFF, "");
     setParameters(EMPTY_PARAMS);
-  }
-
-  @NotNull
-  private StringBuilder getBuilder() {
-    if (builder == null) {
-      builder = new StringBuilder(1024);
-    }
-    return builder;
-  }
-
-  @NotNull
-  private Formatter getFormatter() {
-    if (formatter == null) {
-      formatter = new Formatter(getBuilder());
-    }
-    return formatter;
-  }
-
-
-  @Override public void setMessage(final String message) {
-    StringBuilder builder = getBuilder();
-    builder.setLength(0);
-    builder.append(message);
-  }
-
-  @Override public String getMessage() {
-    return getBuilder().toString();
+    logLevel = LogLevel.NONE;
+    threadName = Thread.currentThread().getName();
+    marker = NullMarker.INSTANCE;
+    location = null;
+    parameterCount = 0;
+    reserved = false;
+    builder = new StringBuilder(DEFAULT_STRING_BUILDER_SIZE);
+    formatter = new Formatter(builder);
   }
 
   private boolean isReserved() {
@@ -172,15 +186,60 @@ public class ExtLogRecord extends LogRecord
     logLevel = LogLevel.NONE;
     marker = NullMarker.INSTANCE;
     location = null;
-    parameterCount = 0;
+    setParameters(null);
     setMillis(System.currentTimeMillis());
     setSequenceNumber(sequenceNumber.getAndIncrement());
-    getBuilder().setLength(0);
+    if (builder.capacity() > maxBuilderSize) {
+      builder.setLength(maxBuilderSize);
+      builder.trimToSize();
+    }
+    builder.setLength(0);
     return this;
   }
 
   private void release() {
     reserved = false;
+  }
+
+  public void setLocation(final @Nullable StackTraceElement location) {
+    this.location = location;
+  }
+
+
+  @Override public String getMessage() {
+    return builder.toString();
+  }
+
+  @Override public void setMessage(final @Nullable String message) {
+    StringBuilder builder = this.builder;
+    builder.setLength(0);
+    builder.append(message);
+  }
+
+  @Override public void setParameters(final @Nullable Object[] parameters) {
+    final Object[] existingParameters = getParameters();
+    if (parameters != null) {
+      parameterCount = parameters.length;
+      if (existingParameters != null && existingParameters.length >= parameters.length) {
+        System.arraycopy(parameters, 0, existingParameters, 0, parameters.length);
+        if (existingParameters.length > parameters.length) {
+          Arrays.fill(existingParameters, parameters.length, existingParameters.length, null);
+        }
+        // in current impl this is redundant, but let's not assume LogRecord never changes
+        super.setParameters(existingParameters);
+      } else {
+        super.setParameters(Arrays.copyOf(parameters, parameters.length));
+      }
+    } else {
+      parameterCount = 0;
+      if (existingParameters != null && existingParameters.length > 0) {
+        Arrays.fill(existingParameters, null);
+      }
+    }
+  }
+
+  public @NotNull LogLevel getLogLevel() {
+    return logLevel;
   }
 
   @NotNull
@@ -190,10 +249,6 @@ public class ExtLogRecord extends LogRecord
     return this;
   }
 
-  public LogLevel getLogLevel() {
-    return logLevel;
-  }
-
   /**
    * Name of the thread on which this instance was constructed
    *
@@ -201,6 +256,10 @@ public class ExtLogRecord extends LogRecord
    */
   @NotNull public String getThreadName() {
     return threadName;
+  }
+
+  public void setThreadName(@NotNull final String threadName) {
+    this.threadName = threadName;
   }
 
   /**
@@ -221,32 +280,9 @@ public class ExtLogRecord extends LogRecord
     return location;
   }
 
-  public void setLocation(final @Nullable StackTraceElement location) {
-    this.location = location;
-  }
-
   /** @return the number of parameters passed to {@link #setParameters(Object[])} */
   public int getParameterCount() {
     return parameterCount;
-  }
-
-  /** If we start pooling this I want to already reuse the object array and keep track of actual parameter count */
-  @Override public void setParameters(final Object[] parameters) {
-    parameterCount = parameters.length;
-    final Object[] existingParameters = getParameters();
-    if (existingParameters != null && existingParameters.length >= parameters.length) {
-      System.arraycopy(parameters, 0, existingParameters, 0, parameters.length);
-      if (existingParameters.length > parameters.length) {
-        Arrays.fill(existingParameters, parameters.length, existingParameters.length, null);
-      }
-      super.setParameters(existingParameters);  // in current impl this is redundant, but let's not assume LogRecord never changes
-    } else {
-      super.setParameters(parameters);
-    }
-  }
-
-  public void setThreadName(@NotNull final String threadName) {
-    this.threadName = threadName;
   }
 
   @Override public void close() {
@@ -261,8 +297,8 @@ public class ExtLogRecord extends LogRecord
     location = (StackTraceElement)in.readObject();
     parameterCount = in.readInt();
     reserved = false;
-    builder = null;
-    formatter = null;
+    builder = new StringBuilder(DEFAULT_STRING_BUILDER_SIZE);
+    formatter = new Formatter(builder);
   }
 
   private void writeObject(ObjectOutputStream out) throws IOException {
@@ -280,9 +316,7 @@ public class ExtLogRecord extends LogRecord
     copy.setSequenceNumber(getSequenceNumber());
     copy.setSourceClassName(getSourceClassName());
     copy.setSourceMethodName(getSourceMethodName());
-    if (builder != null) {
-      copy.builder = new StringBuilder(builder.toString());
-    }
+    copy.builder.append(builder.toString());
     copy.setThreadID(getThreadID());
     copy.setMillis(getMillis());
     copy.setThrown(getThrown());
@@ -298,74 +332,74 @@ public class ExtLogRecord extends LogRecord
     return copy;
   }
 
+  @NotNull @Override public LogRecordBuilder reset() {
+    builder.setLength(0);
+    return this;
+  }
+
+  @NotNull @Override public LogRecordBuilder append(@NotNull final String str) {
+    builder.append(str);
+    return this;
+  }
+
+  @NotNull @Override public LogRecordBuilder append(boolean b) {
+    builder.append(b);
+    return this;
+  }
+
+  @NotNull @Override public LogRecordBuilder append(final char c) {
+    builder.append(c);
+    return this;
+  }
+
+  @NotNull @Override public LogRecordBuilder append(int i) {
+    builder.append(i);
+    return this;
+  }
+
+  @NotNull @Override public LogRecordBuilder append(long lng) {
+    builder.append(lng);
+    return this;
+  }
+
+  @NotNull @Override public LogRecordBuilder append(float f) {
+    builder.append(f);
+    return this;
+  }
+
+  @NotNull @Override public LogRecordBuilder append(double d) {
+    builder.append(d);
+    return this;
+  }
+
+  @NotNull @Override public LogRecordBuilder append(@NotNull final String format,
+                                                    @NotNull final Object... args) {
+    return append(Locale.getDefault(), format, args);
+  }
+
+  @NotNull @Override public LogRecordBuilder append(@NotNull Locale locale,
+                                                    @NotNull final String format,
+                                                    @NotNull final Object... args) {
+    if (args.length > 0) {
+      formatter.format(locale, format, args);
+    } else {
+      builder.append(format);
+    }
+    return this;
+  }
+
   @NotNull @Override public LogRecordBuilder addLocation(final int stackDepth) {
     location = LogUtil.getCallerLocation(stackDepth + 1);
     return this;
   }
 
-  @NotNull @Override public LogMessageFormatter reset() {
-    getBuilder().setLength(0);
-    return this;
-  }
-
-  @NotNull @Override public LogMessageFormatter append(@NotNull final String str) {
-    getBuilder().append(str);
-    return this;
-  }
-
-  @NotNull @Override public LogMessageFormatter append(boolean b) {
-    getBuilder().append(b);
-    return this;
-  }
-
-  @NotNull @Override public LogMessageFormatter append(int i) {
-    getBuilder().append(i);
-    return this;
-  }
-
-  @NotNull @Override public LogMessageFormatter append(long lng) {
-    getBuilder().append(lng);
-    return this;
-  }
-
-  @NotNull @Override public LogMessageFormatter append(float f) {
-    getBuilder().append(f);
-    return this;
-  }
-
-  @NotNull @Override public LogMessageFormatter append(double d) {
-    getBuilder().append(d);
-    return this;
-  }
-
-  @NotNull @Override public LogMessageFormatter append(@NotNull final String format,
-                                                       @NotNull final Object... args) {
-    return append(Locale.getDefault(), format, args);
-  }
-
-  @NotNull @Override public LogMessageFormatter append(@NotNull Locale locale,
-                                                       @NotNull final String format,
-                                                       @NotNull final Object... args) {
-    if (args.length > 0) {
-      getFormatter().format(locale, format, args);
-    } else {
-      getBuilder().append(format);
-    }
-    return this;
-  }
-
   @Override public Appendable append(final CharSequence csq) {
-    getBuilder().append(csq);
+    builder.append(csq);
     return this;
   }
 
   @Override public Appendable append(final CharSequence csq, final int start, final int end) {
-    getBuilder().append(csq, start, end);
-    return this;
-  }
-
-  @NotNull @Override public LogMessageFormatter append(final char c) {
-    getBuilder().append(c);
+    builder.append(csq, start, end);
     return this;
   }
 

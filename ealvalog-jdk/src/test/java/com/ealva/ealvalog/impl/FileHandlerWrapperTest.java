@@ -20,8 +20,6 @@ package com.ealva.ealvalog.impl;
 
 import com.ealva.ealvalog.LogLevel;
 import com.ealva.ealvalog.core.ExtLogRecord;
-import com.ealva.ealvalog.impl.FileHandlerWrapper;
-import com.ealva.ealvalog.impl.HandlerWrapper;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -45,15 +43,15 @@ import java.util.List;
 public class FileHandlerWrapperTest {
 
   private static final String MSG = "msg";
-  private ExtLogRecord record;
-
   @Rule public TemporaryFolder folder = new TemporaryFolder();
+  private ExtLogRecord record;
 
   @Before
   public void setup() {
     record = ExtLogRecord.get(LogLevel.CRITICAL,
                               MSG,
                               "LoggerName",
+                              null,
                               null,
                               null);
   }
@@ -70,7 +68,7 @@ public class FileHandlerWrapperTest {
     final File root = folder.getRoot();
     final String fileNamePattern = new File(root, "ealvalog.%g.%u.log").getAbsolutePath();
     final HandlerWrapper handler = FileHandlerWrapper.builder().fileNamePattern(fileNamePattern)
-                                                                   .build();
+                                                     .build();
     handler.publish(record);
 
     final String[] array = root.list();

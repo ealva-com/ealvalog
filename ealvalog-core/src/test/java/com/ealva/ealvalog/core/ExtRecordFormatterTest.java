@@ -19,7 +19,9 @@
 package com.ealva.ealvalog.core;
 
 import com.ealva.ealvalog.LogLevel;
+import com.ealva.ealvalog.Marker;
 import com.ealva.ealvalog.MarkerFactory;
+import com.ealva.ealvalog.Markers;
 import com.ealva.ealvalog.util.LogUtil;
 
 import org.junit.After;
@@ -46,6 +48,7 @@ public class ExtRecordFormatterTest {
   private static final String MESSAGE_FORMAT = "%s";
   private static final String LOGGER_NAME = "LoggerName";
   private static final IllegalArgumentException THROWABLE = new IllegalArgumentException("Dummy");
+  private static final Marker MARKER = Markers.get("test");
   private static final String MESSAGE_ARG = "The Message";
   private static final String DECLARING_CLASS = "DeclaringClass";
   private static final String METHOD_NAME = "MethodName";
@@ -67,6 +70,7 @@ public class ExtRecordFormatterTest {
                                                       MESSAGE_FORMAT,
                                                       LOGGER_NAME,
                                                       LogUtil.getCallerLocation(0),
+                                                      MARKER,
                                                       THROWABLE,
                                                       MESSAGE_ARG);
   }
