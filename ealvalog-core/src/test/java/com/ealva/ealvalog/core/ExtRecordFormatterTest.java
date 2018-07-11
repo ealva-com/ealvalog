@@ -66,6 +66,7 @@ public class ExtRecordFormatterTest {
   @Before
   public void setup() {
     MockitoAnnotations.initMocks(this);
+    ExtLogRecord.clearCachedRecord();
     record = com.ealva.ealvalog.core.ExtLogRecord.get(LOG_LEVEL,
                                                       MESSAGE_FORMAT,
                                                       LOGGER_NAME,
@@ -240,4 +241,25 @@ public class ExtRecordFormatterTest {
     assertThat(formatter.format(record), is(equalTo(markerName)));
   }
 
+  /**
+   * Test for a defect where the LogRecord message has already been properly formatted or
+   * does not need to be formatted, yet contains formatting characters. The LogRecord parameters
+   * of ExtLogRecord may be larger than the actual number of parameters and may also contain nulls.
+   * ExtLogRecords maybe cached and the parameter array is reused so we don't have to allocate
+   * arrays all the time. The formatter needs to check that the parameter array may be null or
+   * contain nulls, making the actual parameter count smaller than the parameter array length.
+   */
+  @Test
+  public void testNoParametersButHasFormatting() {
+    record.close(); // release the fir
+    record = com.ealva.ealvalog.core.ExtLogRecord.get(LOG_LEVEL,
+                                                      MESSAGE_FORMAT,
+                                                      LOGGER_NAME,
+                                                      LogUtil.getCallerLocation(0),
+                                                      MARKER,
+                                                      THROWABLE);
+    com.ealva.ealvalog.core.ExtRecordFormatter
+        formatter = new com.ealva.ealvalog.core.ExtRecordFormatter("%1$s");
+    assertThat(formatter.format(record), is(equalTo(MESSAGE_FORMAT)));
+  }
 }

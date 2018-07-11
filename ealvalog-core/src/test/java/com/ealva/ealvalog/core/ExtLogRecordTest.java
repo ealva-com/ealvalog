@@ -27,10 +27,15 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+import static org.hamcrest.collection.IsArrayWithSize.arrayWithSize;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.IsNot.not;
-import static org.mockito.ArgumentMatchers.isNull;
 
 /**
  * Created by Eric A. Snell on 7/4/18.
@@ -73,15 +78,29 @@ public class ExtLogRecordTest {
     final LogLevel level = LogLevel.ERROR;
     final String loggerName = "LoggerName";
     final ExtLogRecord first = ExtLogRecord.get(level, loggerName, null, null);
+    final String firstParm = "first";
+    final String secondParm = "second";
+    first.setParameters(new Object[] {firstParm, secondParm});
     assertThat(first.getLogLevel(), is(level));
     assertThat(first.getLoggerName(), is(loggerName));
+    assertThat(first.getParameterCount(), is(2));
+    Object[] firstParameters = first.getParameters();
+    assertThat((String)firstParameters[0], is(firstParm));
+    assertThat((String)firstParameters[1], is(secondParm));
     ExtLogRecord.release(first);
 
     final LogLevel secondLevel = LogLevel.WARN;
     final String secondLoggerName = "Other";
+    final String secondMessage = "%s %d %f";
     final ExtLogRecord second = ExtLogRecord.get(secondLevel, secondLoggerName, null, null);
+    second.setMessage(secondMessage);
     assertThat(second.getLogLevel(), is(secondLevel));
     assertThat(second.getLoggerName(), is(secondLoggerName));
+    Object[] secondParameters = first.getParameters();
+    assertThat(secondParameters, notNullValue());
+    assertThat(secondParameters.length, greaterThanOrEqualTo(firstParameters.length));
+    assertThat(secondParameters[0], nullValue());
+    assertThat(secondParameters[1], nullValue());
   }
 
   @Test

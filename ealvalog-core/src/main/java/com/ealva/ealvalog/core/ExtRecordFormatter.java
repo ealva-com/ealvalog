@@ -26,6 +26,7 @@ import com.ealva.ealvalog.util.FormattableStackTraceElement;
 import com.ealva.ealvalog.util.FormattableThrowable;
 import com.ealva.ealvalog.util.LogMessageFormatterImpl;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.IllegalFormatConversionException;
 import java.util.logging.Formatter;
@@ -232,7 +233,8 @@ public class ExtRecordFormatter extends Formatter {
     try {
       // Any logging client can send a LogRecord so make sure check the parameters
       final Object[] parameters = record.getParameters();
-      if (parameters != null && parameters.length > 0) {
+      int parameterCount = getParameterCount(parameters);
+      if (parameterCount > 0) {
         return formatter.append(record.getMessage(), parameters).toString();
       } else {
         return formatter.append(record.getMessage()).toString();
@@ -244,6 +246,20 @@ public class ExtRecordFormatter extends Formatter {
         throw e;
       }
     }
+  }
+
+  /**
+   * Return the actual number of parameters given the array may be null or contain nulls.
+   * @param parameters the parameters to be used for formatting, if any
+   * @return 0 if parameters is null, or the index of the first null item, or the length of
+   * the parameters array if none are null.
+   */
+  private int getParameterCount(@Nullable final Object[] parameters) {
+    if (null == parameters) return 0;
+    for (int i = 0; i < parameters.length; i++) {
+      if (null == parameters[i]) return i;
+    }
+    return parameters.length;
   }
 
   private void setArgs(final com.ealva.ealvalog.core.ExtLogRecord record, final String msg, final Object[] formatterArgs) {
