@@ -91,16 +91,8 @@ public class JdkLogger extends CoreLogger<JdkBridge> {
     return getBridge().shouldLogToParent(this);
   }
 
-  protected @NotNull JdkBridge getBridge() {
-    return super.getBridge();
-  }
-
-
-
   @Override public void setFilter(@NotNull final LoggerFilter filter) {
     config.setLoggerFilter(this, filter);
   }
-
-
 
 }

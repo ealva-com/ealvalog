@@ -25,7 +25,8 @@ import java.util.Formatter;
 import java.util.logging.LogRecord;
 
 /**
- * It's expected all logging occurs through concrete implementations of this interface which are obtained via {@link Loggers}
+ * It's expected all logging occurs through concrete implementations of this interface which are
+ * obtained via {@link Loggers}
  * <p>
  * Created by Eric A. Snell on 2/28/17.
  */
@@ -49,27 +50,27 @@ public interface Logger {
   void setMarker(@Nullable Marker marker);
 
   /**
-   * Get the {@link com.ealva.ealvalog.LogLevel} for this Logger. If no LogLevel has been set, null is returned
+   * Get the {@link LogLevel} for this Logger. If no LogLevel has been set, null is returned
    *
    * @return the current level or null
    */
-  @Nullable com.ealva.ealvalog.LogLevel getLogLevel();
+  @Nullable LogLevel getLogLevel();
 
   /**
    * Set an optional LogLevel. If null the nearest ancestor LogLevel will be used as the level for this logger
    * <p>
-   * If null is passed to the root logger, it sets the level to {@link com.ealva.ealvalog.LogLevel#NONE}
+   * If null is passed to the root logger, it sets the level to {@link LogLevel#NONE}
    *
    * @param logLevel the new level for this logger or removed if null
    */
-  void setLogLevel(@Nullable com.ealva.ealvalog.LogLevel logLevel);
+  void setLogLevel(@Nullable LogLevel logLevel);
 
   /**
    * Gets the level set for this logger or, if that it has not been set, get the nearest ancestor log level
    *
    * @return the log level at which this logger is operating
    */
-  @NotNull com.ealva.ealvalog.LogLevel getEffectLogLevel();
+  @NotNull LogLevel getEffectLogLevel();
 
   /**
    * Set if this logger should include call site location information in the log information. This is a relatively expensive operation and
@@ -92,28 +93,28 @@ public interface Logger {
   boolean getIncludeLocation();
 
   /**
-   * Determine if a log call at this {@link com.ealva.ealvalog.LogLevel} will result in an actual log statement. Typically this is only a level check, unless
+   * Determine if a log call at this {@link LogLevel} will result in an actual log statement. Typically this is only a level check, unless
    * the Logger instance contains a {@link Marker}. In that case the contained Marker is also checked to promote fast short-circuiting
    *
-   * @param level the level to test, one of {@link com.ealva.ealvalog.LogLevel#TRACE}, {@link com.ealva.ealvalog.LogLevel#DEBUG}, {@link com.ealva.ealvalog.LogLevel#INFO}, {@link com.ealva.ealvalog.LogLevel#WARN},
-   *              {@link com.ealva.ealvalog.LogLevel#ERROR}, {@link com.ealva.ealvalog.LogLevel#CRITICAL}
+   * @param level the level to test, one of {@link LogLevel#TRACE}, {@link LogLevel#DEBUG}, {@link LogLevel#INFO}, {@link LogLevel#WARN},
+   *              {@link LogLevel#ERROR}, {@link LogLevel#CRITICAL}
    *
    * @return true if a log statement will be produced at this level
    */
-  boolean isLoggable(@NotNull com.ealva.ealvalog.LogLevel level);
+  boolean isLoggable(@NotNull LogLevel level);
 
   /**
-   * Will a log at this {@link com.ealva.ealvalog.LogLevel}, with the given (optional) {@link Marker} and (optional) {@link Throwable}, result in an actual log
+   * Will a log at this {@link LogLevel}, with the given (optional) {@link Marker} and (optional) {@link Throwable}, result in an actual log
    * statement
    *
-   * @param level     the level to test, one of {@link com.ealva.ealvalog.LogLevel#TRACE}, {@link com.ealva.ealvalog.LogLevel#DEBUG}, {@link com.ealva.ealvalog.LogLevel#INFO}, {@link
-   *                  com.ealva.ealvalog.LogLevel#WARN}, {@link com.ealva.ealvalog.LogLevel#ERROR}, {@link com.ealva.ealvalog.LogLevel#CRITICAL}
+   * @param level     the level to test, one of {@link LogLevel#TRACE}, {@link LogLevel#DEBUG}, {@link LogLevel#INFO}, {@link
+   *                  LogLevel#WARN}, {@link LogLevel#ERROR}, {@link LogLevel#CRITICAL}
    * @param marker    optional marker to test
    * @param throwable optional throwable to test
    *
    * @return true if a log statement will be produced at this level
    */
-  boolean isLoggable(@NotNull com.ealva.ealvalog.LogLevel level, @Nullable Marker marker, @Nullable Throwable throwable);
+  boolean isLoggable(@NotNull LogLevel level, @Nullable Marker marker, @Nullable Throwable throwable);
 
   /**
    * If isLoggable, log at the {@code msg} at {@code level}
@@ -121,7 +122,7 @@ public interface Logger {
    * @param level log level to use
    * @param msg   log msg which is unaltered
    */
-  void log(@NotNull com.ealva.ealvalog.LogLevel level, @NotNull String msg);
+  void log(@NotNull LogLevel level, @NotNull String msg);
 
   /**
    * If isLoggable, log at the {@code msg} at {@code level} using the {@code marker}
@@ -130,7 +131,7 @@ public interface Logger {
    * @param marker marker to include
    * @param msg    log msg which is unaltered
    */
-  void log(@NotNull com.ealva.ealvalog.LogLevel level, @NotNull Marker marker, @NotNull String msg);
+  void log(@NotNull LogLevel level, @NotNull Marker marker, @NotNull String msg);
 
   /**
    * If isLoggable, log at the {@code msg} at {@code level} with the given {@code throwable}
@@ -139,7 +140,7 @@ public interface Logger {
    * @param throwable throwable to include
    * @param msg       log msg which is unaltered
    */
-  void log(@NotNull com.ealva.ealvalog.LogLevel level, @NotNull Throwable throwable, @NotNull String msg);
+  void log(@NotNull LogLevel level, @NotNull Throwable throwable, @NotNull String msg);
 
   /**
    * If isLoggable, log at the {@code msg} at {@code level} using the {@code marker} and {@code throwable}
@@ -149,7 +150,7 @@ public interface Logger {
    * @param throwable throwable to include
    * @param msg       log msg which is unaltered
    */
-  void log(@NotNull com.ealva.ealvalog.LogLevel level, @NotNull Marker marker, @NotNull Throwable throwable, @NotNull String msg);
+  void log(@NotNull LogLevel level, @NotNull Marker marker, @NotNull Throwable throwable, @NotNull String msg);
 
   /**
    * If isLoggable, log at the {@code msg} at {@code level} using the {@code marker}
@@ -159,7 +160,7 @@ public interface Logger {
    * @param format     a format string in the form required by {@link Formatter}
    * @param formatArgs arguments passed to {@link Formatter#format(String, Object...)}
    */
-  void log(@NotNull com.ealva.ealvalog.LogLevel level, @NotNull Marker marker, @NotNull String format, @NotNull Object... formatArgs);
+  void log(@NotNull LogLevel level, @NotNull Marker marker, @NotNull String format, @NotNull Object... formatArgs);
 
   /**
    * If isLoggable, log at the {@code msg} at {@code level} using the {@code throwable}
@@ -169,7 +170,7 @@ public interface Logger {
    * @param format     a format string in the form required by {@link Formatter}
    * @param formatArgs arguments passed to {@link Formatter#format(String, Object...)}
    */
-  void log(@NotNull com.ealva.ealvalog.LogLevel level, @NotNull Throwable throwable, @NotNull String format, @NotNull Object... formatArgs);
+  void log(@NotNull LogLevel level, @NotNull Throwable throwable, @NotNull String format, @NotNull Object... formatArgs);
 
   /**
    * If isLoggable, log at the {@code msg} at {@code level} using the {@code marker} and {@code throwable}
@@ -180,26 +181,26 @@ public interface Logger {
    * @param format     a format string in the form required by {@link Formatter}
    * @param formatArgs arguments passed to {@link Formatter#format(String, Object...)}
    */
-  void log(@NotNull com.ealva.ealvalog.LogLevel level,
+  void log(@NotNull LogLevel level,
            @NotNull Marker marker,
            @NotNull Throwable throwable,
            @NotNull String format,
            @NotNull Object... formatArgs);
 
-  void log(@NotNull com.ealva.ealvalog.LogLevel level, @NotNull String format, @NotNull Object arg1);
+  void log(@NotNull LogLevel level, @NotNull String format, @NotNull Object arg1);
 
-  void log(@NotNull com.ealva.ealvalog.LogLevel level, @NotNull String format, @NotNull Object arg1, @NotNull Object arg2);
+  void log(@NotNull LogLevel level, @NotNull String format, @NotNull Object arg1, @NotNull Object arg2);
 
-  void log(@NotNull com.ealva.ealvalog.LogLevel level, @NotNull String format, @NotNull Object arg1, @NotNull Object arg2, @NotNull Object arg3);
+  void log(@NotNull LogLevel level, @NotNull String format, @NotNull Object arg1, @NotNull Object arg2, @NotNull Object arg3);
 
-  void log(@NotNull com.ealva.ealvalog.LogLevel level,
+  void log(@NotNull LogLevel level,
            @NotNull String format,
            @NotNull Object arg1,
            @NotNull Object arg2,
            @NotNull Object arg3,
            @NotNull Object arg4);
 
-  void log(@NotNull com.ealva.ealvalog.LogLevel level,
+  void log(@NotNull LogLevel level,
            @NotNull String format,
            @NotNull Object arg1,
            @NotNull Object arg2,
@@ -213,7 +214,7 @@ public interface Logger {
    * @param level     log level to use
    * @param throwable the throwable that was caught
    */
-  void caught(@NotNull com.ealva.ealvalog.LogLevel level, @NotNull Throwable throwable);
+  void caught(@NotNull LogLevel level, @NotNull Throwable throwable);
 
   /**
    * Log a throwable being thrown at the log site.
@@ -227,7 +228,7 @@ public interface Logger {
    *
    * @return returns the throwable for convenience
    */
-  Throwable throwing(@NotNull com.ealva.ealvalog.LogLevel level, @NotNull Throwable throwable);
+  Throwable throwing(@NotNull LogLevel level, @NotNull Throwable throwable);
 
   /**
    * Log without checking the the level and indicate where on the call chain the log is occurring ({@code stackDepth}). This method's
@@ -242,7 +243,7 @@ public interface Logger {
    * @param msg        the log message
    * @param formatArgs any formatting arguments if {@code msg} is a printf style format string (see {@link Formatter}
    */
-  void logImmediate(@NotNull com.ealva.ealvalog.LogLevel level,
+  void logImmediate(@NotNull LogLevel level,
                     @Nullable Marker marker,
                     @Nullable Throwable throwable,
                     int stackDepth,
@@ -259,7 +260,7 @@ public interface Logger {
    * @param msg        the log message
    * @param formatArgs any formatting arguments if {@code msg} is a printf style format string (see {@link Formatter}
    */
-  void logImmediate(@NotNull com.ealva.ealvalog.LogLevel level,
+  void logImmediate(@NotNull LogLevel level,
                     @Nullable Throwable throwable,
                     int stackDepth,
                     @NotNull String msg,
