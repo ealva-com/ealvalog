@@ -394,7 +394,7 @@ public class BaseLoggerTest {
 
     }
 
-    @NotNull @Override public LogLevel getEffectLogLevel() {
+    @NotNull @Override public LogLevel getEffectiveLogLevel() {
       return LogLevel.NONE;
     }
 

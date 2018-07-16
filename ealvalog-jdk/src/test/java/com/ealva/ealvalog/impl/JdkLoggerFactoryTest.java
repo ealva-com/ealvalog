@@ -23,9 +23,6 @@ import com.ealva.ealvalog.LoggerFactory;
 import com.ealva.ealvalog.LoggerFilter;
 import com.ealva.ealvalog.Loggers;
 import com.ealva.ealvalog.filter.AlwaysAcceptFilter;
-import com.ealva.ealvalog.impl.JdkBridge;
-import com.ealva.ealvalog.impl.JdkLogger;
-import com.ealva.ealvalog.impl.JdkLoggerFactory;
 
 import org.junit.Before;
 import org.junit.Test;

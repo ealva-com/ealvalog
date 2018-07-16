@@ -28,9 +28,9 @@ import android.util.Log;
  *
  * Created by Eric A. Snell on 3/14/17.
  */
-public class Levels {
+class Levels {
   @SuppressWarnings("Duplicates") // same as in ealvalog-android, but we don't want a dependency or to factor out a lib with only this
-  public static int toAndroidLevel(@NotNull final LogLevel level) {
+  static int toAndroidLevel(@NotNull final LogLevel level) {
     switch (level) {
       case TRACE:
         return Log.VERBOSE;

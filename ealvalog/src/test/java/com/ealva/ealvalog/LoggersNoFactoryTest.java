@@ -38,7 +38,7 @@ public class LoggersNoFactoryTest {
    * Ensure no NPE or uncaught exception when no logger factory is set
    */
   @Test
-  public void testNoLoggerFactorySet() throws Exception {
+  public void testNoLoggerFactorySet() {
     testLogger(com.ealva.ealvalog.Loggers.get());
     testLogger(com.ealva.ealvalog.Loggers.get("blah"));
     testLogger(com.ealva.ealvalog.Loggers.get(LoggersNoFactoryTest.class));
@@ -58,7 +58,7 @@ public class LoggersNoFactoryTest {
     assertThat(logger, is(notNullValue()));
     assertThat(logger.getName(), is(notNullValue()));
     assertThat(logger.getLogLevel(), is(notNullValue()));
-    assertThat(logger.getEffectLogLevel(), is(notNullValue()));
+    assertThat(logger.getEffectiveLogLevel(), is(notNullValue()));
     assertThat(logger.getMarker(), is(notNullValue()));
     assertThat(logger.isLoggable(com.ealva.ealvalog.LogLevel.CRITICAL), is(false));
     assertThat(logger.isLoggable(LogLevel.CRITICAL, NullMarker.INSTANCE, NullThrowable.INSTANCE), is(false));

@@ -27,6 +27,7 @@ import com.ealva.ealvalog.core.CoreLogger;
 import com.ealva.ealvalog.util.NullThrowable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.TestOnly;
 
 import static com.ealva.ealvalog.LogLevel.NONE;
 
@@ -52,14 +53,16 @@ public class JdkLogger extends CoreLogger<JdkBridge> {
     config.setLogLevel(this, logLevel == null ? NONE : logLevel);
   }
 
-  @NotNull @Override public LogLevel getEffectLogLevel() {
+  @NotNull @Override public LogLevel getEffectiveLogLevel() {
     return getBridge().getLogLevel();
   }
 
   void update(final @NotNull JdkLoggerConfiguration configuration) {
     this.config = configuration;
     setBridge(configuration.getBridge(getName()));
-  }  @Override public void setIncludeLocation(final boolean includeLocation) {
+  }
+
+  @Override public void setIncludeLocation(final boolean includeLocation) {
     config.setIncludeLocation(this, includeLocation);
   }
 
@@ -95,4 +98,12 @@ public class JdkLogger extends CoreLogger<JdkBridge> {
     config.setLoggerFilter(this, filter);
   }
 
+  /**
+   * Make this protected method visible for testing purposes
+   * @inheritDoc
+   */
+  @TestOnly
+  @NotNull @Override public JdkBridge getBridge() {
+    return super.getBridge();
+  }
 }

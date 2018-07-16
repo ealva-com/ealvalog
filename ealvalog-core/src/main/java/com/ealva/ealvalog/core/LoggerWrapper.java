@@ -248,8 +248,8 @@ public abstract class LoggerWrapper implements Logger {
     realLogger.setLogLevel(logLevel);
   }
 
-  @NotNull @Override public LogLevel getEffectLogLevel() {
-    return realLogger.getEffectLogLevel();
+  @NotNull @Override public LogLevel getEffectiveLogLevel() {
+    return realLogger.getEffectiveLogLevel();
   }
 
   @Override public void setIncludeLocation(final boolean includeLocation) {

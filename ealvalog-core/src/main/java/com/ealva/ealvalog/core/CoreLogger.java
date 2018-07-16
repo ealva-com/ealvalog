@@ -68,6 +68,10 @@ public abstract class CoreLogger<T extends com.ealva.ealvalog.core.Bridge> exten
     this.bridge = bridge;
   }
 
+  /**
+   * Get the bridge to the underlying logging system
+   * @return the bridge to the contained logging framework
+   */
   protected @NotNull T getBridge() {
     return bridge;
   }

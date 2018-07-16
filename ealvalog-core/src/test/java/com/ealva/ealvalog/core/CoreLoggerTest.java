@@ -21,8 +21,6 @@ package com.ealva.ealvalog.core;
 import com.ealva.ealvalog.LogLevel;
 import com.ealva.ealvalog.LoggerFilter;
 import com.ealva.ealvalog.Marker;
-import com.ealva.ealvalog.core.Bridge;
-import com.ealva.ealvalog.core.CoreLogger;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -53,7 +51,7 @@ public class CoreLoggerTest {
   }
 
   @Test
-  public void testPrintLog() throws Exception {
+  public void testPrintLog() {
     com.ealva.ealvalog.core.CoreLogger<com.ealva.ealvalog.core.Bridge>
         logger = new CoreLoggerForTest("LoggerName", bridge);
     logger.printLog(LogLevel.CRITICAL, null, null, 1, MESSAGE);
@@ -72,41 +70,44 @@ public class CoreLoggerTest {
       super(name, bridge, null);
     }
 
-    @Override public void setLogToParent(final boolean logToParent) {
-
-    }
-
-    @Override public boolean getLogToParent() {
-      return true;
-    }
-
-    @Override public boolean shouldLogToParent() {
-      return false;
-    }
-
     @Nullable @Override public LogLevel getLogLevel() {
       return null;
+    }    @Override public void setLogToParent(final boolean logToParent) {
+
     }
 
     @Override public void setLogLevel(@Nullable final LogLevel logLevel) {
 
+    }    @Override public boolean getLogToParent() {
+      return true;
     }
 
-    @NotNull @Override public LogLevel getEffectLogLevel() {
+    @NotNull @Override public LogLevel getEffectiveLogLevel() {
       return LogLevel.ALL;
-    }
-
-    @Override public void setIncludeLocation(final boolean includeLocation) {
-
+    }    @Override public boolean shouldLogToParent() {
+      return false;
     }
 
     @Override public boolean getIncludeLocation() {
       return false;
     }
 
-    @Override public boolean isLoggable(@NotNull final LogLevel level, @Nullable final Marker marker, @Nullable final Throwable throwable) {
+    @Override public void setIncludeLocation(final boolean includeLocation) {
+
+    }
+
+    @Override
+    public boolean isLoggable(@NotNull final LogLevel level,
+                              @Nullable final Marker marker,
+                              @Nullable final Throwable throwable) {
       return true;
     }
+
+
+
+
+
+
 
     @Override public void setFilter(@NotNull final LoggerFilter filter) {
 

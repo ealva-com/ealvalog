@@ -53,7 +53,7 @@ public final class NullLogger implements com.ealva.ealvalog.Logger {
 
   }
 
-  @NotNull @Override public com.ealva.ealvalog.LogLevel getEffectLogLevel() {
+  @NotNull @Override public com.ealva.ealvalog.LogLevel getEffectiveLogLevel() {
     return com.ealva.ealvalog.LogLevel.NONE;
   }
 
