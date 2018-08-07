@@ -196,7 +196,7 @@ public class JdkLoggerFactory implements LoggerFactory, JdkLoggerConfiguration {
       final String loggerName = logger.getName();
       final JdkBridge bridge = getBridge(loggerName);
       if (bridge.getName().equals(loggerName)) {
-        bridge.setIncludeLocation(true);
+        bridge.setIncludeLocation(includeLocation);
       } else {
         makeNewBridge(bridge, loggerName, null, null, null).setIncludeLocation(includeLocation);
       }

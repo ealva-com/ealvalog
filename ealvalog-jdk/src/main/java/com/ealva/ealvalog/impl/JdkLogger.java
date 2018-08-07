@@ -68,7 +68,9 @@ public class JdkLogger extends CoreLogger<JdkBridge> {
 
   public void addHandler(final @NotNull BaseLoggerHandler handler) {
     config.addLoggerHandler(this, handler);
-  }  @Override public boolean getIncludeLocation() {
+  }
+
+  @Override public boolean getIncludeLocation() {
     return getBridge().getIncludeLocation();
   }
 
