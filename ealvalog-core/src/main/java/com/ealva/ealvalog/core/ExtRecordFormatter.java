@@ -21,7 +21,6 @@ package com.ealva.ealvalog.core;
 
 import com.ealva.ealvalog.LogLevel;
 import com.ealva.ealvalog.NullMarker;
-
 import com.ealva.ealvalog.util.FormattableStackTraceElement;
 import com.ealva.ealvalog.util.FormattableThrowable;
 import com.ealva.ealvalog.util.LogMessageFormatterImpl;
@@ -42,60 +41,60 @@ import java.util.logging.LogRecord;
  * <th valign="bottom">Type
  * <th valign="bottom">Name
  * <tr>
- *   <td align="center" valign="top">1$
- *   <td align="center" valign="top">"%1$s"
- *   <td align="center" valign="top">String
- *   <td align="center" valign="top">Message
+ * <td align="center" valign="top">1$
+ * <td align="center" valign="top">"%1$s"
+ * <td align="center" valign="top">String
+ * <td align="center" valign="top">Message
  * <p><tr>
- *   <td align="center" valign="top">2$
- *   <td align="center" valign="top">"%2$d"
- *   <td align="center" valign="top">Integer
- *   <td align="center" valign="top">Thread Id
+ * <td align="center" valign="top">2$
+ * <td align="center" valign="top">"%2$d"
+ * <td align="center" valign="top">Integer
+ * <td align="center" valign="top">Thread Id
  * <p><tr>
- *   <td align="center" valign="top">3$
- *   <td align="center" valign="top">"%3$s"
- *   <td align="center" valign="top">String
- *   <td align="center" valign="top">Logger Name
+ * <td align="center" valign="top">3$
+ * <td align="center" valign="top">"%3$s"
+ * <td align="center" valign="top">String
+ * <td align="center" valign="top">Logger Name
  * <p><tr>
- *   <td align="center" valign="top">4$
- *   <td align="center" valign="top">"%4$s"
- *   <td align="center" valign="top">LogLevel
- *   <td align="center" valign="top">Level
+ * <td align="center" valign="top">4$
+ * <td align="center" valign="top">"%4$s"
+ * <td align="center" valign="top">LogLevel
+ * <td align="center" valign="top">Level
  * <p><tr>
- *   <td align="center" valign="top">5$
- *   <td align="center" valign="top">"%5$tF %5$tT.%5$tL"
- *   <td align="center" valign="top">Long
- *   <td align="center" valign="top">Date
+ * <td align="center" valign="top">5$
+ * <td align="center" valign="top">"%5$tF %5$tT.%5$tL"
+ * <td align="center" valign="top">Long
+ * <td align="center" valign="top">Date
  * <p><tr>
- *   <td align="center" valign="top">6$
- *   <td align="center" valign="top">"%6$s" or "%6$#s"
- *   <td align="center" valign="top">FormattableThrowable
- *   <td align="center" valign="top">Thrown <sup>1</sup>
+ * <td align="center" valign="top">6$
+ * <td align="center" valign="top">"%6$s" or "%6$#s"
+ * <td align="center" valign="top">FormattableThrowable
+ * <td align="center" valign="top">Thrown <sup>1</sup>
  * <p><tr>
- *   <td align="center" valign="top">7$
- *   <td align="center" valign="top">"%7$s"
- *   <td align="center" valign="top">String
- *   <td align="center" valign="top">Class Name <sup>2</sup>
+ * <td align="center" valign="top">7$
+ * <td align="center" valign="top">"%7$s"
+ * <td align="center" valign="top">String
+ * <td align="center" valign="top">Class Name <sup>2</sup>
  * <p><tr>
- *   <td align="center" valign="top">8$
- *   <td align="center" valign="top">"%8$s"
- *   <td align="center" valign="top">String
- *   <td align="center" valign="top">Method Name <sup>2</sup>
+ * <td align="center" valign="top">8$
+ * <td align="center" valign="top">"%8$s"
+ * <td align="center" valign="top">String
+ * <td align="center" valign="top">Method Name <sup>2</sup>
  * <p><tr>
- *   <td align="center" valign="top">9$
- *   <td align="center" valign="top">"%9$s"
- *   <td align="center" valign="top">FormattableStackTraceElement
- *   <td align="center" valign="top">Location <sup>2</sup>
+ * <td align="center" valign="top">9$
+ * <td align="center" valign="top">"%9$s"
+ * <td align="center" valign="top">FormattableStackTraceElement
+ * <td align="center" valign="top">Location <sup>2</sup>
  * <p><tr>
- *   <td align="center" valign="top">10$
- *   <td align="center" valign="top">"%10$s"
- *   <td align="center" valign="top">String
- *   <td align="center" valign="top">Thread Name
+ * <td align="center" valign="top">10$
+ * <td align="center" valign="top">"%10$s"
+ * <td align="center" valign="top">String
+ * <td align="center" valign="top">Thread Name
  * <p><tr>
- *   <td align="center" valign="top">11$
- *   <td align="center" valign="top">"%11$s"
- *   <td align="center" valign="top">Marker
- *   <td align="center" valign="top">Marker
+ * <td align="center" valign="top">11$
+ * <td align="center" valign="top">"%11$s"
+ * <td align="center" valign="top">Marker
+ * <td align="center" valign="top">Marker
  * <p>
  * </table>
  * <p><sup>1</sup> # flag for stack trace
@@ -105,35 +104,33 @@ import java.util.logging.LogRecord;
  */
 @SuppressWarnings({"WeakerAccess", "unused", "UnnecessaryBoxing"})
 public class ExtRecordFormatter extends Formatter {
-  private static final int MESSAGE_INDEX = 0;
-  private static final int THREAD_ID_INDEX = 1;
-  private static final int LOGGER_NAME_INDEX = 2;
-  private static final int LOG_LEVEL_INDEX = 3;
-  private static final int DATE_INDEX = 4;
-  private static final int THROWN_INDEX = 5;
-  private static final int CLASS_NAME_INDEX = 6;
-  private static final int METHOD_NAME_INDEX = 7;
-  private static final int LOCATION_INDEX = 8;
-  private static final int THREAD_NAME_INDEX = 9;
-  private static final int MARKER_INDEX = 10;
-
-  public static final String MESSAGE_POSITION = "%" + Integer.toString(MESSAGE_INDEX + 1);
-  public static final String THREAD_ID_POSITION = "%" + Integer.toString(THREAD_ID_INDEX + 1);
-  public static final String LOGGER_NAME_POSITION = "%" + Integer.toString(LOGGER_NAME_INDEX + 1);
-  public static final String LOG_LEVEL_POSITION = "%" + Integer.toString(LOG_LEVEL_INDEX + 1);
-  public static final String DATE_POSITION = "%" + Integer.toString(DATE_INDEX + 1);
-  public static final String THROWN_POSITION = "%" + Integer.toString(THROWN_INDEX + 1);
-  public static final String CLASS_NAME_POSITION = "%" + Integer.toString(CLASS_NAME_INDEX + 1);
-  public static final String METHOD_NAME_POSITION = "%" + Integer.toString(METHOD_NAME_INDEX + 1);
-  public static final String LOCATION_POSITION = "%" + Integer.toString(LOCATION_INDEX + 1);
-  public static final String THREAD_NAME_POSITION = "%" + Integer.toString(THREAD_NAME_INDEX + 1);
-  public static final String MARKER_POSITION = "%" + Integer.toString(MARKER_INDEX + 1);
-
   /** Of the form: "2017-03-05 14:33:15.098" */
   public static final String DATE_TIME_FORMAT = "%5$tF %5$tT.%5$tL";
-
   /** Of the form: "Sun 2017-03-05 14:33:15.098" */
   public static final String DAY_DATE_TIME_FORMAT = "%5$ta " + DATE_TIME_FORMAT;
+
+  private static final int MESSAGE_INDEX = 0;
+  public static final String MESSAGE_POSITION = "%" + Integer.toString(MESSAGE_INDEX + 1);
+  private static final int THREAD_ID_INDEX = 1;
+  public static final String THREAD_ID_POSITION = "%" + Integer.toString(THREAD_ID_INDEX + 1);
+  private static final int LOGGER_NAME_INDEX = 2;
+  public static final String LOGGER_NAME_POSITION = "%" + Integer.toString(LOGGER_NAME_INDEX + 1);
+  private static final int LOG_LEVEL_INDEX = 3;
+  public static final String LOG_LEVEL_POSITION = "%" + Integer.toString(LOG_LEVEL_INDEX + 1);
+  private static final int DATE_INDEX = 4;
+  public static final String DATE_POSITION = "%" + Integer.toString(DATE_INDEX + 1);
+  private static final int THROWN_INDEX = 5;
+  public static final String THROWN_POSITION = "%" + Integer.toString(THROWN_INDEX + 1);
+  private static final int CLASS_NAME_INDEX = 6;
+  public static final String CLASS_NAME_POSITION = "%" + Integer.toString(CLASS_NAME_INDEX + 1);
+  private static final int METHOD_NAME_INDEX = 7;
+  public static final String METHOD_NAME_POSITION = "%" + Integer.toString(METHOD_NAME_INDEX + 1);
+  private static final int LOCATION_INDEX = 8;
+  public static final String LOCATION_POSITION = "%" + Integer.toString(LOCATION_INDEX + 1);
+  private static final int THREAD_NAME_INDEX = 9;
+  public static final String THREAD_NAME_POSITION = "%" + Integer.toString(THREAD_NAME_INDEX + 1);
+  private static final int MARKER_INDEX = 10;
+  public static final String MARKER_POSITION = "%" + Integer.toString(MARKER_INDEX + 1);
 
   public static final String MESSAGE_ARG = MESSAGE_POSITION + "$s";
   public static final String THREAD_ID_ARG = THREAD_ID_POSITION + "$d";
@@ -144,15 +141,13 @@ public class ExtRecordFormatter extends Formatter {
   public static final String CLASS_NAME_ARG = CLASS_NAME_POSITION + "$s";
   public static final String METHOD_NAME_ARG = METHOD_NAME_POSITION + "$s";
   public static final String LOCATION_ARG = LOCATION_POSITION + "$s";
-  public static final String THREAD_NAME_ARG = THREAD_NAME_POSITION  + "$s";
+  public static final String THREAD_NAME_ARG = THREAD_NAME_POSITION + "$s";
   public static final String MARKER_ARG = MARKER_POSITION + "$s";
-
   public static final String THROWN_STACKTRACE_ARG = THROWN_POSITION + "$#s";
   public static final String LOCATION_WITH_CLASS_NAME_ARG = LOCATION_POSITION + "$#s";
-
-  public static final String TYPICAL_FORMAT = DATE_TIME_FORMAT + " %4$s [%10$s] %3$s - %1$s %6$#s%n";
+  public static final String TYPICAL_FORMAT =
+      DATE_TIME_FORMAT + " %4$s [%10$s] %3$s - %1$s %6$#s%n";
   public static final String TYPICAL_ANDROID_FORMAT = "[%10$s]%9$s %1$s";
-
   private static final ThreadLocal<ExtLogMessageFormatter> threadLocalFormatter =
       new ThreadLocal<ExtLogMessageFormatter>() {
         @Override
@@ -173,8 +168,7 @@ public class ExtRecordFormatter extends Formatter {
   private boolean logErrors;
 
   public ExtRecordFormatter() {
-    format = TYPICAL_FORMAT;
-    logErrors = false;
+    this(TYPICAL_FORMAT, false);
   }
 
   public ExtRecordFormatter(final @NotNull String format) {
@@ -182,16 +176,8 @@ public class ExtRecordFormatter extends Formatter {
   }
 
   public ExtRecordFormatter(final @NotNull String format, final boolean logErrors) {
-    setFormat(format);
+    this.format = format;
     this.logErrors = logErrors;
-  }
-
-  public @NotNull String getFormat() {
-    return format;
-  }
-
-  public void setFormat(final String format) {
-    this.format = format == null ? TYPICAL_FORMAT : format;
   }
 
   public boolean logErrors() {
@@ -215,8 +201,8 @@ public class ExtRecordFormatter extends Formatter {
       final ExtLogMessageFormatter formatter = threadLocalFormatter.get();
       final String msg = formatClientMessage(record, formatter);
       formatter.reset();
-      if (record instanceof com.ealva.ealvalog.core.ExtLogRecord) {
-        setArgs((com.ealva.ealvalog.core.ExtLogRecord)record, msg, formatter.formatterArgs);
+      if (record instanceof ExtLogRecord) {
+        setArgs((ExtLogRecord)record, msg, formatter.formatterArgs);
       } else {
         setArgs(record, msg, formatter.formatterArgs);
       }
@@ -230,7 +216,16 @@ public class ExtRecordFormatter extends Formatter {
     }
   }
 
-  protected String formatClientMessage(final LogRecord record, final ExtLogMessageFormatter formatter) {
+  public @NotNull String getFormat() {
+    return format;
+  }
+
+  public void setFormat(final @Nullable String format) {
+    this.format = format == null ? TYPICAL_FORMAT : format;
+  }
+
+  protected String formatClientMessage(final LogRecord record,
+                                       final ExtLogMessageFormatter formatter) {
     try {
       // Any logging client can send a LogRecord so make sure check the parameters
       final Object[] parameters = record.getParameters();
@@ -251,33 +246,32 @@ public class ExtRecordFormatter extends Formatter {
 
   /**
    * Return the actual number of parameters given the array may be null or contain nulls.
+   *
    * @param parameters the parameters to be used for formatting, if any
+   *
    * @return 0 if parameters is null, or the index of the first null item, or the length of
    * the parameters array if none are null.
    */
   private int getParameterCount(@Nullable final Object[] parameters) {
-    if (null == parameters) return 0;
+    if (null == parameters) { return 0; }
     for (int i = 0; i < parameters.length; i++) {
-      if (null == parameters[i]) return i;
+      if (null == parameters[i]) { return i; }
     }
     return parameters.length;
   }
 
-  private void setArgs(final com.ealva.ealvalog.core.ExtLogRecord record, final String msg, final Object[] formatterArgs) {
+  private void setArgs(final com.ealva.ealvalog.core.ExtLogRecord record,
+                       final String msg,
+                       final Object[] formatterArgs) {
     setBaseArgs(record, msg, formatterArgs);
     ((FormattableStackTraceElement)formatterArgs[LOCATION_INDEX]).setElement(record.getCallLocation());
     formatterArgs[THREAD_NAME_INDEX] = record.getThreadName();
     formatterArgs[MARKER_INDEX] = record.getMarker();
   }
 
-  private void setArgs(final LogRecord record, final String msg, final Object[] formatterArgs) {
-    setBaseArgs(record, msg, formatterArgs);
-    ((FormattableStackTraceElement)formatterArgs[LOCATION_INDEX]).setElement(null);
-    formatterArgs[THREAD_NAME_INDEX] = "";
-    formatterArgs[MARKER_INDEX] = NullMarker.INSTANCE;
-  }
-
-  private void setBaseArgs(@NotNull final LogRecord record, @NotNull final String message, @NotNull final Object[] formatterArgs) {
+  private void setBaseArgs(@NotNull final LogRecord record,
+                           @NotNull final String message,
+                           @NotNull final Object[] formatterArgs) {
     formatterArgs[MESSAGE_INDEX] = message;
     formatterArgs[THREAD_ID_INDEX] = Integer.valueOf(record.getThreadID());
     formatterArgs[LOGGER_NAME_INDEX] = record.getLoggerName();
@@ -286,6 +280,13 @@ public class ExtRecordFormatter extends Formatter {
     ((FormattableThrowable)formatterArgs[THROWN_INDEX]).setRealThrowable(record.getThrown());
     formatterArgs[CLASS_NAME_INDEX] = record.getSourceClassName();
     formatterArgs[METHOD_NAME_INDEX] = record.getSourceMethodName();
+  }
+
+  private void setArgs(final LogRecord record, final String msg, final Object[] formatterArgs) {
+    setBaseArgs(record, msg, formatterArgs);
+    ((FormattableStackTraceElement)formatterArgs[LOCATION_INDEX]).setElement(null);
+    formatterArgs[THREAD_NAME_INDEX] = "";
+    formatterArgs[MARKER_INDEX] = NullMarker.INSTANCE;
   }
 
   private static class ExtLogMessageFormatter extends LogMessageFormatterImpl {

@@ -45,7 +45,7 @@ class AndroidLoggerTest {
   fun setup() {
     MockitoAnnotations.initMocks(this)
     AndroidLogger.setHandler(mockHandler!!)
-    Loggers.setFactory(AndroidLoggerFactory())
+    Loggers.setFactory(AndroidLoggerFactory)
   }
 
   @Test
@@ -111,7 +111,7 @@ class AndroidLoggerTest {
   }
 
   companion object {
-    private val TAG = "AndroidLoggerTest"
+    private const val TAG = "AndroidLoggerTest"
   }
 
 }

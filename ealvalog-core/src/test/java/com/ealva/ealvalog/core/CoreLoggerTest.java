@@ -50,6 +50,7 @@ public class CoreLoggerTest {
     MockitoAnnotations.initMocks(this);
   }
 
+  @SuppressWarnings("deprecation") // isNull()
   @Test
   public void testPrintLog() {
     com.ealva.ealvalog.core.CoreLogger<com.ealva.ealvalog.core.Bridge>

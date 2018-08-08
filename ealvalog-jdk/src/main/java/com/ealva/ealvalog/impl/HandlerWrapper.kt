@@ -19,6 +19,7 @@
 package com.ealva.ealvalog.impl
 
 import com.ealva.ealvalog.FilterResult
+import com.ealva.ealvalog.FilterResult.DENY
 import com.ealva.ealvalog.LogLevel
 import com.ealva.ealvalog.Logger
 import com.ealva.ealvalog.LoggerFilter
@@ -27,17 +28,11 @@ import com.ealva.ealvalog.Marker
 import com.ealva.ealvalog.NullMarker
 import com.ealva.ealvalog.core.ExtLogRecord
 import com.ealva.ealvalog.util.NullThrowable
-
-import com.ealva.ealvalog.FilterResult.ACCEPT
-import com.ealva.ealvalog.FilterResult.DENY
-import com.ealva.ealvalog.FilterResult.NEUTRAL
-
 import java.util.logging.Handler
 import java.util.logging.LogRecord
 
 /**
  * Wrap a JUL handler
- *
  *
  * Created by Eric A. Snell on 3/8/17.
  */
@@ -65,14 +60,14 @@ open class HandlerWrapper internal constructor(
     marker: Marker?,
     throwable: Throwable?
   ): FilterResult {
-    if (level.shouldNotLogAtLevel(realHandler.level.intValue())) {
-      return DENY
-    }
-    val filterResult = loggerFilter!!.isLoggable(logger, level, marker, throwable)
-    return if (filterResult !== NEUTRAL) {
-      filterResult
-    } else ACCEPT
+    return if (shouldNotLogAt(level)) DENY else applyFilter(logger, level, marker, throwable)
   }
+
+  private fun applyFilter(logger: Logger, level: LogLevel, marker: Marker?, throwable: Throwable?) =
+    loggerFilter.isLoggable(logger, level, marker, throwable).acceptIfNeutral()
+
+  private fun shouldNotLogAt(level: LogLevel) =
+    level.shouldNotLogAtLevel(realHandler.level.intValue())
 
   private fun getRecordMarker(record: LogRecord): Marker {
     return (record as? ExtLogRecord)?.getMarker() ?: NullMarker

@@ -18,29 +18,20 @@
 
 package com.ealva.ealvalog.impl
 
-import com.ealva.ealvalog.Logger
-import com.ealva.ealvalog.LoggerFactory
+import com.ealva.ealvalog.BaseLoggerFactory
 import com.ealva.ealvalog.Marker
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.ConcurrentMap
 
 /**
  * Create AndroidLogger instances
  *
  * Created by Eric A. Snell on 3/4/17.
  */
-class AndroidLoggerFactory : LoggerFactory {
-  override fun get(name: String): Logger {
-    return AndroidLogger(name, false, null)
-  }
+object AndroidLoggerFactory : BaseLoggerFactory() {
+  private val loggerMap: ConcurrentMap<String, AndroidLogger> = ConcurrentHashMap()
 
-  override fun get(name: String, includeLocation: Boolean): Logger {
-    return AndroidLogger(name, includeLocation, null)
-  }
-
-  override fun get(name: String, marker: Marker): Logger {
-    return AndroidLogger(name, false, marker)
-  }
-
-  override fun get(name: String, marker: Marker, includeLocation: Boolean): Logger {
-    return AndroidLogger(name, includeLocation, marker)
+  override fun getLogger(name: String, marker: Marker?, incLocation: Boolean): AndroidLogger {
+    return loggerMap.getOrPut(name) { AndroidLogger(name, marker, incLocation) }
   }
 }

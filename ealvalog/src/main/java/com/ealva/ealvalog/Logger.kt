@@ -289,10 +289,5 @@ interface Logger {
    * @param record the full log information
    */
   fun logImmediate(record: LogRecord)
-
-  companion object {
-    /** Used when there are no formatArgs  */
-    val NO_ARGUMENTS = arrayOfNulls<Any>(0)
-  }
 }
 

@@ -18,20 +18,22 @@
 
 package com.ealva.ealvalog
 
-/**
- * Filter results are used to determine if logging passes various thresholds. Because filtering may
- * include several factors, some filters may respond with NONE to allow processing to continue to
- * further checks. An example would be a composite filter where contained filters need to allow
- * processing to move down the chain rather than ACCEPT or DENY.
- *
- * Created by Eric A. Snell on 3/13/17.
- */
-enum class FilterResult {
-  ACCEPT,
-  DENY,
-  NEUTRAL;
+abstract class BaseLoggerFactory : LoggerFactory {
+    override fun get(name: String): Logger {
+        return getLogger(name, null, false)
+    }
 
-  fun acceptIfNeutral(): FilterResult {
-    return if (this === DENY) DENY else ACCEPT
-  }
+    override fun get(name: String, includeLocation: Boolean): Logger {
+        return getLogger(name, null, includeLocation)
+    }
+
+    override fun get(name: String, marker: Marker): Logger {
+        return getLogger(name, marker, false)
+    }
+
+    override fun get(name: String, marker: Marker, includeLocation: Boolean): Logger {
+        return getLogger(name, marker, includeLocation)
+    }
+
+    protected abstract fun getLogger(name: String, marker: Marker?, incLocation: Boolean): Logger
 }

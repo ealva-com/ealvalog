@@ -18,7 +18,6 @@
 
 package com.ealva.ealvalog.core
 
-import com.ealva.ealvalog.util.LogUtil
 import com.ealva.ealvalog.LogLevel
 import com.ealva.ealvalog.Logger
 import com.ealva.ealvalog.Marker
@@ -29,7 +28,7 @@ import com.ealva.ealvalog.Marker
  *
  * Created by Eric A. Snell on 3/1/17.
  */
-abstract class BaseLogger @JvmOverloads protected constructor(
+abstract class BaseLogger protected constructor(
   override val name: String,
   override var marker: Marker? = null
 ) : Logger {

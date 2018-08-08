@@ -18,12 +18,15 @@
 
 package com.ealva.ealvalog.impl
 
+import com.ealva.ealvalog.BaseLoggerFactory
 import com.ealva.ealvalog.LogLevel
 import com.ealva.ealvalog.Logger
 import com.ealva.ealvalog.LoggerFactory
 import com.ealva.ealvalog.LoggerFilter
 import com.ealva.ealvalog.Marker
+import org.jetbrains.annotations.TestOnly
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.ConcurrentMap
 import java.util.concurrent.locks.ReentrantLock
 import java.util.logging.LogManager
 
@@ -33,12 +36,17 @@ import java.util.logging.LogManager
  *
  * Created by Eric A. Snell on 3/4/17.
  */
-class JdkLoggerFactory private constructor() : LoggerFactory, JdkLoggerConfiguration {
-  private val bridgeMap = ConcurrentHashMap<String, JdkBridge>()
-  private val loggerMap = ConcurrentHashMap<String, JdkLogger>()
+object JdkLoggerFactory : BaseLoggerFactory(), JdkLoggerConfiguration {
+  private val bridgeMap: ConcurrentHashMap<String, JdkBridge> = ConcurrentHashMap()
+  private val loggerMap: ConcurrentMap<String, JdkLogger> = ConcurrentHashMap()
   private val jdkBridgeRoot = JdkBridge(LoggerFactory.ROOT_LOGGER_NAME)
   val root = JdkLogger(LoggerFactory.ROOT_LOGGER_NAME, null, this)
   private val bridgeTreeLock = ReentrantLock()
+
+  @TestOnly
+  fun getForTest(name: String): JdkLogger {
+    return getLogger(name, null, false)
+  }
 
   /**
    * Resets all loggers, removing filters and underlying handlers from the java.util.logging Loggers
@@ -61,38 +69,34 @@ class JdkLoggerFactory private constructor() : LoggerFactory, JdkLoggerConfigura
     updateLoggers()
   }
 
-  override fun get(name: String): JdkLogger {
-    return getJdkLogger(name, null, false)
-  }
-
-  override fun get(name: String, includeLocation: Boolean): JdkLogger {
-    return getJdkLogger(name, null, includeLocation)
-  }
-
-  override fun get(name: String, marker: Marker): JdkLogger {
-    return getJdkLogger(name, marker, false)
-  }
-
-  override fun get(name: String, marker: Marker, includeLocation: Boolean): JdkLogger {
-    return getJdkLogger(name, marker, includeLocation)
-  }
-
-  private fun getJdkLogger(name: String, marker: Marker?, includeLocation: Boolean): JdkLogger {
+  override fun getLogger(name: String, marker: Marker?, incLocation: Boolean): JdkLogger {
     if (LoggerFactory.ROOT_LOGGER_NAME == name) {
       return root
     }
     bridgeTreeLock.lock()
     try {
-      var jdkLogger: JdkLogger? = loggerMap[name]
-      if (jdkLogger == null) {
-        jdkLogger = JdkLogger(name, marker, this)
-        loggerMap[name] = jdkLogger
+      var created = false
+      val logger = loggerMap.getOrPut(name) {
+        created = true // if we create a new one we need to ensure the parent hierarchy is correct
+        JdkLogger(name, marker, this)
+      }
+      if (created) {
         setParents()
-        if (includeLocation) {
-          jdkLogger.includeLocation = true
+        if (incLocation) {
+          logger.includeLocation = true
         }
       }
-      return jdkLogger
+      return logger
+//      var jdkLogger: JdkLogger? = loggerMap[name]
+//      if (jdkLogger == null) {
+//        jdkLogger = JdkLogger(name, marker, this)
+//        loggerMap[name] = jdkLogger
+//        setParents()
+//        if (includeLocation) {
+//          jdkLogger.includeLocation = true
+//        }
+//      }
+//      return jdkLogger
     } finally {
       bridgeTreeLock.unlock()
     }
@@ -230,26 +234,11 @@ class JdkLoggerFactory private constructor() : LoggerFactory, JdkLoggerConfigura
     }
   }
 
-  companion object {
-
-    @Volatile private var INSTANCE: JdkLoggerFactory? = null
-    fun instance(): JdkLoggerFactory? {
-      if (INSTANCE == null) {
-        synchronized(JdkLoggerFactory::class.java) {
-          if (INSTANCE == null) {
-            INSTANCE = JdkLoggerFactory()
-          }
-        }
-      }
-      return INSTANCE
+  private fun getParentName(name: String): String? {
+    if (name.isEmpty()) {
+      return null
     }
-
-    private fun getParentName(name: String): String? {
-      if (name.isEmpty()) {
-        return null
-      }
-      val i = name.lastIndexOf('.')
-      return if (i > 0) name.substring(0, i) else ""
-    }
+    val i = name.lastIndexOf('.')
+    return if (i > 0) name.substring(0, i) else ""
   }
 }

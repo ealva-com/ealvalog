@@ -35,8 +35,8 @@ import java.util.logging.LogRecord
  */
 class AndroidLogger internal constructor(
   name: String,
-  override var includeLocation: Boolean,
-  marker: Marker?
+  marker: Marker?,
+  override var includeLocation: Boolean
 ) : BaseLogger(name, marker) {
 
   private val tag: String = LogUtil.tagFromName(name)

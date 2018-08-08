@@ -22,6 +22,7 @@ import com.ealva.ealvalog.FilterResult;
 import com.ealva.ealvalog.Logger;
 import com.ealva.ealvalog.NullMarker;
 import com.ealva.ealvalog.core.ExtLogRecord;
+import com.ealva.ealvalog.core.ExtRecordFormatter;
 import com.ealva.ealvalog.filter.AlwaysAcceptFilter;
 import com.ealva.ealvalog.util.NullThrowable;
 
@@ -52,7 +53,7 @@ public class AndroidLoggerHandlerTest {
   public void testIsLoggableNoFilter() {
     when(logger.getName()).thenReturn(AndroidLoggerHandlerTest.class.getName());
 
-    AndroidLoggerHandler handler = AndroidLoggerHandler.builder().build();
+    AndroidLoggerHandler handler = AndroidLoggerHandler.Companion.make();
     assertThat(handler.isLoggable(logger, CRITICAL, NullMarker.INSTANCE,
                                   NullThrowable.INSTANCE),
                is(FilterResult.NEUTRAL));
@@ -62,9 +63,10 @@ public class AndroidLoggerHandlerTest {
   public void testIsLoggableAlwaysAcceptFilter() {
     when(logger.getName()).thenReturn(AndroidLoggerHandlerTest.class.getName());
 
-    AndroidLoggerHandler handler = AndroidLoggerHandler.builder()
-                                                       .filter(AlwaysAcceptFilter.INSTANCE)
-                                                       .build();
+    AndroidLoggerHandler handler = AndroidLoggerHandler.Companion.make(
+        new ExtRecordFormatter(ExtRecordFormatter.TYPICAL_ANDROID_FORMAT, true),
+        AlwaysAcceptFilter.INSTANCE
+    );
     assertThat(handler.isLoggable(logger, CRITICAL, NullMarker.INSTANCE,
                                   NullThrowable.INSTANCE),
                is(FilterResult.ACCEPT));
@@ -72,9 +74,10 @@ public class AndroidLoggerHandlerTest {
 
   @Test
   public void testLogOutput() {
-    AndroidLoggerHandler handler = AndroidLoggerHandler.builder()
-                                                       .filter(AlwaysAcceptFilter.INSTANCE)
-                                                       .build();
+    AndroidLoggerHandler handler = AndroidLoggerHandler.Companion.make(
+        new ExtRecordFormatter(ExtRecordFormatter.TYPICAL_ANDROID_FORMAT, true),
+        AlwaysAcceptFilter.INSTANCE
+    );
     handler.publish(ExtLogRecord.Companion.get(CRITICAL,
                                                "Message",
                                                getClass().getName(),

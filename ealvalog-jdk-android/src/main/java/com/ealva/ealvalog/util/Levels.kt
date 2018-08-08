@@ -16,22 +16,28 @@
  * limitations under the License.
  */
 
-package com.ealva.ealvalog
+package com.ealva.ealvalog.util
+
+import com.ealva.ealvalog.LogLevel
+
+import android.util.Log
 
 /**
- * Filter results are used to determine if logging passes various thresholds. Because filtering may
- * include several factors, some filters may respond with NONE to allow processing to continue to
- * further checks. An example would be a composite filter where contained filters need to allow
- * processing to move down the chain rather than ACCEPT or DENY.
+ * Utility methods
  *
- * Created by Eric A. Snell on 3/13/17.
+ * Created by Eric A. Snell on 3/14/17.
  */
-enum class FilterResult {
-  ACCEPT,
-  DENY,
-  NEUTRAL;
-
-  fun acceptIfNeutral(): FilterResult {
-    return if (this === DENY) DENY else ACCEPT
+object Levels {
+  // same as in ealvalog-android, but we don't want a dependency or to factor out a lib with only this
+  fun toAndroidLevel(level: LogLevel): Int {
+    return when (level) {
+      LogLevel.TRACE -> Log.VERBOSE
+      LogLevel.DEBUG -> Log.DEBUG
+      LogLevel.INFO -> Log.INFO
+      LogLevel.WARN -> Log.WARN
+      LogLevel.ERROR -> Log.ERROR
+      LogLevel.CRITICAL -> Log.ASSERT
+      else -> throw IllegalArgumentException("Illegal Level to map to Android")
+    }
   }
 }

@@ -18,11 +18,12 @@
 
 package com.ealva.ealvalog.impl;
 
-import com.ealva.ealvalog.Marker;
 import com.ealva.ealvalog.core.ExtLogRecord;
-import com.ealva.ealvalog.impl.BaseLoggerHandler;
-import com.ealva.ealvalog.impl.JdkLogger;
-import com.ealva.ealvalog.impl.JdkLoggerFactory;
+
+import static com.ealva.ealvalog.LogLevel.CRITICAL;
+import static com.ealva.ealvalog.LogLevel.ERROR;
+import static com.ealva.ealvalog.LogLevel.TRACE;
+import static com.ealva.ealvalog.LogLevel.WARN;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -30,10 +31,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import static com.ealva.ealvalog.LogLevel.CRITICAL;
-import static com.ealva.ealvalog.LogLevel.ERROR;
-import static com.ealva.ealvalog.LogLevel.TRACE;
-import static com.ealva.ealvalog.LogLevel.WARN;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -54,30 +51,30 @@ import java.util.logging.Logger;
  * Created by Eric A. Snell on 3/16/17.
  */
 public class JdkLoggerTest {
-  private static final String PARENT_NAME = "parent";
+  //  private static final String PARENT_NAME = "parent";
   private static final String CHILD_NAME = "parent.child";
   private static final String MSG = "=The Message=";
 
   @SuppressWarnings("WeakerAccess") @Mock BaseLoggerHandler rootHandler;
-  @SuppressWarnings("WeakerAccess") @Mock BaseLoggerHandler parentHandler;
+  //  @SuppressWarnings("WeakerAccess") @Mock BaseLoggerHandler parentHandler;
   @SuppressWarnings("WeakerAccess") @Mock BaseLoggerHandler childHandler;
-  @SuppressWarnings("WeakerAccess") @Mock Marker marker;
-  @SuppressWarnings("WeakerAccess") @Mock Throwable throwable;
+//  @SuppressWarnings("WeakerAccess") @Mock Marker marker;
+//  @SuppressWarnings("WeakerAccess") @Mock Throwable throwable;
 
   private JdkLogger rootLogger;
-  private JdkLogger parentLogger;
+  //  private JdkLogger parentLogger;
   private JdkLogger childLogger;
 
   @Before
   public void setup() {
     MockitoAnnotations.initMocks(this);
 
-    final JdkLoggerFactory loggerFactory = JdkLoggerFactory.Companion.instance();
+    final JdkLoggerFactory loggerFactory = JdkLoggerFactory.INSTANCE;
     loggerFactory.reset();
 
     rootLogger = loggerFactory.getRoot();
-    parentLogger = loggerFactory.get(PARENT_NAME);
-    childLogger = loggerFactory.get(CHILD_NAME);
+//    parentLogger = loggerFactory.get(PARENT_NAME);
+    childLogger = loggerFactory.getForTest(CHILD_NAME);
 
     rootLogger.addHandler(rootHandler);
   }
