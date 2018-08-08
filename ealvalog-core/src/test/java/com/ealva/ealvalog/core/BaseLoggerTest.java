@@ -21,8 +21,6 @@ package com.ealva.ealvalog.core;
 import com.ealva.ealvalog.LogLevel;
 import com.ealva.ealvalog.Marker;
 import com.ealva.ealvalog.MarkerFactory;
-import com.ealva.ealvalog.core.BaseLogger;
-import com.ealva.ealvalog.core.MarkerImpl;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -49,12 +47,12 @@ public class BaseLoggerTest {
 
   private static final String SOME_MESSAGE = "some message";
   private static final String FORMAT = "%d";
+  @SuppressWarnings("WeakerAccess") @Mock MarkerFactory markerFactory;
   private LoggerImpl logger;
   private Marker markerParameter;
   private Marker loggerMarker;
   private LoggerImpl loggerWithMarker;
   private Throwable theThrowable;
-  @SuppressWarnings("WeakerAccess") @Mock MarkerFactory markerFactory;
 
   @Before
   public void setup() {
@@ -358,7 +356,7 @@ public class BaseLoggerTest {
   class LoggerImpl extends BaseLogger {
 
     private static final String NAME = "";
-
+    boolean isLoggableInvoked;
     private String name = NAME;
     private boolean shouldLog = false;
     private LogLevel level = null;
@@ -382,10 +380,6 @@ public class BaseLoggerTest {
       this.shouldLog = true;
     }
 
-    @Override public @NotNull String getName() {
-      return name;
-    }
-
     @Nullable @Override public LogLevel getLogLevel() {
       return null;
     }
@@ -398,23 +392,24 @@ public class BaseLoggerTest {
       return LogLevel.NONE;
     }
 
-    @Override public void setIncludeLocation(final boolean includeLocation) {
-      this.includeLocation = includeLocation;
-    }
-
     @Override public boolean getIncludeLocation() {
       return includeLocation;
     }
 
-    boolean isLoggableInvoked;
+    @Override public void setIncludeLocation(final boolean includeLocation) {
+      this.includeLocation = includeLocation;
+    }
 
-    @Override public boolean isLoggable(@NotNull final LogLevel level, final @Nullable Marker marker, final @Nullable Throwable throwable) {
+    @Override
+    public boolean isLoggable(@NotNull final LogLevel level,
+                              final @Nullable Marker marker,
+                              final @Nullable Throwable throwable) {
       isLoggableInvoked = true;
       return shouldLog;
     }
 
     @Override public void logImmediate(@NotNull final LogRecord record) {
-      this.level = LogLevel.fromLevel(record.getLevel());
+      this.level = LogLevel.Companion.fromLevel(record.getLevel());
       this.marker = null;
       this.throwable = record.getThrown();
       this.stackDepth = 0;
@@ -436,6 +431,10 @@ public class BaseLoggerTest {
       this.stackDepth = stackDepth;
       this.msg = msg;
       this.formatArgs = formatArgs;
+    }
+
+    @Override public @NotNull String getName() {
+      return name;
     }
   }
 }

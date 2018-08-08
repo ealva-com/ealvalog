@@ -25,6 +25,7 @@ import com.ealva.ealvalog.NullMarker;
 import com.ealva.ealvalog.util.FormattableStackTraceElement;
 import com.ealva.ealvalog.util.FormattableThrowable;
 import com.ealva.ealvalog.util.LogMessageFormatterImpl;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -168,7 +169,7 @@ public class ExtRecordFormatter extends Formatter {
       };
   private static final int ARG_COUNT = 11;
 
-  private String format;
+  private @NotNull String format;
   private boolean logErrors;
 
   public ExtRecordFormatter() {
@@ -185,7 +186,7 @@ public class ExtRecordFormatter extends Formatter {
     this.logErrors = logErrors;
   }
 
-  public String getFormat() {
+  public @NotNull String getFormat() {
     return format;
   }
 
@@ -280,7 +281,7 @@ public class ExtRecordFormatter extends Formatter {
     formatterArgs[MESSAGE_INDEX] = message;
     formatterArgs[THREAD_ID_INDEX] = Integer.valueOf(record.getThreadID());
     formatterArgs[LOGGER_NAME_INDEX] = record.getLoggerName();
-    formatterArgs[LOG_LEVEL_INDEX] = LogLevel.fromLevel(record.getLevel());
+    formatterArgs[LOG_LEVEL_INDEX] = LogLevel.Companion.fromLevel(record.getLevel());
     formatterArgs[DATE_INDEX] = Long.valueOf(record.getMillis());
     ((FormattableThrowable)formatterArgs[THROWN_INDEX]).setRealThrowable(record.getThrown());
     formatterArgs[CLASS_NAME_INDEX] = record.getSourceClassName();

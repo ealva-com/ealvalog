@@ -72,7 +72,7 @@ public class JdkLoggerTest {
   public void setup() {
     MockitoAnnotations.initMocks(this);
 
-    final JdkLoggerFactory loggerFactory = JdkLoggerFactory.instance();
+    final JdkLoggerFactory loggerFactory = JdkLoggerFactory.Companion.instance();
     loggerFactory.reset();
 
     rootLogger = loggerFactory.getRoot();

@@ -80,8 +80,8 @@ public class JdkLogger extends CoreLogger<JdkBridge> {
                             @Nullable final Throwable throwable) {
     return getBridge().isLoggable(this,
                                   level,
-                                  NullMarker.nullToNullInstance(marker),
-                                  NullThrowable.nullToNullInstance(throwable)) != FilterResult.DENY;
+                                  marker == null ? NullMarker.INSTANCE : marker,
+                                  throwable == null ? NullThrowable.INSTANCE : throwable) != FilterResult.DENY;
   }
 
   @Override public void setLogToParent(final boolean logToParent) {

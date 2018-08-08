@@ -48,17 +48,17 @@ public class FileHandlerWrapperTest {
 
   @Before
   public void setup() {
-    record = ExtLogRecord.get(LogLevel.CRITICAL,
-                              MSG,
-                              "LoggerName",
-                              null,
-                              null,
-                              null);
+    record = ExtLogRecord.Companion.get(LogLevel.CRITICAL,
+                                        MSG,
+                                        "LoggerName",
+                                        null,
+                                        null,
+                                        null);
   }
 
   @Test(expected = IllegalStateException.class)
   public void testNoPattern() throws Exception {
-    FileHandlerWrapper.Builder builder = FileHandlerWrapper.builder();
+    FileHandlerWrapper.Builder builder = FileHandlerWrapper.Companion.builder();
     //noinspection unused
     final HandlerWrapper handler = builder.build();
   }
@@ -67,8 +67,8 @@ public class FileHandlerWrapperTest {
   public void testWithPattern() throws Exception {
     final File root = folder.getRoot();
     final String fileNamePattern = new File(root, "ealvalog.%g.%u.log").getAbsolutePath();
-    final HandlerWrapper handler = FileHandlerWrapper.builder().fileNamePattern(fileNamePattern)
-                                                     .build();
+    final HandlerWrapper handler = FileHandlerWrapper.Companion.builder().fileNamePattern(fileNamePattern)
+                                                               .build();
     handler.publish(record);
 
     final String[] array = root.list();

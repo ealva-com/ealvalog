@@ -1,4 +1,6 @@
-/*
+plugins {
+    id 'org.jetbrains.kotlin.jvm' version '1.2.60'
+}/*
  * Copyright 2017 Eric A. Snell
  *
  * This file is part of eAlvaLog.
@@ -36,6 +38,7 @@ repositories {
 
 dependencies {
     implementation 'org.jetbrains:annotations:16.0.2'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:${versions.kotlin}"
 
 // Test libraries
     testImplementation 'org.jetbrains:annotations:16.0.2'
@@ -53,3 +56,13 @@ tasks.withType(Javadoc) {
 }
 
 apply from: rootProject.file('gradle/gradle-mvn-push-jar.gradle')
+compileKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+}
+compileTestKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+}

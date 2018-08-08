@@ -28,6 +28,7 @@ import com.ealva.ealvalog.filter.AlwaysNeutralFilter;
 
 import com.ealva.ealvalog.util.Levels;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import static com.ealva.ealvalog.FilterResult.DENY;
 import static com.ealva.ealvalog.util.LogUtil.tagFromName;
@@ -100,11 +101,11 @@ public class AndroidLoggerHandler extends BaseLoggerHandler {
     setErrorManager(errorManager);
   }
 
-  @Override
+  @NotNull @Override
   public FilterResult isLoggable(@NotNull final Logger logger,
                                  @NotNull final LogLevel level,
-                                 @NotNull final Marker marker,
-                                 @NotNull final Throwable throwable) {
+                                 @Nullable final Marker marker,
+                                 @Nullable final Throwable throwable) {
     if (isLoggable(tagFromName(logger.getName()), Levels.toAndroidLevel(level))) {
       return getLoggerFilter().isLoggable(logger, level, marker, throwable);
     }
@@ -119,7 +120,7 @@ public class AndroidLoggerHandler extends BaseLoggerHandler {
 
 
   @Override public void publish(final LogRecord record) {
-    final int androidLevel = Levels.toAndroidLevel(LogLevel.fromLevel(record.getLevel()));
+    final int androidLevel = Levels.toAndroidLevel(LogLevel.Companion.fromLevel(record.getLevel()));
     final String tag = tagFromName(record.getLoggerName());
     if (isLoggable(tag, androidLevel)) {
       final String msg = getFormatter().format(record);

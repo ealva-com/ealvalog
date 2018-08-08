@@ -50,26 +50,26 @@ public class MarkerFilterTest {
   @Test
   public void testBuilder() throws Exception {
     when(marker.isOrContains(marker)).thenReturn(true);
-    final com.ealva.ealvalog.filter.MarkerFilter filter = com.ealva.ealvalog.filter.MarkerFilter.builder()
-                                                                                                .marker(marker)
-                                                                                                .build();
+    final com.ealva.ealvalog.filter.MarkerFilter filter = MarkerFilter.Companion.builder()
+                                                                                .marker(marker)
+                                                                                .build();
     assertThat(filter.isLoggable(logger, LogLevel.CRITICAL, marker, null), is(FilterResult.NEUTRAL));
   }
 
   @Test(expected = IllegalStateException.class)
   public void testBuilderNoMarker() throws Exception {
     //noinspection unused
-    final com.ealva.ealvalog.filter.MarkerFilter filter = com.ealva.ealvalog.filter.MarkerFilter.builder()
-                                                                                                .build();
+    final com.ealva.ealvalog.filter.MarkerFilter filter = MarkerFilter.Companion.builder()
+                                                                                .build();
   }
 
 
   @Test
   public void testMarkerDoesNotMatch() throws Exception {
     when(marker.isOrContains(marker)).thenReturn(false);
-    final com.ealva.ealvalog.filter.MarkerFilter filter = MarkerFilter.builder()
-                                                                      .marker(marker)
-                                                                      .build();
+    final com.ealva.ealvalog.filter.MarkerFilter filter = MarkerFilter.Companion.builder()
+                                                                                .marker(marker)
+                                                                                .build();
     assertThat(filter.isLoggable(logger, LogLevel.CRITICAL, marker, null), is(FilterResult.DENY));
   }
 }

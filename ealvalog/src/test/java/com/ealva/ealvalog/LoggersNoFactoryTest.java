@@ -23,6 +23,7 @@ import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
 
 
@@ -39,29 +40,24 @@ public class LoggersNoFactoryTest {
    */
   @Test
   public void testNoLoggerFactorySet() {
-    testLogger(com.ealva.ealvalog.Loggers.get());
-    testLogger(com.ealva.ealvalog.Loggers.get("blah"));
-    testLogger(com.ealva.ealvalog.Loggers.get(LoggersNoFactoryTest.class));
-    testLogger(com.ealva.ealvalog.Loggers.getRoot());
-    testLogger(com.ealva.ealvalog.Loggers.get(com.ealva.ealvalog.NullMarker.INSTANCE));
-    testLogger(com.ealva.ealvalog.Loggers.get(LoggersNoFactoryTest.class, com.ealva.ealvalog.NullMarker.INSTANCE));
-    testLogger(com.ealva.ealvalog.Loggers.get("blah", com.ealva.ealvalog.NullMarker.INSTANCE));
-    com.ealva.ealvalog.Loggers.log(com.ealva.ealvalog.LogLevel.CRITICAL, "");
-    com.ealva.ealvalog.Loggers.log(com.ealva.ealvalog.LogLevel.CRITICAL, com.ealva.ealvalog.NullMarker.INSTANCE, "");
-    com.ealva.ealvalog.Loggers.log(com.ealva.ealvalog.LogLevel.CRITICAL, NullThrowable.INSTANCE, "");
-    com.ealva.ealvalog.Loggers.log(com.ealva.ealvalog.LogLevel.CRITICAL, com.ealva.ealvalog.NullMarker.INSTANCE, NullThrowable.INSTANCE, "");
-    Loggers.log(com.ealva.ealvalog.LogLevel.CRITICAL, "", 1, 2, 3);
-
+    testLogger(Loggers.INSTANCE.get());
+    testLogger(Loggers.INSTANCE.get("blah"));
+    testLogger(Loggers.INSTANCE.get(LoggersNoFactoryTest.class));
+    testLogger(Loggers.INSTANCE.getRoot());
+    testLogger(Loggers.INSTANCE.get(com.ealva.ealvalog.NullMarker.INSTANCE));
+    testLogger(Loggers.INSTANCE.get(LoggersNoFactoryTest.class, com.ealva.ealvalog.NullMarker.INSTANCE));
+    testLogger(Loggers.INSTANCE.get("blah", com.ealva.ealvalog.NullMarker.INSTANCE));
   }
 
   private void testLogger(final Logger logger) {
     assertThat(logger, is(notNullValue()));
     assertThat(logger.getName(), is(notNullValue()));
-    assertThat(logger.getLogLevel(), is(notNullValue()));
+    assertThat(logger.getLogLevel(), is(nullValue()));
     assertThat(logger.getEffectiveLogLevel(), is(notNullValue()));
-    assertThat(logger.getMarker(), is(notNullValue()));
+    assertThat(logger.getMarker(), is(nullValue()));
     assertThat(logger.isLoggable(com.ealva.ealvalog.LogLevel.CRITICAL), is(false));
-    assertThat(logger.isLoggable(LogLevel.CRITICAL, NullMarker.INSTANCE, NullThrowable.INSTANCE), is(false));
+    assertThat(logger.isLoggable(LogLevel.CRITICAL, NullMarker.INSTANCE,
+                                 NullThrowable.INSTANCE), is(false));
 
   }
 

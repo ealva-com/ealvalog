@@ -31,10 +31,7 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
-import static org.hamcrest.collection.IsArrayWithSize.arrayWithSize;
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.IsNot.not;
 
 /**
@@ -45,27 +42,29 @@ public class ExtLogRecordTest {
   @Before
   public void setup() {
     // ensure that tests related to caching of the record don't interfere with each other
-    ExtLogRecord.clearCachedRecord();
+    ExtLogRecord.Companion.clearCachedRecord();
   }
 
   @Test
   public void testGet() {
     final LogLevel level = LogLevel.ERROR;
     final String loggerName = "LoggerName";
-    final Marker marker = Markers.get("marker");
+    final Marker marker = Markers.INSTANCE.get("marker");
     //noinspection ThrowableNotThrown
     final Throwable throwable = new RuntimeException();
-    final ExtLogRecord first = ExtLogRecord.get(level, loggerName, marker, throwable);
+    final ExtLogRecord first = ExtLogRecord.Companion.get(level, loggerName, marker, throwable);
     assertThat(first.getLogLevel(), is(level));
     assertThat(first.getLoggerName(), is(loggerName));
     assertThat(first.getMarker(), is(marker));
     assertThat(first.getThrown(), is(throwable));
-    ExtLogRecord.release(first);
+    ExtLogRecord.Companion.release(first);
     final LogLevel secondLevel = LogLevel.WARN;
     final String secondLoggerName = "Other";
     final Marker secondMarker = NullMarker.INSTANCE;
     final Throwable secondThrowable = null;
-    final ExtLogRecord second = ExtLogRecord.get(secondLevel, secondLoggerName, secondMarker, secondThrowable);
+    final ExtLogRecord
+        second =
+        ExtLogRecord.Companion.get(secondLevel, secondLoggerName, secondMarker, secondThrowable);
     assertThat(second, sameInstance(first));
     assertThat(second.getLogLevel(), is(secondLevel));
     assertThat(second.getLoggerName(), is(secondLoggerName));
@@ -77,22 +76,24 @@ public class ExtLogRecordTest {
   public void testGetCachedRecord() {
     final LogLevel level = LogLevel.ERROR;
     final String loggerName = "LoggerName";
-    final ExtLogRecord first = ExtLogRecord.get(level, loggerName, null, null);
+    final ExtLogRecord first = ExtLogRecord.Companion.get(level, loggerName, null, null);
     final String firstParm = "first";
     final String secondParm = "second";
-    first.setParameters(new Object[] {firstParm, secondParm});
+    first.setParameters(new Object[]{firstParm, secondParm});
     assertThat(first.getLogLevel(), is(level));
     assertThat(first.getLoggerName(), is(loggerName));
     assertThat(first.getParameterCount(), is(2));
     Object[] firstParameters = first.getParameters();
     assertThat((String)firstParameters[0], is(firstParm));
     assertThat((String)firstParameters[1], is(secondParm));
-    ExtLogRecord.release(first);
+    ExtLogRecord.Companion.release(first);
 
     final LogLevel secondLevel = LogLevel.WARN;
     final String secondLoggerName = "Other";
     final String secondMessage = "%s %d %f";
-    final ExtLogRecord second = ExtLogRecord.get(secondLevel, secondLoggerName, null, null);
+    final ExtLogRecord
+        second =
+        ExtLogRecord.Companion.get(secondLevel, secondLoggerName, null, null);
     second.setMessage(secondMessage);
     assertThat(second.getLogLevel(), is(secondLevel));
     assertThat(second.getLoggerName(), is(secondLoggerName));
@@ -105,14 +106,16 @@ public class ExtLogRecordTest {
 
   @Test
   public void testGetMultiple() {
-    final ExtLogRecord first = ExtLogRecord.get(LogLevel.ERROR, "LoggerName", null, null);
-    final ExtLogRecord second = ExtLogRecord.get(LogLevel.ERROR, "LoggerName", null, null);
+    final ExtLogRecord first = ExtLogRecord.Companion.get(LogLevel.ERROR, "LoggerName", null, null);
+    final ExtLogRecord
+        second =
+        ExtLogRecord.Companion.get(LogLevel.ERROR, "LoggerName", null, null);
     assertThat(first, not(sameInstance(second)));
-    ExtLogRecord.release(first);
-    ExtLogRecord.release(second);
+    ExtLogRecord.Companion.release(first);
+    ExtLogRecord.Companion.release(second);
     final LogLevel logLevel = LogLevel.WARN;
     final String loggerName = "Other";
-    final ExtLogRecord third = ExtLogRecord.get(logLevel, loggerName, null, null);
+    final ExtLogRecord third = ExtLogRecord.Companion.get(logLevel, loggerName, null, null);
     assertThat(first, sameInstance(third));
     assertThat(third.getLogLevel(), is(logLevel));
     assertThat(third.getLoggerName(), is(loggerName));

@@ -44,12 +44,12 @@ public class LoggersTest {
   @Before
   public void setup() {
     MockitoAnnotations.initMocks(this);
-    com.ealva.ealvalog.Loggers.setFactory(mockFactory);
+    Loggers.INSTANCE.setFactory(mockFactory);
   }
 
   @After
   public void tearDown() {
-    com.ealva.ealvalog.Loggers.setFactory(NullLoggerFactory.INSTANCE);
+    Loggers.INSTANCE.setFactory(NullLoggerFactory.INSTANCE);
   }
 
   @Test
@@ -57,21 +57,9 @@ public class LoggersTest {
     given(mockFactory.get(LoggersTest.class.getName())).willReturn(mockLogger);
 
     // when
-    final Logger logger = com.ealva.ealvalog.Loggers.get();
+    final Logger logger = Loggers.INSTANCE.get();
 
     then(mockFactory).should(only()).get(LoggersTest.class.getName());
     assertThat(logger, is(mockLogger));  // not really testing anything, but using that variable
-  }
-
-  @Test
-  public void testConvenienceLog() {
-    given(mockFactory.get(LoggersTest.class.getName())).willReturn(mockLogger);
-
-    // when
-    final String msg = "The message";
-    Loggers.log(com.ealva.ealvalog.LogLevel.CRITICAL, msg);
-
-    then(mockFactory).should(only()).get(LoggersTest.class.getName());
-    then(mockLogger).should(only()).log(LogLevel.CRITICAL, msg);
   }
 }

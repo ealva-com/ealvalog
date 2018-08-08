@@ -17,6 +17,21 @@
  */
 
 buildscript {
+    ext {
+        versions = [
+                'support_library': '27.1.1',
+                'play_services'  : '12.0.1',
+                'kotlin'         : '1.2.60',
+                'anko'           : '0.10.5'
+        ]
+        setup = [
+                'compile_sdk': 27,
+//                'build_tools': '27.0.3',
+                'min_sdk'    : 21,
+                'target_sdk' : 26
+        ]
+    }
+
     repositories {
         jcenter()
         mavenCentral()

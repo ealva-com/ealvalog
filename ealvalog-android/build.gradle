@@ -64,8 +64,13 @@ dependencies {
     implementation project(path: ':ealvalog-core')
 }
 
+//task javadoc(type: Javadoc) {
+//    excludes = ['**/*.kt'] // < ---- Exclude all kotlin files from javadoc file.
+//}
+
 
 tasks.withType(Javadoc) {
+    excludes = ['**/*.kt'] // < ---- Exclude all kotlin files from javadoc file.
     options.addStringOption('Xdoclint:none', '-quiet')
     options.addStringOption('encoding', 'UTF-8')
     options.addStringOption('charSet', 'UTF-8')

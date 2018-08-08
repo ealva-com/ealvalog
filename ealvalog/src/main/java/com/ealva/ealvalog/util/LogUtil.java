@@ -20,8 +20,6 @@ package com.ealva.ealvalog.util;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Iterator;
-
 /**
  * Various utility methods
  * <p>
@@ -91,7 +89,7 @@ public final class LogUtil {
   }
 
   /**
-   * Convenience for autoboxing primitives to an Object[] to pass to a {@link java.util.Formatter}
+   * Convenience for autoboxing primitives to an Object[] to pass to a Formatter
    *
    * @param primitivesOrObjects list to convert to array
    *
@@ -107,11 +105,11 @@ public final class LogUtil {
   }
 
   /**
-   * Get a {@link StackTraceElement} at an index offset from the current stack position.
+   * Get a StackTraceElement at an index offset from the current stack position.
    *
    * @param currentStackDepthFromCallSite the index of the stack depth to return
    *
-   * @return a {@link StackTraceElement} from the requested stack index
+   * @return a StackTraceElement from the requested stack index
    *
    * @throws IllegalStateException if the call stack is too small for the depth requested. Typically
    *                               this would only happen if the calling code has a defect and is
@@ -131,18 +129,6 @@ public final class LogUtil {
   public static String getCallerClassNameStripInner(final int currentStackDepthFromCallSite) {
     return stripInnerClassesFromName(getCallerLocation(currentStackDepthFromCallSite +
                                                            1).getClassName());
-  }
-
-  /**
-   * Early Android doesn't provide Collections.emptyIterator(), so we will.
-   *
-   * @param <T> type to iterate over
-   *
-   * @return an Iterator over type T which is empty
-   */
-  public static <T> Iterator<T> emptyIterator() {
-    //noinspection unchecked
-    return (Iterator<T>)com.ealva.ealvalog.util.EmptyIterator.EMPTY_ITERATOR;
   }
 
   private LogUtil() {

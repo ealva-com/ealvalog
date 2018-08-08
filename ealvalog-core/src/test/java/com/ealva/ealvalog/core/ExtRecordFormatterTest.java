@@ -48,7 +48,7 @@ public class ExtRecordFormatterTest {
   private static final String MESSAGE_FORMAT = "%s";
   private static final String LOGGER_NAME = "LoggerName";
   private static final IllegalArgumentException THROWABLE = new IllegalArgumentException("Dummy");
-  private static final Marker MARKER = Markers.get("test");
+  private static final Marker MARKER = Markers.INSTANCE.get("test");
   private static final String MESSAGE_ARG = "The Message";
   private static final String DECLARING_CLASS = "DeclaringClass";
   private static final String METHOD_NAME = "MethodName";
@@ -66,19 +66,19 @@ public class ExtRecordFormatterTest {
   @Before
   public void setup() {
     MockitoAnnotations.initMocks(this);
-    ExtLogRecord.clearCachedRecord();
-    record = com.ealva.ealvalog.core.ExtLogRecord.get(LOG_LEVEL,
-                                                      MESSAGE_FORMAT,
-                                                      LOGGER_NAME,
-                                                      LogUtil.getCallerLocation(0),
-                                                      MARKER,
-                                                      THROWABLE,
-                                                      MESSAGE_ARG);
+    ExtLogRecord.Companion.clearCachedRecord();
+    record = ExtLogRecord.Companion.get(LOG_LEVEL,
+                                        MESSAGE_FORMAT,
+                                        LOGGER_NAME,
+                                        LogUtil.getCallerLocation(0),
+                                        MARKER,
+                                        THROWABLE,
+                                        MESSAGE_ARG);
   }
 
   @After
   public void tearDown() {
-    ExtLogRecord.release(record);
+    ExtLogRecord.Companion.release(record);
   }
 
   @Test(expected = IllegalFormatConversionException.class)
@@ -252,12 +252,12 @@ public class ExtRecordFormatterTest {
   @Test
   public void testNoParametersButHasFormatting() {
     record.close(); // release the fir
-    record = com.ealva.ealvalog.core.ExtLogRecord.get(LOG_LEVEL,
-                                                      MESSAGE_FORMAT,
-                                                      LOGGER_NAME,
-                                                      LogUtil.getCallerLocation(0),
-                                                      MARKER,
-                                                      THROWABLE);
+    record = ExtLogRecord.Companion.get(LOG_LEVEL,
+                                        MESSAGE_FORMAT,
+                                        LOGGER_NAME,
+                                        LogUtil.getCallerLocation(0),
+                                        MARKER,
+                                        THROWABLE);
     com.ealva.ealvalog.core.ExtRecordFormatter
         formatter = new com.ealva.ealvalog.core.ExtRecordFormatter("%1$s");
     assertThat(formatter.format(record), is(equalTo(MESSAGE_FORMAT)));

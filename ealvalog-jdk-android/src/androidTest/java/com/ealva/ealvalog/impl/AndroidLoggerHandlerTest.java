@@ -24,13 +24,15 @@ import com.ealva.ealvalog.NullMarker;
 import com.ealva.ealvalog.core.ExtLogRecord;
 import com.ealva.ealvalog.filter.AlwaysAcceptFilter;
 import com.ealva.ealvalog.util.NullThrowable;
+
+import static com.ealva.ealvalog.LogLevel.CRITICAL;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import static com.ealva.ealvalog.LogLevel.CRITICAL;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.when;
@@ -47,34 +49,37 @@ public class AndroidLoggerHandlerTest {
   }
 
   @Test
-  public void testIsLoggableNoFilter() throws Exception {
+  public void testIsLoggableNoFilter() {
     when(logger.getName()).thenReturn(AndroidLoggerHandlerTest.class.getName());
 
     AndroidLoggerHandler handler = AndroidLoggerHandler.builder().build();
-    assertThat(handler.isLoggable(logger, CRITICAL, NullMarker.INSTANCE, NullThrowable.INSTANCE),
+    assertThat(handler.isLoggable(logger, CRITICAL, NullMarker.INSTANCE,
+                                  NullThrowable.INSTANCE),
                is(FilterResult.NEUTRAL));
   }
 
   @Test
-  public void testIsLoggableAlwaysAcceptFilter() throws Exception {
+  public void testIsLoggableAlwaysAcceptFilter() {
     when(logger.getName()).thenReturn(AndroidLoggerHandlerTest.class.getName());
 
     AndroidLoggerHandler handler = AndroidLoggerHandler.builder()
                                                        .filter(AlwaysAcceptFilter.INSTANCE)
                                                        .build();
-    assertThat(handler.isLoggable(logger, CRITICAL, NullMarker.INSTANCE, NullThrowable.INSTANCE),
+    assertThat(handler.isLoggable(logger, CRITICAL, NullMarker.INSTANCE,
+                                  NullThrowable.INSTANCE),
                is(FilterResult.ACCEPT));
   }
 
   @Test
-  public void testLogOutput() throws Exception {
+  public void testLogOutput() {
     AndroidLoggerHandler handler = AndroidLoggerHandler.builder()
                                                        .filter(AlwaysAcceptFilter.INSTANCE)
                                                        .build();
-    handler.publish(ExtLogRecord.get(CRITICAL,
-                                     "Message",
-                                     getClass().getName(),
-                                     null,
-                                     null));
+    handler.publish(ExtLogRecord.Companion.get(CRITICAL,
+                                               "Message",
+                                               getClass().getName(),
+                                               null,
+                                               null,
+                                               null));
   }
 }

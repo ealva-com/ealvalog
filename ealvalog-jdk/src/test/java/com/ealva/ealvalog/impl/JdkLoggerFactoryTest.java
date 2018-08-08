@@ -24,6 +24,8 @@ import com.ealva.ealvalog.LoggerFilter;
 import com.ealva.ealvalog.Loggers;
 import com.ealva.ealvalog.filter.AlwaysAcceptFilter;
 
+import static com.ealva.ealvalog.LoggerFactory.ROOT_LOGGER_NAME;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -44,30 +46,30 @@ public class JdkLoggerFactoryTest {
 
   @Before
   public void setup() {
-    final JdkLoggerFactory loggerFactory = JdkLoggerFactory.instance();
-    theRootLogger = JdkLoggerFactory.instance().get(LoggerFactory.ROOT_LOGGER_NAME);
+    final JdkLoggerFactory loggerFactory = JdkLoggerFactory.Companion.instance();
+    theRootLogger = JdkLoggerFactory.Companion.instance().get(ROOT_LOGGER_NAME);
     theRootBridge = theRootLogger.getBridge();
-    Loggers.setFactory(loggerFactory);
+    Loggers.INSTANCE.setFactory(loggerFactory);
   }
 
   @Test
   public void testGetRootLogger() {
-    final Logger rootByName = Loggers.get("");
+    final Logger rootByName = Loggers.INSTANCE.get("");
     assertThat(rootByName, is(notNullValue()));
     assertThat(theRootLogger, is(rootByName));
     assertThat(theRootLogger.getBridge(), is(theRootBridge));
 
-    final Logger root = Loggers.getRoot();
+    final Logger root = Loggers.INSTANCE.getRoot();
     assertThat(root, is(notNullValue()));
 
     assertThat(root, is(rootByName));
-    assertThat(rootByName.getName(), is(equalTo(LoggerFactory.ROOT_LOGGER_NAME)));
+    assertThat(rootByName.getName(), is(equalTo(ROOT_LOGGER_NAME)));
 
-    JdkLogger directRoot = JdkLoggerFactory.instance().get("");
+    JdkLogger directRoot = JdkLoggerFactory.Companion.instance().get("");
     assertThat(directRoot, is(notNullValue()));
     assertThat(directRoot, is(root));
 
-    JdkLogger anotherDirect = JdkLoggerFactory.instance().get("");
+    JdkLogger anotherDirect = JdkLoggerFactory.Companion.instance().get("");
     assertThat(anotherDirect, is(notNullValue()));
     assertThat(anotherDirect, is(directRoot));
 
@@ -78,15 +80,15 @@ public class JdkLoggerFactoryTest {
     assertThat(anotherBridge, is(notNullValue()));
     assertThat(directBridge, is(anotherBridge));
 
-    assertThat(directBridge.getName(), is(equalTo(LoggerFactory.ROOT_LOGGER_NAME)));
+    assertThat(directBridge.getName(), is(equalTo(ROOT_LOGGER_NAME)));
     assertThat(directBridge.getParent(), is(nullValue()));
   }
 
   @Test
   public void testBridgeIsRoot() {
-    final Logger logger = Loggers.get();
+    final Logger logger = Loggers.INSTANCE.get();
 
-    final JdkLogger jdkLogger = JdkLoggerFactory.instance().get(this.getClass().getName());
+    final JdkLogger jdkLogger = JdkLoggerFactory.Companion.instance().get(this.getClass().getName());
     assertThat(jdkLogger, is(logger));
 
     final JdkBridge bridge = jdkLogger.getBridge();
@@ -95,9 +97,9 @@ public class JdkLoggerFactoryTest {
 
   @Test
   public void testSetFilter() {
-    final Logger logger = Loggers.get();
+    final Logger logger = Loggers.INSTANCE.get();
 
-    final JdkLogger jdkLogger = JdkLoggerFactory.instance().get(this.getClass().getName());
+    final JdkLogger jdkLogger = JdkLoggerFactory.Companion.instance().get(this.getClass().getName());
     assertThat(jdkLogger, is(logger));
 
     JdkBridge bridge = jdkLogger.getBridge();
@@ -116,7 +118,7 @@ public class JdkLoggerFactoryTest {
 
   @Test
   public void testReset() {
-    JdkLogger jdkLogger = JdkLoggerFactory.instance().get(this.getClass().getName());
+    JdkLogger jdkLogger = JdkLoggerFactory.Companion.instance().get(this.getClass().getName());
 
     JdkBridge bridge = jdkLogger.getBridge();
     assertThat(bridge, is(theRootBridge));  // no filter set so will be the root
@@ -128,8 +130,8 @@ public class JdkLoggerFactoryTest {
     assertThat(bridge.getFilter(), is(dummy));
     assertThat(bridge.getParent(), is(theRootBridge));
 
-    JdkLoggerFactory.instance().reset();
-    jdkLogger = JdkLoggerFactory.instance().get(this.getClass().getName());
+    JdkLoggerFactory.Companion.instance().reset();
+    jdkLogger = JdkLoggerFactory.Companion.instance().get(this.getClass().getName());
     bridge = jdkLogger.getBridge();
     assertThat(bridge, is(theRootBridge));  // no filter set so will be the root
   }
