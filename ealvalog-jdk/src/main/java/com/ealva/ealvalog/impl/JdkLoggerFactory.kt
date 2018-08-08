@@ -45,7 +45,7 @@ object JdkLoggerFactory : BaseLoggerFactory(), JdkLoggerConfiguration {
 
   @TestOnly
   fun getForTest(name: String): JdkLogger {
-    return getLogger(name, null, false)
+    return get(name, null, false)
   }
 
   /**
@@ -69,7 +69,7 @@ object JdkLoggerFactory : BaseLoggerFactory(), JdkLoggerConfiguration {
     updateLoggers()
   }
 
-  override fun getLogger(name: String, marker: Marker?, incLocation: Boolean): JdkLogger {
+  override fun get(name: String, marker: Marker?, includeLocation: Boolean): JdkLogger {
     if (LoggerFactory.ROOT_LOGGER_NAME == name) {
       return root
     }
@@ -82,21 +82,11 @@ object JdkLoggerFactory : BaseLoggerFactory(), JdkLoggerConfiguration {
       }
       if (created) {
         setParents()
-        if (incLocation) {
+        if (includeLocation) {
           logger.includeLocation = true
         }
       }
       return logger
-//      var jdkLogger: JdkLogger? = loggerMap[name]
-//      if (jdkLogger == null) {
-//        jdkLogger = JdkLogger(name, marker, this)
-//        loggerMap[name] = jdkLogger
-//        setParents()
-//        if (includeLocation) {
-//          jdkLogger.includeLocation = true
-//        }
-//      }
-//      return jdkLogger
     } finally {
       bridgeTreeLock.unlock()
     }

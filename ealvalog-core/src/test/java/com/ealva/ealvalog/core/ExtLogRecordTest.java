@@ -18,6 +18,7 @@
 
 package com.ealva.ealvalog.core;
 
+import com.ealva.ealvalog.ExtLogRecord;
 import com.ealva.ealvalog.LogLevel;
 import com.ealva.ealvalog.Marker;
 import com.ealva.ealvalog.Markers;

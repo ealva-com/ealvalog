@@ -81,7 +81,7 @@ object Loggers {
    * @return a logger for for the caller's class
    */
   fun get(): Logger {
-    return loggerFactory[LogUtil.getCallerClassName(STACK_DEPTH)]
+    return loggerFactory[LogUtil.getCallerClassName(STACK_DEPTH), null, false]
   }
 
   /**
@@ -95,7 +95,7 @@ object Loggers {
    * @see .get
    */
   operator fun get(marker: Marker): Logger {
-    return loggerFactory[LogUtil.getCallerClassName(STACK_DEPTH), marker]
+    return loggerFactory[LogUtil.getCallerClassName(STACK_DEPTH), marker, false]
   }
 
   /**
@@ -106,7 +106,7 @@ object Loggers {
    * @return a logger for `aClass`
    */
   operator fun get(aClass: Class<*>): Logger {
-    return loggerFactory[aClass.name]
+    return loggerFactory[aClass.name, null, false]
   }
 
   /**
@@ -117,7 +117,7 @@ object Loggers {
    * @return a logger for `name`
    */
   operator fun get(name: String): Logger {
-    return loggerFactory[name]
+    return loggerFactory[name, null, false]
   }
 
   /**
@@ -129,8 +129,8 @@ object Loggers {
    *
    * @return a logger for `aClass`
    */
-  operator fun get(aClass: Class<*>, marker: Marker): Logger {
-    return loggerFactory[aClass.name, marker]
+  operator fun get(aClass: Class<*>, marker: Marker?): Logger {
+    return loggerFactory[aClass.name, marker, false]
   }
 
   /**
@@ -142,7 +142,7 @@ object Loggers {
    *
    * @return a logger for `name`
    */
-  operator fun get(name: String, marker: Marker): Logger {
-    return loggerFactory[name, marker]
+  operator fun get(name: String, marker: Marker?): Logger {
+    return loggerFactory[name, marker, false]
   }
 }

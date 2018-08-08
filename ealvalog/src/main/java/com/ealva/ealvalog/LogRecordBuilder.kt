@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.ealva.ealvalog.core
+package com.ealva.ealvalog
 
 import java.util.Formatter
 import java.util.Locale

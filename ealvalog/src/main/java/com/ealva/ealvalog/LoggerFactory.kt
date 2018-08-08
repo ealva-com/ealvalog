@@ -66,15 +66,15 @@ interface LoggerFactory {
    *
    * @param name   the name of the logger. This name will be treated as if it were a class name
    * with the canonical package hierarchy
-   * @param marker every log from the returned [Logger] will use this as
-   * it's [Marker] unless overridden on a per method basis
+   * @param marker optional [Marker] - every log from the returned [Logger] will use this as
+   * it's marker unless overridden on a per method basis
    * @param includeLocation include call site location in every log call. Formatters must be
    * configured to display this optional
    * information.
    *
    * @return [Logger] instance
    */
-  operator fun get(name: String, marker: Marker, includeLocation: Boolean): Logger
+  operator fun get(name: String, marker: Marker?, includeLocation: Boolean): Logger
 
   companion object {
     const val ROOT_LOGGER_NAME = ""

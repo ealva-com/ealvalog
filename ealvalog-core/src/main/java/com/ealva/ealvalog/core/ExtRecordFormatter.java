@@ -19,6 +19,7 @@
 package com.ealva.ealvalog.core;
 
 
+import com.ealva.ealvalog.ExtLogRecord;
 import com.ealva.ealvalog.LogLevel;
 import com.ealva.ealvalog.NullMarker;
 import com.ealva.ealvalog.util.FormattableStackTraceElement;
@@ -260,7 +261,7 @@ public class ExtRecordFormatter extends Formatter {
     return parameters.length;
   }
 
-  private void setArgs(final com.ealva.ealvalog.core.ExtLogRecord record,
+  private void setArgs(final ExtLogRecord record,
                        final String msg,
                        final Object[] formatterArgs) {
     setBaseArgs(record, msg, formatterArgs);

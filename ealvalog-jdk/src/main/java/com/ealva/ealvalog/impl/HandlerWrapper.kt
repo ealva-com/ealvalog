@@ -26,7 +26,7 @@ import com.ealva.ealvalog.LoggerFilter
 import com.ealva.ealvalog.Loggers
 import com.ealva.ealvalog.Marker
 import com.ealva.ealvalog.NullMarker
-import com.ealva.ealvalog.core.ExtLogRecord
+import com.ealva.ealvalog.ExtLogRecord
 import com.ealva.ealvalog.util.NullThrowable
 import java.util.logging.Handler
 import java.util.logging.LogRecord

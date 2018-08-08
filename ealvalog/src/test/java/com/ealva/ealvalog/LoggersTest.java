@@ -54,12 +54,12 @@ public class LoggersTest {
 
   @Test
   public void testUnspecifiedLoggerName() {
-    given(mockFactory.get(LoggersTest.class.getName())).willReturn(mockLogger);
+    given(mockFactory.get(LoggersTest.class.getName(), null, false)).willReturn(mockLogger);
 
     // when
     final Logger logger = Loggers.INSTANCE.get();
 
-    then(mockFactory).should(only()).get(LoggersTest.class.getName());
+    then(mockFactory).should(only()).get(LoggersTest.class.getName(), null, false);
     assertThat(logger, is(mockLogger));  // not really testing anything, but using that variable
   }
 }

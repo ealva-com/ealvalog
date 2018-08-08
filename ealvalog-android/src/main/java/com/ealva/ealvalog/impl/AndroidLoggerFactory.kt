@@ -31,7 +31,7 @@ import java.util.concurrent.ConcurrentMap
 object AndroidLoggerFactory : BaseLoggerFactory() {
   private val loggerMap: ConcurrentMap<String, AndroidLogger> = ConcurrentHashMap()
 
-  override fun getLogger(name: String, marker: Marker?, incLocation: Boolean): AndroidLogger {
-    return loggerMap.getOrPut(name) { AndroidLogger(name, marker, incLocation) }
+  override fun get(name: String, marker: Marker?, includeLocation: Boolean): AndroidLogger {
+    return loggerMap.getOrPut(name) { AndroidLogger(name, marker, includeLocation) }
   }
 }

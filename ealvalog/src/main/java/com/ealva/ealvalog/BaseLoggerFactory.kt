@@ -20,20 +20,14 @@ package com.ealva.ealvalog
 
 abstract class BaseLoggerFactory : LoggerFactory {
     override fun get(name: String): Logger {
-        return getLogger(name, null, false)
+        return get(name, null, false)
     }
 
     override fun get(name: String, includeLocation: Boolean): Logger {
-        return getLogger(name, null, includeLocation)
+        return get(name, null, includeLocation)
     }
 
     override fun get(name: String, marker: Marker): Logger {
-        return getLogger(name, marker, false)
+        return get(name, marker, false)
     }
-
-    override fun get(name: String, marker: Marker, includeLocation: Boolean): Logger {
-        return getLogger(name, marker, includeLocation)
-    }
-
-    protected abstract fun getLogger(name: String, marker: Marker?, incLocation: Boolean): Logger
 }

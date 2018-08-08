@@ -18,6 +18,7 @@
 
 package com.ealva.ealvalog.core;
 
+import com.ealva.ealvalog.ExtLogRecord;
 import com.ealva.ealvalog.LogLevel;
 import com.ealva.ealvalog.Marker;
 import com.ealva.ealvalog.MarkerFactory;
@@ -61,7 +62,7 @@ public class ExtRecordFormatterTest {
       EXPECTED_ALT =
       String.format(Locale.getDefault(), "(%s.%s:%d)", DECLARING_CLASS, METHOD_NAME, LINE_NUMBER);
   @SuppressWarnings("WeakerAccess") @Mock MarkerFactory markerFactory;
-  private com.ealva.ealvalog.core.ExtLogRecord record;
+  private ExtLogRecord record;
 
   @Before
   public void setup() {

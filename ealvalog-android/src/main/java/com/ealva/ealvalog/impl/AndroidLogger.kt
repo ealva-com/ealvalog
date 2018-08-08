@@ -21,10 +21,9 @@ package com.ealva.ealvalog.impl
 import com.ealva.ealvalog.LogLevel
 import com.ealva.ealvalog.Marker
 import com.ealva.ealvalog.core.BaseLogger
+import com.ealva.ealvalog.util.LogMessageFormatter
 import com.ealva.ealvalog.util.LogMessageFormatterImpl
 import com.ealva.ealvalog.util.LogUtil
-import com.ealva.ealvalog.util.LogMessageFormatter
-
 import java.util.concurrent.atomic.AtomicReference
 import java.util.logging.LogRecord
 

@@ -19,7 +19,7 @@
 package com.ealva.ealvalog.impl;
 
 import com.ealva.ealvalog.LogLevel;
-import com.ealva.ealvalog.core.ExtLogRecord;
+import com.ealva.ealvalog.ExtLogRecord;
 
 import org.junit.Before;
 import org.junit.Rule;

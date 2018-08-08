@@ -21,7 +21,7 @@ package com.ealva.ealvalog.impl;
 import com.ealva.ealvalog.FilterResult;
 import com.ealva.ealvalog.Logger;
 import com.ealva.ealvalog.NullMarker;
-import com.ealva.ealvalog.core.ExtLogRecord;
+import com.ealva.ealvalog.ExtLogRecord;
 import com.ealva.ealvalog.core.ExtRecordFormatter;
 import com.ealva.ealvalog.filter.AlwaysAcceptFilter;
 import com.ealva.ealvalog.util.NullThrowable;

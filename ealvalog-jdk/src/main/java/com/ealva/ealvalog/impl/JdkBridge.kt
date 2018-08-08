@@ -25,7 +25,7 @@ import com.ealva.ealvalog.Marker
 import com.ealva.ealvalog.NullMarker
 import com.ealva.ealvalog.core.Bridge
 import com.ealva.ealvalog.core.CoreLogger
-import com.ealva.ealvalog.core.ExtLogRecord
+import com.ealva.ealvalog.ExtLogRecord
 import com.ealva.ealvalog.filter.AlwaysNeutralFilter
 import com.ealva.ealvalog.util.LogUtil
 import com.ealva.ealvalog.util.NullThrowable

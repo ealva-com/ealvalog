@@ -27,5 +27,5 @@ object NullLoggerFactory : com.ealva.ealvalog.LoggerFactory {
   override fun get(name: String) = NullLogger
   override fun get(name: String, includeLocation: Boolean) = NullLogger
   override fun get(name: String, marker: Marker) = NullLogger
-  override fun get(name: String, marker: Marker, includeLocation: Boolean) = NullLogger
+  override fun get(name: String, marker: Marker?, includeLocation: Boolean) = NullLogger
 }
