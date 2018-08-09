@@ -36,13 +36,13 @@ import java.util.logging.LogRecord
  * Subclass of LogRecord adding the extra info we need. Not thread safe.
  *
  *
- * Use [.getRecord] to obtain an ExtLogRecord which is associated with a thread and needs
- * to be [.release]ed to be properly reused. Lower layers of the logging framework
+ * Use [get] to obtain an ExtLogRecord which is associated with a thread and needs
+ * to be [release]ed to be properly reused. Lower layers of the logging framework
  * need to copy this ExtLogRecord if it's to be passed to another thread.
  *
  *
- * Don't use the [.getParameters] array length as the actual number of parameters. Use
- * [.getParameterCount] instead. There might be nulls at the end of the array due to reuse
+ * DO NOT use the [getParameters] array length as the actual number of parameters. Use
+ * [parameterCount] instead. There might be nulls at the end of the array due to reuse
  *
  *
  * Created by Eric A. Snell on 3/4/17.
@@ -60,13 +60,14 @@ class ExtLogRecord private constructor() : LogRecord(Level.OFF, ""),
    */
   @Transient var threadName: String
   @Transient private var marker: Marker
-  @Transient var callLocation: StackTraceElement? = null
+  @Transient var callLocation: StackTraceElement?
     private set
-  /** @return the number of parameters passed to [.setParameters]
+  /**
+   * The number of parameters passed to [parameters]
    */
-  @Transient var parameterCount: Int = 0
+  @Transient var parameterCount: Int
     private set   // actual number of parameters, array might be over-sized
-  @Transient private var isReserved: Boolean = false
+  @Transient private var isReserved: Boolean
   @Transient private var builder: StringBuilder
   @Transient private var formatter: Formatter
 
@@ -168,26 +169,26 @@ class ExtLogRecord private constructor() : LogRecord(Level.OFF, ""),
   }
 
   @Throws(IOException::class, ClassNotFoundException::class)
-  private fun readObject(`in`: ObjectInputStream) {
-    `in`.defaultReadObject()
-    logLevel = `in`.readObject() as LogLevel
-    threadName = `in`.readUTF()
-    marker = `in`.readObject() as Marker
-    callLocation = `in`.readObject() as StackTraceElement
-    parameterCount = `in`.readInt()
+  private fun readObject(inputStream: ObjectInputStream) = inputStream.run {
+    defaultReadObject()
+    logLevel = readObject() as LogLevel
+    threadName = readUTF()
+    marker = readObject() as Marker
+    callLocation = readObject() as StackTraceElement
+    parameterCount = readInt()
     isReserved = false
     builder = StringBuilder(DEFAULT_STRING_BUILDER_SIZE)
     formatter = Formatter(builder)
   }
 
   @Throws(IOException::class)
-  private fun writeObject(out: ObjectOutputStream) {
-    out.defaultWriteObject()
-    out.writeObject(logLevel)
-    out.writeUTF(threadName)
-    out.writeObject(marker)
-    out.writeObject(callLocation)
-    out.writeInt(parameterCount)
+  private fun writeObject(outputStream: ObjectOutputStream) = outputStream.run {
+    defaultWriteObject()
+    writeObject(logLevel)
+    writeUTF(threadName)
+    writeObject(marker)
+    writeObject(callLocation)
+    writeInt(parameterCount)
   }
 
   @Suppress("unused")
@@ -356,16 +357,15 @@ class ExtLogRecord private constructor() : LogRecord(Level.OFF, ""),
       throwable: Throwable?,
       vararg formatArgs: Any
     ): ExtLogRecord {
-      val logRecord =
-        get(level, loggerName, marker, throwable)
-      logRecord.message = msg
-      logRecord.parameters = arrayOf(*formatArgs)
-      if (callerLocation != null) {
-        logRecord.sourceClassName = callerLocation.className
-        logRecord.sourceMethodName = callerLocation.methodName
-        logRecord.setLocation(callerLocation)
+      return get(level, loggerName, marker, throwable).apply {
+        message = msg
+        parameters = formatArgs
+        if (callerLocation != null) {
+          sourceClassName = callerLocation.className
+          sourceMethodName = callerLocation.methodName
+          setLocation(callerLocation)
+        }
       }
-      return logRecord
     }
 
     fun get(
@@ -374,16 +374,16 @@ class ExtLogRecord private constructor() : LogRecord(Level.OFF, ""),
       marker: Marker?,
       throwable: Throwable?
     ): ExtLogRecord {
-      val logRecord = record
-      logRecord.logLevel = level
-      logRecord.level = level.jdkLevel
-      logRecord.setMarker(marker)
-      logRecord.thrown = throwable
-      val currentThread = Thread.currentThread()
-      logRecord.threadName = currentThread.name
-      logRecord.threadID = currentThread.id.toInt()
-      logRecord.loggerName = loggerName
-      return logRecord
+      return record.apply {
+        logLevel = level
+        this.level = level.jdkLevel
+        setMarker(marker)
+        thrown = throwable
+        val currentThread = Thread.currentThread()
+        threadName = currentThread.name
+        threadID = currentThread.id.toInt()
+        this.loggerName = loggerName
+      }
     }
 
     fun release(record: ExtLogRecord) {
