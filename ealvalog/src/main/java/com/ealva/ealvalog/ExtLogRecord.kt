@@ -18,9 +18,9 @@
 
 package com.ealva.ealvalog
 
+import com.ealva.ealvalog.ExtLogRecord.Companion.get
 import com.ealva.ealvalog.util.LogUtil
 import org.jetbrains.annotations.TestOnly
-
 import java.io.Closeable
 import java.io.IOException
 import java.io.ObjectInputStream
@@ -72,15 +72,15 @@ class ExtLogRecord private constructor() : LogRecord(Level.OFF, ""),
   @Transient private var formatter: Formatter
 
   init {
-    parameters = null
+    isReserved = false
     logLevel = LogLevel.NONE
-    threadName = Thread.currentThread().name
     marker = NullMarker
     callLocation = null
+    parameters = null
     parameterCount = 0
-    isReserved = false
     builder = StringBuilder(DEFAULT_STRING_BUILDER_SIZE)
     formatter = Formatter(builder)
+    threadName = Thread.currentThread().name
   }
 
   private fun reserve(): ExtLogRecord {
@@ -112,7 +112,6 @@ class ExtLogRecord private constructor() : LogRecord(Level.OFF, ""),
   }
 
   override fun setMessage(message: String?) {
-    val builder = this.builder
     builder.setLength(0)
     builder.append(message)
   }
@@ -206,7 +205,6 @@ class ExtLogRecord private constructor() : LogRecord(Level.OFF, ""),
     copy.parameters = parameters
     copy.resourceBundle = resourceBundle
     copy.resourceBundleName = resourceBundleName
-
     copy.threadName = threadName
     copy.marker = marker
     copy.callLocation = callLocation
@@ -300,24 +298,23 @@ class ExtLogRecord private constructor() : LogRecord(Level.OFF, ""),
     const val DEFAULT_MAX_STRING_BUILDER_SIZE = 2048
     private var maxBuilderSize = DEFAULT_MAX_STRING_BUILDER_SIZE
 
-    @Suppress("unused")
-        /**
+    /**
      * Sets the maximum size in bytes of the StringBuilder used to build log messages. If necessary,
      * a builder will be trimmed sometime after it's used but before it's is reused.
      * @param max the maximum size of the cached thread builder. Don't set this too high as you'll
      * this much memory for every thread that logs
      * @return the new max size which is maximum of DEFAULT_STRING_BUILDER_SIZE and max
      */
+    @Suppress("unused")
     fun setMaxStringBuilderSize(max: Int): Int {
       maxBuilderSize = Math.max(DEFAULT_STRING_BUILDER_SIZE, max)
       return maxBuilderSize
     }
 
-    @Suppress("unused")
     /**
-    *
-    * @return the current maximum cached string builder size
-    */
+     * The current maximum cached string builder size
+     */
+    @Suppress("unused")
     fun getMaxStringBuilderSize(): Int {
       return maxBuilderSize
     }
@@ -343,8 +340,9 @@ class ExtLogRecord private constructor() : LogRecord(Level.OFF, ""),
      * ```
      *
      * </pre>
-     * Return the record via [.release] so new records don't need to be created for every log. Not releasing a record
-     * defeats the pool. Preference is to use via try with resources as in example above.
+     * Return the record via [release], which is called during [close], so new records don't need
+     * to be created for every log. Not releasing a record defeats the pool. Preference is to use
+     * via try-with-resources as in example above. or a use{} block in Kotlin
      *
      * @return an ExtLogRecord initialized based on parameters and the current thread
      */
