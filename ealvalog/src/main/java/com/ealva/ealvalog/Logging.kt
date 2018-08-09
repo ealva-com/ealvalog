@@ -65,7 +65,7 @@ inline fun Logger.t(
     block: (LogRecordBuilder) -> Unit
 ) {
     if (isLoggable(LogLevel.TRACE, marker, throwable)) {
-        ExtLogRecord[LogLevel.TRACE, name, marker, throwable].use { record ->
+        ExtLogRecord.get(LogLevel.TRACE, name, marker, throwable).use { record ->
             block(record)
             logImmediate(record)
         }
@@ -78,7 +78,7 @@ inline fun Logger.d(
     block: (LogRecordBuilder) -> Unit
 ) {
     if (isLoggable(LogLevel.DEBUG, marker, null)) {
-        ExtLogRecord[LogLevel.DEBUG, name, marker, throwable].use { record ->
+        ExtLogRecord.get(LogLevel.DEBUG, name, marker, throwable).use { record ->
             block(record)
             logImmediate(record)
         }
@@ -91,7 +91,7 @@ inline fun Logger.i(
     block: (LogRecordBuilder) -> Unit
 ) {
     if (isLoggable(LogLevel.INFO, marker, throwable)) {
-        ExtLogRecord[LogLevel.INFO, name, marker, throwable].use { record ->
+        ExtLogRecord.get(LogLevel.INFO, name, marker, throwable).use { record ->
             block(record)
             logImmediate(record)
         }
@@ -104,7 +104,7 @@ inline fun Logger.w(
     block: (LogRecordBuilder) -> Unit
 ) {
     if (isLoggable(LogLevel.WARN, marker, null)) {
-        ExtLogRecord[LogLevel.WARN, name, marker, throwable].use { record ->
+        ExtLogRecord.get(LogLevel.WARN, name, marker, throwable).use { record ->
             block(record)
             logImmediate(record)
         }
@@ -117,7 +117,7 @@ inline fun Logger.e(
     block: (LogRecordBuilder) -> Unit
 ) {
     if (isLoggable(LogLevel.ERROR, marker, null)) {
-        ExtLogRecord[LogLevel.ERROR, name, marker, throwable].use { record ->
+        ExtLogRecord.get(LogLevel.ERROR, name, marker, throwable).use { record ->
             block(record)
             logImmediate(record)
         }
@@ -130,7 +130,7 @@ inline fun Logger.wtf(
     block: (LogRecordBuilder) -> Unit
 ) {
     if (isLoggable(LogLevel.CRITICAL, marker, throwable)) {
-        ExtLogRecord[LogLevel.CRITICAL, name, marker, throwable].use { record ->
+        ExtLogRecord.get(LogLevel.CRITICAL, name, marker, throwable).use { record ->
             block(record)
             logImmediate(record)
         }

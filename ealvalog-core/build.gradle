@@ -19,8 +19,8 @@
 apply plugin: 'org.jetbrains.kotlin.jvm'
 apply plugin: 'java'
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+sourceCompatibility = 1.6
+targetCompatibility = 1.6
 
 version = VERSION_NAME
 
@@ -50,22 +50,22 @@ dependencies {
 }
 
 compileKotlin {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+    sourceCompatibility = JavaVersion.VERSION_1_6
+    targetCompatibility = JavaVersion.VERSION_1_6
 
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "1.6"
         apiVersion = "1.2"
         languageVersion = "1.2"
     }
 }
 
 compileTestKotlin {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+    sourceCompatibility = JavaVersion.VERSION_1_6
+    targetCompatibility = JavaVersion.VERSION_1_6
 
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "1.6"
         apiVersion = "1.2"
         languageVersion = "1.2"
     }

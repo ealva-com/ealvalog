@@ -18,21 +18,19 @@
 
 package com.ealva.ealvalog.impl
 
+import com.ealva.ealvalog.ExtLogRecord
 import com.ealva.ealvalog.FilterResult
+import com.ealva.ealvalog.FilterResult.DENY
+import com.ealva.ealvalog.FilterResult.NEUTRAL
 import com.ealva.ealvalog.LogLevel
 import com.ealva.ealvalog.LoggerFilter
 import com.ealva.ealvalog.Marker
 import com.ealva.ealvalog.NullMarker
 import com.ealva.ealvalog.core.Bridge
 import com.ealva.ealvalog.core.CoreLogger
-import com.ealva.ealvalog.ExtLogRecord
 import com.ealva.ealvalog.filter.AlwaysNeutralFilter
 import com.ealva.ealvalog.util.LogUtil
 import com.ealva.ealvalog.util.NullThrowable
-
-import com.ealva.ealvalog.FilterResult.DENY
-import com.ealva.ealvalog.FilterResult.NEUTRAL
-
 import java.util.logging.LogRecord
 import java.util.logging.Logger
 
@@ -142,10 +140,15 @@ class JdkBridge internal constructor(name: String) : Bridge {
     // ENSURE the record obtained is released!
     //
     // We're not using try with resources here due to warnings about early Android versions.
-    val logRecord = ExtLogRecord[level, msg, logger.name, if (shouldIncludeLocation())
-      LogUtil.getCallerLocation(stackDepth + 1)
-    else
-      null, marker, throwable, formatArgs]
+    val logRecord = ExtLogRecord.get(
+      level,
+      msg,
+      logger.name,
+      if (shouldIncludeLocation()) LogUtil.getCallerLocation(stackDepth + 1) else null,
+      marker,
+      throwable,
+      *formatArgs
+    )
     try {
       log(logRecord)
     } finally {

@@ -265,7 +265,7 @@ class ExtLogRecord private constructor() : LogRecord(Level.OFF, ""),
     format: String,
     vararg args: Any
   ): LogRecordBuilder {
-    if (args.size > 0) {
+    if (args.isNotEmpty()) {
       formatter.format(locale, format, *args)
     } else {
       builder.append(format)
@@ -347,7 +347,7 @@ class ExtLogRecord private constructor() : LogRecord(Level.OFF, ""),
      *
      * @return an ExtLogRecord initialized based on parameters and the current thread
      */
-    operator fun get(
+    fun get(
       level: LogLevel,
       msg: String,
       loggerName: String,
@@ -368,7 +368,7 @@ class ExtLogRecord private constructor() : LogRecord(Level.OFF, ""),
       return logRecord
     }
 
-    operator fun get(
+    fun get(
       level: LogLevel,
       loggerName: String,
       marker: Marker?,

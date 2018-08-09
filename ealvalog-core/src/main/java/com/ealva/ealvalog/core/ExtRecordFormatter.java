@@ -208,7 +208,7 @@ public class ExtRecordFormatter extends Formatter {
         setArgs(record, msg, formatter.formatterArgs);
       }
       return formatter.append(getFormat(), formatter.formatterArgs).toString();
-    } catch (Exception e) {
+    } catch (IllegalFormatConversionException e) {
       if (logErrors) {
         return e.getMessage();
       } else {
@@ -236,7 +236,7 @@ public class ExtRecordFormatter extends Formatter {
       } else {
         return formatter.append(record.getMessage()).toString();
       }
-    } catch (Exception e) {
+    } catch (IllegalFormatConversionException e) {
       if (logErrors) {
         return e.getMessage();
       } else {

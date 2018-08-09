@@ -18,8 +18,8 @@
 
 package com.ealva.ealvalog.impl;
 
-import com.ealva.ealvalog.LogLevel;
 import com.ealva.ealvalog.ExtLogRecord;
+import com.ealva.ealvalog.LogLevel;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -67,7 +67,8 @@ public class FileHandlerWrapperTest {
   public void testWithPattern() throws Exception {
     final File root = folder.getRoot();
     final String fileNamePattern = new File(root, "ealvalog.%g.%u.log").getAbsolutePath();
-    final HandlerWrapper handler = FileHandlerWrapper.Companion.builder().fileNamePattern(fileNamePattern)
+    final HandlerWrapper handler = FileHandlerWrapper.Companion.builder()
+                                                               .fileNamePattern(fileNamePattern)
                                                                .build();
     handler.publish(record);
 
