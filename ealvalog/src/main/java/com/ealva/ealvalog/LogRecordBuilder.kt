@@ -21,6 +21,18 @@ package com.ealva.ealvalog
 import java.util.Formatter
 import java.util.Locale
 
+operator fun LogRecordBuilder.invoke(format: String) {
+  append(format)
+}
+
+operator fun LogRecordBuilder.invoke(format: String, vararg args: Any) {
+  append(format, *args)
+}
+
+operator fun LogRecordBuilder.unaryPlus() {
+  addLocation(1)
+}
+
 /**
  * Created by Eric A. Snell on 6/29/18.
  */
@@ -81,4 +93,5 @@ interface LogRecordBuilder : Appendable {
    * @return this LogRecordBuilder
    */
   fun addLocation(stackDepth: Int): LogRecordBuilder
+
 }

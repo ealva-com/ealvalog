@@ -18,7 +18,6 @@
 
 package com.ealva.ealvalog
 
-import java.util.Formatter
 import java.util.logging.LogRecord
 
 /**
@@ -48,14 +47,14 @@ interface Logger {
 
   /**
    * The level set for this logger or, if that it has not been set, get the nearest ancestor
-   * log level
+   * log level if the Loggers are hierarchical
    */
   val effectiveLogLevel: LogLevel
 
   /**
    * Set if this logger should include call site location information in the log information. This
-   * is a relatively expensive operation and defaults to false.
-   *
+   * is a relatively expensive operation and defaults to false. Even if this is false a lower level
+   * handler may request location be included. See [resolveLocation]
    *
    * The information passed to lower layers of the logging framework include: caller class,
    * caller method, and caller file line number. This is obtained from the call stack. If calling
@@ -67,14 +66,11 @@ interface Logger {
   var includeLocation: Boolean
 
   /**
-   * Determine if a log call at this [LogLevel] will result in an actual log statement.
-   * Typically this is only a level check, unless the Logger instance contains a [Marker]. In
-   * that case the contained Marker is also checked to promote fast short-circuiting
-   *
-   * [level] is one of [LogLevel.TRACE], [LogLevel.DEBUG],
-   * [LogLevel.INFO], [LogLevel.WARN], [LogLevel.ERROR], [LogLevel.CRITICAL]
+   * Determine if a log call will include location information. If [includeLocation] is true or a
+   * lower level handler requests location information, it is obtained from the stack. Obtaining
+   * the location is a relatively expensive operation.
    */
-  fun isLoggable(level: LogLevel): Boolean
+  fun resolveLocation(logLevel: LogLevel, marker: Marker?, throwable: Throwable?): Boolean
 
   /**
    * Determine if a log at this [LogLevel], with the given (optional) [Marker] and (optional)
@@ -82,205 +78,9 @@ interface Logger {
    */
   fun isLoggable(
     level: LogLevel,
-    marker: Marker?,
-    throwable: Throwable?
+    marker: Marker? = null,
+    throwable: Throwable? = null
   ): Boolean
-
-  /**
-   * If isLoggable, log at the `msg` at `level`
-   *
-   * @param level log level to use
-   * @param msg   log msg which is unaltered
-   */
-  fun log(level: LogLevel, msg: String)
-
-  /**
-   * If isLoggable, log at the `msg` at `level` using the `marker`
-   *
-   * @param level  log level to use
-   * @param marker marker to include
-   * @param msg    log msg which is unaltered
-   */
-  fun log(level: LogLevel, marker: Marker, msg: String)
-
-  /**
-   * If isLoggable, log at the `msg` at `level` with the given `throwable`
-   *
-   * @param level     log level to use
-   * @param throwable throwable to include
-   * @param msg       log msg which is unaltered
-   */
-  fun log(level: LogLevel, throwable: Throwable, msg: String)
-
-  /**
-   * If isLoggable, log at the `msg` at `level` using the `marker` and
-   * `throwable`
-   *
-   * @param level     log level to use
-   * @param marker    marker to include
-   * @param throwable throwable to include
-   * @param msg       log msg which is unaltered
-   */
-  fun log(
-    level: LogLevel,
-    marker: Marker,
-    throwable: Throwable,
-    msg: String
-  )
-
-  /**
-   * If isLoggable, log at the `msg` at `level` using the `marker`
-   *
-   * @param level      log level to use
-   * @param marker     marker to include
-   * @param format     a format string in the form required by [Formatter]
-   * @param formatArgs arguments passed to [Formatter.format]
-   */
-  fun log(
-    level: LogLevel,
-    marker: Marker,
-    format: String,
-    vararg formatArgs: Any
-  )
-
-  /**
-   * If isLoggable, log at the `msg` at `level` using the `throwable`
-   *
-   * @param level      log level to use
-   * @param throwable  throwable to include
-   * @param format     a format string in the form required by [Formatter]
-   * @param formatArgs arguments passed to [Formatter.format]
-   */
-  fun log(
-    level: LogLevel,
-    throwable: Throwable,
-    format: String,
-    vararg formatArgs: Any
-  )
-
-  /**
-   * If isLoggable, log at the `msg` at `level` using the `marker` and
-   * `throwable`
-   *
-   * @param level      log level to use
-   * @param marker     marker to include
-   * @param throwable  throwable to include
-   * @param format     a format string in the form required by [Formatter]
-   * @param formatArgs arguments passed to [Formatter.format]
-   */
-  fun log(
-    level: LogLevel,
-    marker: Marker,
-    throwable: Throwable,
-    format: String,
-    vararg formatArgs: Any
-  )
-
-  fun log(level: LogLevel, format: String, arg1: Any)
-
-  fun log(
-    level: LogLevel,
-    format: String,
-    arg1: Any,
-    arg2: Any
-  )
-
-  fun log(
-    level: LogLevel,
-    format: String,
-    arg1: Any,
-    arg2: Any,
-    arg3: Any
-  )
-
-  fun log(
-    level: LogLevel,
-    format: String,
-    arg1: Any,
-    arg2: Any,
-    arg3: Any,
-    arg4: Any
-  )
-
-  fun log(
-    level: LogLevel,
-    format: String,
-    arg1: Any,
-    arg2: Any,
-    arg3: Any,
-    arg4: Any,
-    vararg remaining: Any
-  )
-
-  /**
-   * Used to log an exception being caught where no message is needed
-   *
-   * @param level     log level to use
-   * @param throwable the throwable that was caught
-   */
-  fun caught(level: LogLevel, throwable: Throwable)
-
-  /**
-   * Log a throwable being thrown at the log site.
-   *
-   *
-   * `throw LOG.throwing(LogLevel.ERROR, new MyException("Important Info"));
-  ` *
-   *
-   * @param level     level at which to log
-   * @param throwable the Throwable/Exception/Error to log
-   *
-   * @return returns the throwable for convenience
-   */
-  fun throwing(level: LogLevel, throwable: Throwable): Throwable
-
-  /**
-   * Log without checking the the level and indicate where on the call chain the log is occurring
-   * (`stackDepth`). This method's primary use is for this logging framework and it's not
-   * expected client's would typically use this method.
-   *
-   *
-   * This method has a [Marker] parameter which will override any [Marker] in the
-   * Logger itself
-   *
-   * @param level      log level - will not be checked before logging
-   * @param marker     an optional [Marker]
-   * @param throwable  an optional [Throwable]
-   * @param stackDepth the level of indirection from the original "log" invocation. This must be 0
-   * if a client invokes this method.
-   * @param msg        the log message
-   * @param formatArgs any formatting arguments if `msg` is a printf style format string
-   * (see [Formatter]
-   */
-  fun logImmediate(
-    level: LogLevel,
-    marker: Marker?,
-    throwable: Throwable?,
-    stackDepth: Int,
-    msg: String,
-    vararg formatArgs: Any
-  )
-
-  /**
-   * Log without checking the the level and indicate where on the call chain the log is occurring
-   * (`stackDepth`). This method's primary use is for this logging framework and it's not
-   * expected client's would typically use this method.
-   *
-   * @param level      log level - will not be checked before logging
-   * @param throwable  an optional [Throwable]
-   * @param stackDepth the level of indirection from the original "log" invocation. This must be 0
-   * if a client invokes this method.
-   * @param msg        the log message
-   * @param formatArgs any formatting arguments if `msg` is a printf style format string
-   * (see [Formatter]
-   */
-  fun logImmediate(
-    level: LogLevel,
-    throwable: Throwable?,
-    stackDepth: Int,
-    msg: String,
-    vararg formatArgs: Any
-  )
 
   /**
    * Log without checking the the level. This method's primary use is for this logging framework
@@ -289,5 +89,5 @@ interface Logger {
    * @param record the full log information
    */
   fun logImmediate(record: LogRecord)
-}
 
+}

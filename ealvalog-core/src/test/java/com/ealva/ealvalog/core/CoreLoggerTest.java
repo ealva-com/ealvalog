@@ -29,11 +29,12 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.only;
+
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
 
 /**
  * Test core functionality. Ensure it's calling the bridge correctly, including passing itself.
@@ -55,37 +56,40 @@ public class CoreLoggerTest {
   public void testPrintLog() {
     com.ealva.ealvalog.core.CoreLogger<com.ealva.ealvalog.core.Bridge>
         logger = new CoreLoggerForTest("LoggerName", bridge);
-    logger.printLog(LogLevel.CRITICAL, null, null, 1, MESSAGE);
-
-    then(bridge).should(only()).log(same(logger),
-                                    same(LogLevel.CRITICAL),
-                                    isNull(Marker.class),
-                                    isNull(Throwable.class),
-                                    eq(2),
-                                    eq(MESSAGE));
+    final LogRecord record = new LogRecord(Level.ALL, MESSAGE);
+    logger.logImmediate(record);
+    then(bridge).should(only()).log(same(record));
   }
 
   private static class CoreLoggerForTest extends CoreLogger<com.ealva.ealvalog.core.Bridge> {
+    private final @NotNull String name;
 
     CoreLoggerForTest(@NotNull final String name, @NotNull final Bridge bridge) {
-      super(name, bridge, null);
+      super(bridge);
+      this.name = name;
     }
 
     @Nullable @Override public LogLevel getLogLevel() {
       return null;
-    }    @Override public void setLogToParent(final boolean logToParent) {
+    }
+
+    @Override public void setLogToParent(final boolean logToParent) {
 
     }
 
     @Override public void setLogLevel(@Nullable final LogLevel logLevel) {
 
-    }    @Override public boolean getLogToParent() {
+    }
+
+    @Override public boolean getLogToParent() {
       return true;
     }
 
     @NotNull @Override public LogLevel getEffectiveLogLevel() {
       return LogLevel.ALL;
-    }    @Override public boolean shouldLogToParent() {
+    }
+
+    @Override public boolean shouldLogToParent() {
       return false;
     }
 
@@ -93,7 +97,15 @@ public class CoreLoggerTest {
       return false;
     }
 
+    @Override
+    public boolean resolveLocation(@NotNull final LogLevel logLevel,
+                                   @Nullable final Marker marker,
+                                   @Nullable final Throwable throwable) {
+      return false;
+    }
+
     @Override public void setIncludeLocation(final boolean includeLocation) {
+
 
     }
 
@@ -105,12 +117,19 @@ public class CoreLoggerTest {
     }
 
 
-
-
-
-
-
     @Override public void setFilter(@NotNull final LoggerFilter filter) {
+
+    }
+
+    @NotNull @Override public String getName() {
+      return name;
+    }
+
+    @Nullable @Override public Marker getMarker() {
+      return null;
+    }
+
+    @Override public void setMarker(@Nullable final Marker marker) {
 
     }
   }

@@ -22,6 +22,7 @@ import com.ealva.ealvalog.FilterResult
 import com.ealva.ealvalog.LogLevel
 import com.ealva.ealvalog.Logger
 import com.ealva.ealvalog.LoggerFilter
+import com.ealva.ealvalog.Marker
 import com.ealva.ealvalog.filter.AlwaysNeutralFilter
 import java.util.logging.Handler
 
@@ -32,6 +33,14 @@ import java.util.logging.Handler
  */
 abstract class BaseLoggerHandler(var loggerFilter: LoggerFilter = AlwaysNeutralFilter) : Handler(),
   LoggerFilter {
+
+  override fun shouldIncludeLocation(
+    level: LogLevel,
+    marker: Marker?,
+    throwable: Throwable?
+  ): Boolean {
+    return loggerFilter.shouldIncludeLocation(level, marker, throwable)
+  }
 
   override fun isLoggable(logger: Logger, level: LogLevel): FilterResult {
     return isLoggable(logger, level, null, null)

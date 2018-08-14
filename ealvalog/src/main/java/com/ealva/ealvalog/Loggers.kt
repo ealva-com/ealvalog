@@ -16,37 +16,149 @@
  * limitations under the License.
  */
 
+@file:Suppress("unused")
+
 package com.ealva.ealvalog
 
 import com.ealva.ealvalog.util.LogUtil
 
+import kotlin.reflect.KClass
+
 /**
- * This is where [Logger] instances are obtained. This singleton must be configured with a concrete implementation of [ ] before use.
+ * Created by Eric A. Snell on 8/8/18.
+ */
+fun logger(name: String, marker: Marker? = null, includeLocation: Boolean = false): Logger {
+  return Loggers[name, marker, includeLocation]
+}
+
+fun <T : Any> logger(forClass: Class<T>, marker: Marker? = null, includeLocation: Boolean = false): Logger {
+  return Loggers[forClass.simpleName, marker, includeLocation]
+}
+
+fun <T : Any> lazyLogger(forClass: KClass<T>, marker: Marker? = null, includeLocation: Boolean = false): Lazy<Logger> {
+  return lazy { Loggers[forClass.java.simpleName, marker, includeLocation] }
+}
+
+fun <T : Any> T.logger(marker: Marker? = null, includeLocation: Boolean = false): Logger {
+  return logger(this.javaClass, marker, includeLocation)
+}
+
+fun <T : Any> T.lazyLogger(marker: Marker? = null, includeLocation: Boolean = false): Lazy<Logger> {
+  return lazy { logger(this.javaClass, marker, includeLocation) }
+}
+
+inline fun Logger.t(
+  throwable: Throwable? = null,
+  marker: Marker? = null,
+  block: (LogRecordBuilder) -> Unit
+) {
+  if (isLoggable(LogLevel.TRACE, marker, throwable)) {
+    ExtLogRecord.get(LogLevel.TRACE, name, marker, throwable).use { record ->
+      block(record)
+      logImmediate(record)
+    }
+  }
+}
+
+inline fun Logger.d(
+  throwable: Throwable? = null,
+  marker: Marker? = null,
+  block: (LogRecordBuilder) -> Unit
+) {
+  if (isLoggable(LogLevel.DEBUG, marker, throwable)) {
+    ExtLogRecord.get(LogLevel.DEBUG, name, marker, throwable).use { record ->
+      block(record)
+      logImmediate(record)
+    }
+  }
+}
+
+inline fun Logger.i(
+  throwable: Throwable? = null,
+  marker: Marker? = null,
+  block: (LogRecordBuilder) -> Unit
+) {
+  if (isLoggable(LogLevel.INFO, marker, throwable)) {
+    ExtLogRecord.get(LogLevel.INFO, name, marker, throwable).use { record ->
+      block(record)
+      logImmediate(record)
+    }
+  }
+}
+
+inline fun Logger.w(
+  throwable: Throwable? = null,
+  marker: Marker? = null,
+  block: (LogRecordBuilder) -> Unit
+) {
+  if (isLoggable(LogLevel.WARN, marker, throwable)) {
+    ExtLogRecord.get(LogLevel.WARN, name, marker, throwable).use { record ->
+      block(record)
+      logImmediate(record)
+    }
+  }
+}
+
+inline fun Logger.e(
+  throwable: Throwable? = null,
+  marker: Marker? = null,
+  block: (LogRecordBuilder) -> Unit
+) {
+  if (isLoggable(LogLevel.ERROR, marker, throwable)) {
+    ExtLogRecord.get(LogLevel.ERROR, name, marker, throwable).use { record ->
+      block(record)
+      logImmediate(record)
+    }
+  }
+}
+
+inline fun Logger.wtf(
+  throwable: Throwable? = null,
+  marker: Marker? = null,
+  block: (LogRecordBuilder) -> Unit
+) {
+  if (isLoggable(LogLevel.CRITICAL, marker, throwable)) {
+    ExtLogRecord.get(LogLevel.CRITICAL, name, marker, throwable).use { record ->
+      block(record)
+      logImmediate(record)
+    }
+  }
+}
+
+
+/**
+ * This is where [Logger] instances are obtained. This singleton must be configured with a concrete
+ * implementation of [LoggerFactory] before use. Setting this factory is the
+ * responsibility of the client. It's expected this will be done during application initialization.
  *
+ * &nbsp;
  *
- * This class has a dependency on a concrete [LoggerFactory] instance which must be set before use. Setting and using this factory is
- * the responsibility of the client. It's expected this will be done during application load.
+ * Canonical use:
  *
- *
- * Canonical use is to declare a static Logger obtained from a static get() method.
- *
- *
- * <pre>
- * `class MyClass {
- * private static final Logger logger = Loggers.get();
+ * ```kotlin
+ * private val LOG = logger(MyClass::class)
+ * class MyClass {
+ *   fun someMethod(arg1: String, arg2: Int) {
+ *      LOG.w { it("%s %d", arg1, arg2) }
+ *   }
  * }
- * ` *
- * </pre> *
+ * ```
+ * &nbsp;
  *
- *
- * As a convenience, static log() methods are provided on this class for "quick and dirty" logging. The Logger to be used is determined from
- * the call stack, which is an expensive operation. Use sparingly and not in time critical areas.
- *
+ * or for a lazy version:
+ * ```kotlin
+ * private val LOG by lazyLogger(MyClass::class)
+ * class MyClass {
+ *   fun someMethod(name: String, number: Int) {
+ *      LOG.i { +it("name=%s number=%d", name, number) }
+ *   }
+ * }
+ * ```
  *
  * Created by Eric A. Snell on 2/28/17.
  */
 object Loggers {
-  private const val STACK_DEPTH = 1
+  private const val STACK_DEPTH = 2
   @Volatile private var loggerFactory: LoggerFactory = NullLoggerFactory
 
   /**
@@ -62,87 +174,16 @@ object Loggers {
     loggerFactory = factory
   }
 
+  operator fun get(name: String, marker: Marker? = null, includeLocation: Boolean = false): Logger {
+    return loggerFactory[name, marker, includeLocation]
+  }
+
   /**
    * Convenience method to obtain a [Logger] for the current object's class. The follow are equivalent:
    *
-   *
-   * <pre>
-   * `class MyClass {
-   * private static final Logger logger = Loggers.get();
-   * }
-  ` *
-   * class MyClass {
-   * private static final Logger logger = Loggers.get(MyClass.class);
-   * }
-  </pre> *
-   *
-   *
-   *
    * @return a logger for for the caller's class
    */
-  fun get(): Logger {
-    return loggerFactory[LogUtil.getCallerClassName(STACK_DEPTH), null, false]
-  }
-
-  /**
-   * Get a [Logger] inferring the name from the call stack
-   *
-   * @param marker each log statement from the returned logger should include this [Marker] unless another Marker is used in the log()
-   * call
-   *
-   * @return logger for the caller's class
-   *
-   * @see .get
-   */
-  operator fun get(marker: Marker): Logger {
-    return loggerFactory[LogUtil.getCallerClassName(STACK_DEPTH), marker, false]
-  }
-
-  /**
-   * Get a [Logger] for `aClass`, using the class name
-   *
-   * @param aClass logger name comes from the name of this class
-   *
-   * @return a logger for `aClass`
-   */
-  operator fun get(aClass: Class<*>): Logger {
-    return loggerFactory[aClass.name, null, false]
-  }
-
-  /**
-   * Get a [Logger] for `aClass`, using the class name
-   *
-   * @param name name of the logger. It's assumed this name is a Class name in the standard form
-   *
-   * @return a logger for `name`
-   */
-  operator fun get(name: String): Logger {
-    return loggerFactory[name, null, false]
-  }
-
-  /**
-   * Get a [Logger] for `aClass`, using the class name
-   *
-   * @param aClass logger name comes from the name of this class
-   * @param marker each log statement from the returned logger should include this [Marker] unless another Marker is used in the log()
-   * call
-   *
-   * @return a logger for `aClass`
-   */
-  operator fun get(aClass: Class<*>, marker: Marker?): Logger {
-    return loggerFactory[aClass.name, marker, false]
-  }
-
-  /**
-   * Get a [Logger] for `aClass`, using the class name
-   *
-   * @param name   name of the logger. It's assumed this name is a Class name in the standard form
-   * @param marker each log statement from the returned logger should include this [Marker] unless another Marker is used in the log()
-   * call
-   *
-   * @return a logger for `name`
-   */
-  operator fun get(name: String, marker: Marker?): Logger {
-    return loggerFactory[name, marker, false]
+  fun get(marker: Marker? = null, includeLocation: Boolean = false): Logger {
+    return loggerFactory[LogUtil.getCallerClassName(STACK_DEPTH), marker, includeLocation]
   }
 }

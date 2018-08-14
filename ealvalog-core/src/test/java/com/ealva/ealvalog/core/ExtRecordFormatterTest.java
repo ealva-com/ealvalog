@@ -67,19 +67,16 @@ public class ExtRecordFormatterTest {
   @Before
   public void setup() {
     MockitoAnnotations.initMocks(this);
-    ExtLogRecord.Companion.clearCachedRecord();
-    record = ExtLogRecord.Companion.get(LOG_LEVEL,
-                                        MESSAGE_FORMAT,
-                                        LOGGER_NAME,
-                                        LogUtil.getCallerLocation(0),
-                                        MARKER,
-                                        THROWABLE,
-                                        MESSAGE_ARG);
+    ExtLogRecord.clearCachedRecord();
+    record = ExtLogRecord.get(LOG_LEVEL, LOGGER_NAME, MARKER, THROWABLE);
+    record.addLocation(0);
+    record.append(MESSAGE_FORMAT, MESSAGE_ARG);
+
   }
 
   @After
   public void tearDown() {
-    ExtLogRecord.Companion.release(record);
+    ExtLogRecord.release(record);
   }
 
   @Test(expected = IllegalFormatConversionException.class)
@@ -253,12 +250,9 @@ public class ExtRecordFormatterTest {
   @Test
   public void testNoParametersButHasFormatting() {
     record.close(); // release the fir
-    record = ExtLogRecord.Companion.get(LOG_LEVEL,
-                                        MESSAGE_FORMAT,
-                                        LOGGER_NAME,
-                                        LogUtil.getCallerLocation(0),
-                                        MARKER,
-                                        THROWABLE);
+    record = ExtLogRecord.get(LOG_LEVEL, LOGGER_NAME, MARKER, THROWABLE);
+    record.addLocation(0);
+    record.append(MESSAGE_FORMAT);
     com.ealva.ealvalog.core.ExtRecordFormatter
         formatter = new com.ealva.ealvalog.core.ExtRecordFormatter("%1$s");
     assertThat(formatter.format(record), is(equalTo(MESSAGE_FORMAT)));

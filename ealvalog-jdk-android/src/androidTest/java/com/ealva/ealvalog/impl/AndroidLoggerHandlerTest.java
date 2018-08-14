@@ -78,11 +78,10 @@ public class AndroidLoggerHandlerTest {
         new ExtRecordFormatter(ExtRecordFormatter.TYPICAL_ANDROID_FORMAT, true),
         AlwaysAcceptFilter.INSTANCE
     );
-    handler.publish(ExtLogRecord.Companion.get(CRITICAL,
-                                               "Message",
-                                               getClass().getName(),
-                                               null,
-                                               null,
-                                               null));
+    try (final ExtLogRecord record = ExtLogRecord.get(CRITICAL, getClass().getName(), null, null)) {
+      record.append("Message");
+      handler.publish(record);
+    }
+
   }
 }

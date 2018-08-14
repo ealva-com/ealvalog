@@ -18,7 +18,6 @@
 
 package com.ealva.ealvalog.impl
 
-import com.ealva.ealvalog.ExtLogRecord
 import com.ealva.ealvalog.FilterResult
 import com.ealva.ealvalog.FilterResult.DENY
 import com.ealva.ealvalog.FilterResult.NEUTRAL
@@ -29,10 +28,9 @@ import com.ealva.ealvalog.NullMarker
 import com.ealva.ealvalog.core.Bridge
 import com.ealva.ealvalog.core.CoreLogger
 import com.ealva.ealvalog.filter.AlwaysNeutralFilter
-import com.ealva.ealvalog.util.LogUtil
 import com.ealva.ealvalog.util.NullThrowable
+import java.util.logging.Handler
 import java.util.logging.LogRecord
-import java.util.logging.Logger
 
 /**
  * Bridge the [CoreLogger] to the underlying java.util.logging.Logger
@@ -40,17 +38,18 @@ import java.util.logging.Logger
  *
  * Created by Eric A. Snell on 3/7/17.
  */
-class JdkBridge internal constructor(name: String) : Bridge {
+class JdkBridge internal constructor(
+  name: String,
+  aFilter: LoggerFilter? = AlwaysNeutralFilter,
+  handler: Handler? = null,
+  logLevel: LogLevel? = null
+) : Bridge {
+  private var filter: LoggerFilter = aFilter ?: AlwaysNeutralFilter
   @Volatile var parent: JdkBridge? = null  // root bridge will have a null parent
-  private val jdkLogger: java.util.logging.Logger
-  @Volatile private var filter: LoggerFilter
-  /** @return the include location flag
-   */
-  /** Set the include location flag  */
-  override var includeLocation: Boolean = false
-
-  override val name: String
-    get() = jdkLogger.name
+  private val jdkLogger: java.util.logging.Logger = java.util.logging.Logger.getLogger(name).apply {
+    if (handler != null) addHandler(handler)
+    if (logLevel != null) level = logLevel.jdkLevel
+  }
 
   override var logLevel: LogLevel
     get() = LogLevel.fromLevel(jdkLogger.level)
@@ -58,30 +57,13 @@ class JdkBridge internal constructor(name: String) : Bridge {
       jdkLogger.level = logLevel.jdkLevel
     }
 
+  override var includeLocation: Boolean = false
+
+  override val name: String
+    get() = jdkLogger.name
+
   val logToParent: Boolean
     get() = jdkLogger.useParentHandlers
-
-  init {
-    parent = null
-    jdkLogger = Logger.getLogger(name)
-    filter = AlwaysNeutralFilter
-    includeLocation = false
-  }
-
-  constructor(
-    loggerName: String,
-    filter: LoggerFilter?,
-    handler: BaseLoggerHandler?,
-    level: LogLevel?
-  ) : this(loggerName) {
-    setFilter(filter)
-    if (handler != null) {
-      addLoggerHandler(handler)
-    }
-    if (level != null) {
-      logLevel = level
-    }
-  }
 
   fun getFilter(): LoggerFilter? {
     return filter
@@ -91,8 +73,12 @@ class JdkBridge internal constructor(name: String) : Bridge {
     this.filter = filter ?: AlwaysNeutralFilter
   }
 
-  private fun shouldIncludeLocation(): Boolean {
-    return includeLocation || parent != null && parent!!.shouldIncludeLocation()
+  override fun shouldIncludeLocation(
+    level: LogLevel,
+    marker: Marker?,
+    throwable: Throwable?
+  ): Boolean {
+    return includeLocation || parent?.shouldIncludeLocation(level, marker, throwable) == true
   }
 
   override fun shouldLogToParent(jdkLogger: com.ealva.ealvalog.Logger): Boolean {
@@ -115,45 +101,17 @@ class JdkBridge internal constructor(name: String) : Bridge {
    */
   override fun isLoggable(
     logger: com.ealva.ealvalog.Logger,
-    level: LogLevel,
+    logLevel: LogLevel,
     marker: Marker?,
     throwable: Throwable?
   ): FilterResult {
-    if (!jdkLogger.isLoggable(level.jdkLevel)) {
+    if (!jdkLogger.isLoggable(logLevel.jdkLevel)) {
       return DENY
     }
-    val filterResult = filter.isLoggable(logger, level, marker, throwable)
+    val filterResult = filter.isLoggable(logger, logLevel, marker, throwable)
     return if (filterResult === DENY) {
       DENY
     } else NEUTRAL
-  }
-
-  override fun log(
-    logger: com.ealva.ealvalog.Logger,
-    level: LogLevel,
-    marker: Marker?,
-    throwable: Throwable?,
-    stackDepth: Int,
-    msg: String,
-    vararg formatArgs: Any
-  ) {
-    // ENSURE the record obtained is released!
-    //
-    // We're not using try with resources here due to warnings about early Android versions.
-    val logRecord = ExtLogRecord.get(
-      level,
-      msg,
-      logger.name,
-      if (shouldIncludeLocation()) LogUtil.getCallerLocation(stackDepth + 1) else null,
-      marker,
-      throwable,
-      *formatArgs
-    )
-    try {
-      log(logRecord)
-    } finally {
-      ExtLogRecord.release(logRecord)
-    }
   }
 
   override fun log(record: LogRecord) {
@@ -170,7 +128,7 @@ class JdkBridge internal constructor(name: String) : Bridge {
     return name == logger.name
   }
 
-  fun addLoggerHandler(loggerHandler: BaseLoggerHandler) {
+  fun addLoggerHandler(loggerHandler: Handler) {
     jdkLogger.addHandler(loggerHandler)
   }
 

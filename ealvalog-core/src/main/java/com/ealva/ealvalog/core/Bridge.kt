@@ -21,8 +21,6 @@ package com.ealva.ealvalog.core
 import com.ealva.ealvalog.LogLevel
 import com.ealva.ealvalog.Logger
 import com.ealva.ealvalog.LoggerFilter
-import com.ealva.ealvalog.Marker
-
 import java.util.logging.LogRecord
 
 /**
@@ -52,28 +50,6 @@ interface Bridge : LoggerFilter {
   fun shouldLogToParent(jdkLogger: Logger): Boolean
 
   fun setLogToParent(logToParent: Boolean)
-
-  /**
-   * Proceed with logging. It's expected the framework has already invoked [.isLoggable] and this
-   * method need not check level or filter. Lover levels of the framework may still discard the log message.
-   *
-   * @param logger     the logger invoking this method
-   * @param level      client log level
-   * @param marker     optional [Marker]
-   * @param throwable  optional [Throwable]
-   * @param stackDepth depth of stack from client log site
-   * @param msg        log message
-   * @param formatArgs arguments to format the msg
-   */
-  fun log(
-    logger: Logger,
-    level: LogLevel,
-    marker: Marker?,
-    throwable: Throwable?,
-    stackDepth: Int,
-    msg: String,
-    vararg formatArgs: Any
-  )
 
   fun log(record: LogRecord)
 

@@ -192,7 +192,8 @@ public class ExtRecordFormatter extends Formatter {
   /**
    * {@inheritDoc}
    *
-   * @throws IllegalFormatConversionException if either the log message format is bad or the ExtLogRecord format is bad. Not thrown if
+   * @throws IllegalFormatConversionException if either the log message format is bad or the
+   *                                          ExtLogRecord format is bad. Not thrown if
    *                                          {@link #setLogErrors(boolean)} is true.
    * @see #logErrors
    * @see #setLogErrors(boolean)

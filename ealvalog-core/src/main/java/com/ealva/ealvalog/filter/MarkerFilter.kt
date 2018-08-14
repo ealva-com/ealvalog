@@ -16,6 +16,8 @@
  * limitations under the License.
  */
 
+@file:Suppress("unused")
+
 package com.ealva.ealvalog.filter
 
 import com.ealva.ealvalog.FilterResult
@@ -35,19 +37,15 @@ import com.ealva.ealvalog.FilterResult.NEUTRAL
  */
 class MarkerFilter internal constructor(
   private val marker: Marker,
-  whenMatched: FilterResult,
-  whenDiffer: FilterResult
-) : BaseFilter(whenMatched, whenDiffer) {
+  whenMatched: FilterResult = NEUTRAL,
+  whenDiffer: FilterResult = DENY,
+  includeLocation: Boolean = false
+) : BaseFilter(whenMatched, whenDiffer, includeLocation) {
 
-  class Builder {
-    private var marker: Marker? = null
+  /** For Java clients */
+  class Builder(val marker: Marker) {
     private var whenMatched = NEUTRAL
     private var whenDiffer = DENY
-
-    fun marker(marker: Marker?): Builder {
-      this.marker = marker
-      return this
-    }
 
     fun whenMatched(whenMatched: FilterResult): Builder {
       this.whenMatched = whenMatched
@@ -64,10 +62,7 @@ class MarkerFilter internal constructor(
      */
     @Throws(IllegalStateException::class)
     fun build(): MarkerFilter {
-      if (marker == null) {
-        throw IllegalStateException("Marker required")
-      }
-      return MarkerFilter(marker!!, whenMatched, whenDiffer)
+      return MarkerFilter(marker, whenMatched, whenDiffer)
     }
 
   }
@@ -78,7 +73,7 @@ class MarkerFilter internal constructor(
 
   override fun isLoggable(
     logger: Logger,
-    level: LogLevel,
+    logLevel: LogLevel,
     marker: Marker?,
     throwable: Throwable?
   ): FilterResult {
@@ -86,9 +81,9 @@ class MarkerFilter internal constructor(
   }
 
   companion object {
-
-    fun builder(): Builder {
-      return Builder()
+    /** For Java clients */
+    fun builder(marker: Marker): Builder {
+      return Builder(marker)
     }
   }
 

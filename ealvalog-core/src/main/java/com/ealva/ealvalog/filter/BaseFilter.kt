@@ -19,7 +19,9 @@
 package com.ealva.ealvalog.filter
 
 import com.ealva.ealvalog.FilterResult
+import com.ealva.ealvalog.LogLevel
 import com.ealva.ealvalog.LoggerFilter
+import com.ealva.ealvalog.Marker
 
 /**
  * Convenience base class for filters
@@ -28,9 +30,18 @@ import com.ealva.ealvalog.LoggerFilter
  */
 abstract class BaseFilter(
   private val whenMatched: FilterResult = FilterResult.NEUTRAL,
-  private val whenDiffer: FilterResult = FilterResult.DENY
+  private val whenDiffer: FilterResult = FilterResult.DENY,
+  private val includeLocation: Boolean = false
 ) : LoggerFilter {
   protected fun result(matched: Boolean): FilterResult {
     return if (matched) whenMatched else whenDiffer
+  }
+
+  override fun shouldIncludeLocation(
+    level: LogLevel,
+    marker: Marker?,
+    throwable: Throwable?
+  ): Boolean {
+    return includeLocation
   }
 }

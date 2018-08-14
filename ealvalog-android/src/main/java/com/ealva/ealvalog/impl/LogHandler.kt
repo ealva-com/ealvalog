@@ -22,6 +22,7 @@ import com.ealva.ealvalog.Marker
 import com.ealva.ealvalog.util.LogMessageFormatter
 
 import android.util.Log
+import com.ealva.ealvalog.LogLevel
 
 import java.util.logging.LogRecord
 
@@ -32,18 +33,23 @@ import java.util.logging.LogRecord
  */
 interface LogHandler {
 
-  fun isLoggable(tag: String, level: Int): Boolean
+  fun isLoggable(
+    tag: String,
+    logLevel: LogLevel,
+    marker: Marker?,
+    throwable: Throwable?
+  ): Boolean
 
   fun shouldIncludeLocation(
     tag: String,
-    level: Int,
+    androidLevel: Int,
     marker: Marker?,
     throwable: Throwable?
   ): Boolean
 
   fun prepareLog(
     tag: String,
-    level: Int,
+    androidLevel: Int,
     marker: Marker?,
     throwable: Throwable?,
     callerLocation: StackTraceElement?,
@@ -53,8 +59,4 @@ interface LogHandler {
   )
 
   fun prepareLog(record: LogRecord)
-
-  companion object {
-    const val MAX_LOG_LENGTH = 4000
-  }
 }

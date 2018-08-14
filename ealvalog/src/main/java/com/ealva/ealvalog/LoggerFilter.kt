@@ -19,8 +19,8 @@
 package com.ealva.ealvalog
 
 /**
- * Used at top layer of logging to prevent unnecessary calls into lower layers, hence lots of
- * unnecessary objects being created
+ * Used at top layer of logging to prevent unnecessary calls into lower layers, hence preventing
+ * lots of unnecessary objects being created
  *
  * Created by Eric A. Snell on 3/6/17.
  */
@@ -40,11 +40,16 @@ interface LoggerFilter {
    * result in an actual log statement
    *
    * @param logger    the logger that is making the log call
-   * @param level     the level to test
+   * @param logLevel     the level to test
    * @param marker    optional marker to test
    * @param throwable optional throwable to test
    *
    * @return [FilterResult.ACCEPT] or [FilterResult.NEUTRAL] if logging will proceed
    */
-  fun isLoggable(logger: Logger, level: LogLevel, marker: Marker?, throwable: Throwable?): FilterResult
+  fun isLoggable(logger: Logger, logLevel: LogLevel, marker: Marker?, throwable: Throwable?): FilterResult
+
+  /**
+   * Is this filter requesting location information
+   */
+  fun shouldIncludeLocation(level: LogLevel, marker: Marker?, throwable: Throwable?): Boolean
 }

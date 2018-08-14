@@ -18,25 +18,35 @@
 
 package com.ealva.ealvalog.impl
 
+import android.util.Log
 import com.ealva.ealvalog.FilterResult
+import com.ealva.ealvalog.FilterResult.DENY
 import com.ealva.ealvalog.LogLevel
 import com.ealva.ealvalog.Logger
 import com.ealva.ealvalog.LoggerFilter
 import com.ealva.ealvalog.Marker
 import com.ealva.ealvalog.core.ExtRecordFormatter
 import com.ealva.ealvalog.filter.AlwaysNeutralFilter
-
-import com.ealva.ealvalog.util.Levels
-
-import com.ealva.ealvalog.FilterResult.DENY
 import com.ealva.ealvalog.util.LogUtil.tagFromName
-
-import android.util.Log
-
 import java.util.logging.ErrorManager
 import java.util.logging.Formatter
-import java.util.logging.Handler
 import java.util.logging.LogRecord
+
+private const val ANDROID_LOG_OFF = -1
+
+/** Returns corresponding android [android.util.Log] level or -1 for none */
+private fun LogLevel.toAndroid(): Int {
+  return when (this) {
+    LogLevel.ALL -> Log.VERBOSE
+    LogLevel.TRACE -> Log.VERBOSE
+    LogLevel.DEBUG -> Log.DEBUG
+    LogLevel.INFO -> Log.INFO
+    LogLevel.WARN -> Log.WARN
+    LogLevel.ERROR -> Log.ERROR
+    LogLevel.CRITICAL -> Log.ASSERT
+    LogLevel.NONE -> ANDROID_LOG_OFF
+  }
+}
 
 /**
  * Handler for the jdk facade implementation which logs to the Android Log
@@ -57,21 +67,21 @@ class AndroidLoggerHandler private constructor(
 
   override fun isLoggable(
     logger: Logger,
-    level: LogLevel,
+    logLevel: LogLevel,
     marker: Marker?,
     throwable: Throwable?
   ): FilterResult {
-    return if (isLoggable(tagFromName(logger.name), Levels.toAndroidLevel(level))) {
-      loggerFilter.isLoggable(logger, level, marker, throwable)
+    return if (isLoggable(tagFromName(logger.name), logLevel.toAndroid())) {
+      loggerFilter.isLoggable(logger, logLevel, marker, throwable)
     } else DENY
   }
 
   private fun isLoggable(tag: String, androidLevel: Int): Boolean {
-    return Log.isLoggable(tag, androidLevel)
+    return androidLevel in Log.VERBOSE..Log.ASSERT && Log.isLoggable(tag, androidLevel)
   }
 
   override fun publish(record: LogRecord) {
-    val androidLevel = Levels.toAndroidLevel(LogLevel.fromLevel(record.level))
+    val androidLevel = LogLevel.fromLevel(record.level).toAndroid()
     val tag = tagFromName(record.loggerName)
     if (isLoggable(tag, androidLevel)) {
       val msg = formatter.format(record)

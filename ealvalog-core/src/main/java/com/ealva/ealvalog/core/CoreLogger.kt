@@ -18,10 +18,8 @@
 
 package com.ealva.ealvalog.core
 
-import com.ealva.ealvalog.LogLevel
+import com.ealva.ealvalog.Logger
 import com.ealva.ealvalog.LoggerFilter
-import com.ealva.ealvalog.Marker
-
 import java.util.logging.LogRecord
 
 /**
@@ -32,26 +30,12 @@ import java.util.logging.LogRecord
  * Created by Eric A. Snell on 3/7/17.
  */
 abstract class CoreLogger<T : Bridge> protected constructor(
-  name: String,
-  @field:Volatile protected open var bridge: T,
-  marker: Marker?
-) : BaseLogger(name, marker) {
+  @field:Volatile protected open var bridge: T
+) : Logger {
 
   abstract var logToParent: Boolean
 
   abstract fun shouldLogToParent(): Boolean
-
-  public override fun printLog(
-    level: LogLevel,
-    marker: Marker?,
-    throwable: Throwable?,
-    stackDepth: Int,
-    msg: String,
-    vararg formatArgs: Any
-  ) {
-    // isLoggable() should have already been called
-    bridge.log(this, level, marker, throwable, stackDepth + 1, msg, *formatArgs)
-  }
 
   override fun logImmediate(record: LogRecord) {
     bridge.log(record)

@@ -32,6 +32,16 @@ import com.ealva.ealvalog.Marker
  */
 object AlwaysNeutralFilter : LoggerFilter {
   override fun isLoggable(logger: Logger, level: LogLevel) = NEUTRAL
-  override fun isLoggable(logger: Logger, level: LogLevel, marker: Marker?, throwable: Throwable?) =
-    NEUTRAL
+  override fun isLoggable(
+    logger: Logger,
+    logLevel: LogLevel,
+    marker: Marker?,
+    throwable: Throwable?
+  ) = NEUTRAL
+
+  override fun shouldIncludeLocation(
+    level: LogLevel,
+    marker: Marker?,
+    throwable: Throwable?
+  ): Boolean = false
 }

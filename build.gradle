@@ -21,9 +21,7 @@ buildscript {
     ext {
         versions = [
                 'support_library': '27.1.1',
-                'play_services'  : '12.0.1',
                 'kotlin'         : '1.2.60',
-                'anko'           : '0.10.5'
         ]
         setup = [
                 'compile_sdk': 27,

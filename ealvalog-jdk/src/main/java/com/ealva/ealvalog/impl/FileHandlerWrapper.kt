@@ -16,6 +16,8 @@
  * limitations under the License.
  */
 
+@file:Suppress("unused")
+
 package com.ealva.ealvalog.impl
 
 import com.ealva.ealvalog.LoggerFilter
@@ -32,24 +34,32 @@ import java.util.logging.FileHandler
  *
  * Created by Eric A. Snell on 3/15/17.
  */
-class FileHandlerWrapper internal constructor(
-  private val fileHandler: FileHandler,
-  filter: LoggerFilter
-) : HandlerWrapper(fileHandler, filter) {
+class FileHandlerWrapper(
+  pattern: String = "ealvalog.%g.%u.log",
+  limit: Int = 0,
+  count: Int = 1,
+  append: Boolean = false,
+  formatterPattern: String = ExtRecordFormatter.TYPICAL_FORMAT,
+  formatterLogErrors: Boolean = true,
+  filter: LoggerFilter = AlwaysNeutralFilter,
+  manager: ErrorManager = ErrorManager()
+) : HandlerWrapper(
+  FileHandler(pattern, limit, count, append).apply {
+    errorManager = manager
+    formatter = ExtRecordFormatter(formatterPattern, formatterLogErrors)
+  },
+  filter
+) {
 
   val currentFileName: String?
     get() {
-      val theField = getFileNameField(fileHandler)
-      if (theField != null) {
-        try {
-          return theField.get(fileHandler) as String
-        } catch (e: IllegalAccessException) {
-          System.err.println("Could not find field 'fileName' inside class $fileHandler $e")
-        }
-
+      val theField = getFileNameField(realHandler as FileHandler)
+      return try {
+        theField?.get(realHandler) as String
+      } catch (e: IllegalAccessException) {
+        System.err.println("Could not find field 'fileName' inside class $realHandler $e")
+        null
       }
-
-      return null
     }
 
   @Synchronized private fun getFileNameField(fileHandler: FileHandler): Field? {
@@ -58,7 +68,7 @@ class FileHandlerWrapper internal constructor(
       try {
         //TODO: check if there is a better way
         fileNameField = fileHandler.javaClass.getDeclaredField("fileName")
-        fileNameField!!.isAccessible = true
+        fileNameField?.isAccessible = true
       } catch (e: NoSuchFieldException) {
         System.err.println("Could not find field 'fileName' inside class " + fileHandler.javaClass)
       }
@@ -68,35 +78,18 @@ class FileHandlerWrapper internal constructor(
   }
 
   /**
-   * Build a [FileHandler] including an [ExtRecordFormatter]
+   * Build a [FileHandler] including an [ExtRecordFormatter]. For Java clients
    *
    * Created by Eric A. Snell on 3/8/17.
    */
-  class Builder internal constructor() {
-    private var pattern: String? = null
+  class Builder internal constructor(private val pattern: String) {
     private var limit: Int = 0
-    private var count: Int = 0
+    private var count: Int = 1
     private var append: Boolean = false
-    private var formatterPattern: String
-    private var formatterLogErrors: Boolean = false
-    private var filter: LoggerFilter
-    private var errorManager: ErrorManager
-
-    init {
-      pattern = null
-      limit = 0
-      count = 1
-      append = false
-      formatterPattern = ExtRecordFormatter.TYPICAL_FORMAT
-      formatterLogErrors = true
-      filter = AlwaysNeutralFilter
-      errorManager = ErrorManager()
-    }
-
-    fun fileNamePattern(pattern: String): Builder {
-      this.pattern = pattern
-      return this
-    }
+    private var formatterPattern: String = ExtRecordFormatter.TYPICAL_FORMAT
+    private var formatterLogErrors: Boolean = true
+    private var filter: LoggerFilter = AlwaysNeutralFilter
+    private var errorManager: ErrorManager = ErrorManager()
 
     fun fileSizeLimit(limit: Int): Builder {
       this.limit = limit
@@ -135,19 +128,22 @@ class FileHandlerWrapper internal constructor(
 
     @Throws(IOException::class, IllegalStateException::class)
     fun build(): FileHandlerWrapper {
-      if (pattern == null) {
-        throw IllegalStateException("File name pattern required")
-      }
-      val fileHandler = FileHandler(pattern!!, limit, count, append)
-      fileHandler.errorManager = errorManager
-      fileHandler.formatter = ExtRecordFormatter(formatterPattern, formatterLogErrors)
-      return FileHandlerWrapper(fileHandler, filter)
+      return FileHandlerWrapper(
+        pattern,
+        limit,
+        count,
+        append,
+        formatterPattern,
+        formatterLogErrors,
+        filter
+      )
     }
   }
 
   companion object {
-    fun builder(): Builder {
-      return Builder()
+    /** For Java clients */
+    fun builder(fileNamePattern: String): Builder {
+      return Builder(fileNamePattern)
     }
 
     private var fileNameField: Field? = null

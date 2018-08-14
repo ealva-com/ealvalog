@@ -61,28 +61,7 @@ public final class LogUtil {
    */
   public static @NotNull Object[] combineArgs(@NotNull final Object[] formatArgs,
                                               @NotNull Object... preceding) {
-    return combineArgs(new Object[formatArgs.length + preceding.length], formatArgs, preceding);
-  }
-
-  /**
-   * Combine 2 Object[]. The first array was passed in by the client as original varargs. The second, our internal
-   * varargs, should actually precede the original as they were listed first in the parameter list by the client.
-   *
-   * @param destination both {@code formatArgs} and {@code preceding} are copied into this array and returned, if it is large enough.
-   *                    Otherwise a new Object[] is created, copied into, and returned. Array indices past what is required are not
-   *                    modified.
-   * @param formatArgs  objects that come LAST in the resulting array
-   * @param preceding   objects that come first, specified as varargs as a nicety
-   *
-   * @return joined array of objects, {@code preceding} first, followed by {@code formatArgs}
-   */
-  public static @NotNull Object[] combineArgs(final @NotNull Object[] destination,
-                                              @NotNull final Object[] formatArgs,
-                                              @NotNull Object... preceding) {
-    final int requiredLength = formatArgs.length + preceding.length;
-    Object[]
-        result =
-        destination.length >= requiredLength ? destination : new Object[requiredLength];
+    final Object[] result = new Object[formatArgs.length + preceding.length];
     System.arraycopy(preceding, 0, result, 0, preceding.length);
     System.arraycopy(formatArgs, 0, result, preceding.length, formatArgs.length);
     return result;
@@ -114,10 +93,10 @@ public final class LogUtil {
    * @throws IllegalStateException if the call stack is too small for the depth requested. Typically
    *                               this would only happen if the calling code has a defect and is
    *                               incorrectly indexing into the stack or if some type of
-   *                               obfuscation/shrinker tool modified the code in some way
-   *                               (eg. Proguard)
+   *                               obfuscation/bytecode tool modified the code in some way
    */
-  public static @NotNull StackTraceElement getCallerLocation(final int currentStackDepthFromCallSite) {
+  public static @NotNull
+  StackTraceElement getCallerLocation(final int currentStackDepthFromCallSite) {
     StackTraceElement[] stackTrace = new Throwable().getStackTrace();
     if (stackTrace.length <= currentStackDepthFromCallSite + 1) {
       throw new IllegalStateException(
@@ -126,6 +105,7 @@ public final class LogUtil {
     return stackTrace[currentStackDepthFromCallSite + 1];
   }
 
+  @SuppressWarnings("unused")
   public static String getCallerClassNameStripInner(final int currentStackDepthFromCallSite) {
     return stripInnerClassesFromName(getCallerLocation(currentStackDepthFromCallSite +
                                                            1).getClassName());

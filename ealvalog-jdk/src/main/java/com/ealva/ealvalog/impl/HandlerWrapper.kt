@@ -18,6 +18,7 @@
 
 package com.ealva.ealvalog.impl
 
+import com.ealva.ealvalog.ExtLogRecord
 import com.ealva.ealvalog.FilterResult
 import com.ealva.ealvalog.FilterResult.DENY
 import com.ealva.ealvalog.LogLevel
@@ -26,7 +27,6 @@ import com.ealva.ealvalog.LoggerFilter
 import com.ealva.ealvalog.Loggers
 import com.ealva.ealvalog.Marker
 import com.ealva.ealvalog.NullMarker
-import com.ealva.ealvalog.ExtLogRecord
 import com.ealva.ealvalog.util.NullThrowable
 import java.util.logging.Handler
 import java.util.logging.LogRecord
@@ -37,9 +37,17 @@ import java.util.logging.LogRecord
  * Created by Eric A. Snell on 3/8/17.
  */
 open class HandlerWrapper internal constructor(
-  private val realHandler: Handler,
-  filter: LoggerFilter
+  protected val realHandler: Handler,
+  private val filter: LoggerFilter
 ) : BaseLoggerHandler(filter) {
+
+  override fun shouldIncludeLocation(
+    level: LogLevel,
+    marker: Marker?,
+    throwable: Throwable?
+  ): Boolean {
+    return filter.shouldIncludeLocation(level, marker, throwable)
+  }
 
   override fun publish(record: LogRecord) {
     val thrown = record.thrown
@@ -56,11 +64,11 @@ open class HandlerWrapper internal constructor(
 
   override fun isLoggable(
     logger: Logger,
-    level: LogLevel,
+    logLevel: LogLevel,
     marker: Marker?,
     throwable: Throwable?
   ): FilterResult {
-    return if (shouldNotLogAt(level)) DENY else applyFilter(logger, level, marker, throwable)
+    return if (shouldNotLogAt(logLevel)) DENY else applyFilter(logger, logLevel, marker, throwable)
   }
 
   private fun applyFilter(logger: Logger, level: LogLevel, marker: Marker?, throwable: Throwable?) =
@@ -70,7 +78,7 @@ open class HandlerWrapper internal constructor(
     level.shouldNotLogAtLevel(realHandler.level.intValue())
 
   private fun getRecordMarker(record: LogRecord): Marker {
-    return (record as? ExtLogRecord)?.getMarker() ?: NullMarker
+    return (record as? ExtLogRecord)?.marker ?: NullMarker
   }
 
   override fun flush() {

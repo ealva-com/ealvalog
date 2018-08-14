@@ -40,13 +40,8 @@ public class LoggersNoFactoryTest {
    */
   @Test
   public void testNoLoggerFactorySet() {
-    testLogger(Loggers.INSTANCE.get());
-    testLogger(Loggers.INSTANCE.get("blah"));
-    testLogger(Loggers.INSTANCE.get(LoggersNoFactoryTest.class));
+    testLogger(Loggers.INSTANCE.get("blah", null, false));
     testLogger(Loggers.INSTANCE.getRoot());
-    testLogger(Loggers.INSTANCE.get(com.ealva.ealvalog.NullMarker.INSTANCE));
-    testLogger(Loggers.INSTANCE.get(LoggersNoFactoryTest.class, com.ealva.ealvalog.NullMarker.INSTANCE));
-    testLogger(Loggers.INSTANCE.get("blah", com.ealva.ealvalog.NullMarker.INSTANCE));
   }
 
   private void testLogger(final Logger logger) {
@@ -55,7 +50,7 @@ public class LoggersNoFactoryTest {
     assertThat(logger.getLogLevel(), is(nullValue()));
     assertThat(logger.getEffectiveLogLevel(), is(notNullValue()));
     assertThat(logger.getMarker(), is(nullValue()));
-    assertThat(logger.isLoggable(com.ealva.ealvalog.LogLevel.CRITICAL), is(false));
+    assertThat(logger.isLoggable(com.ealva.ealvalog.LogLevel.CRITICAL, null, null), is(false));
     assertThat(logger.isLoggable(LogLevel.CRITICAL, NullMarker.INSTANCE,
                                  NullThrowable.INSTANCE), is(false));
 

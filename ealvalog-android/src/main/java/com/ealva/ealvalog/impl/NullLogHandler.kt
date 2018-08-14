@@ -18,6 +18,7 @@
 
 package com.ealva.ealvalog.impl
 
+import com.ealva.ealvalog.LogLevel
 import com.ealva.ealvalog.Marker
 import com.ealva.ealvalog.util.LogMessageFormatter
 
@@ -31,13 +32,18 @@ import java.util.logging.LogRecord
  */
 object NullLogHandler : LogHandler {
 
-  override fun isLoggable(tag: String, level: Int): Boolean {
+  override fun isLoggable(
+    tag: String,
+    logLevel: LogLevel,
+    marker: Marker?,
+    throwable: Throwable?
+  ): Boolean {
     return false
   }
 
   override fun shouldIncludeLocation(
     tag: String,
-    level: Int,
+    androidLevel: Int,
     marker: Marker?,
     throwable: Throwable?
   ): Boolean {
@@ -46,7 +52,7 @@ object NullLogHandler : LogHandler {
 
   override fun prepareLog(
     tag: String,
-    level: Int,
+    androidLevel: Int,
     marker: Marker?,
     throwable: Throwable?,
     callerLocation: StackTraceElement?,

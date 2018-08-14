@@ -20,10 +20,6 @@ package com.ealva.ealvalog
 
 import java.util.Formatter
 
-fun Marker?.orNullInstance(): Marker {
-  return this ?: NullMarker
-}
-
 /**
  * A no-op implementation of the [Marker] interface
  *

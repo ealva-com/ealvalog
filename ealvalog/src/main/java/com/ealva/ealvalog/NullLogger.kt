@@ -23,7 +23,6 @@ import java.util.logging.LogRecord
 /**
  * A no-op [com.ealva.ealvalog.Logger] implementation
  *
- *
  * Created by Eric A. Snell on 2/28/17.
  */
 object NullLogger : Logger {
@@ -32,50 +31,11 @@ object NullLogger : Logger {
   override var logLevel: LogLevel? = null
   override val effectiveLogLevel: LogLevel = LogLevel.NONE
   override var includeLocation: Boolean = false
-  override fun isLoggable(level: LogLevel) = false
-  override fun isLoggable(level: LogLevel, marker: Marker?, throwable: Throwable?) = false
-  override fun log(level: LogLevel, msg: String) {}
-  override fun log(level: LogLevel, marker: Marker, msg: String) {}
-  override fun log(level: LogLevel, throwable: Throwable, msg: String) {}
-  override fun log(level: LogLevel, marker: Marker, throwable: Throwable, msg: String) {}
-  override fun log(level: LogLevel, marker: Marker, format: String, vararg formatArgs: Any) {}
-  override fun log(level: LogLevel, throwable: Throwable, format: String, vararg formatArgs: Any) {}
-  override fun log(
-    level: LogLevel,
-    marker: Marker,
-    throwable: Throwable,
-    format: String,
-    vararg formatArgs: Any
-  ) {}
-  override fun log(level: LogLevel, format: String, arg1: Any) {}
-  override fun log(level: LogLevel, format: String, arg1: Any, arg2: Any) {}
-  override fun log(level: LogLevel, format: String, arg1: Any, arg2: Any, arg3: Any) {}
-  override fun log(level: LogLevel, format: String, arg1: Any, arg2: Any, arg3: Any, arg4: Any) {}
-  override fun log(
-    level: LogLevel,
-    format: String,
-    arg1: Any,
-    arg2: Any,
-    arg3: Any,
-    arg4: Any,
-    vararg remaining: Any
-  ) {}
-  override fun caught(level: LogLevel, throwable: Throwable) {}
-  override fun throwing(level: LogLevel, throwable: Throwable): Throwable = throwable
-  override fun logImmediate(
-    level: LogLevel,
+  override fun resolveLocation(
+    logLevel: LogLevel,
     marker: Marker?,
-    throwable: Throwable?,
-    stackDepth: Int,
-    msg: String,
-    vararg formatArgs: Any
-  ) {}
-  override fun logImmediate(
-    level: LogLevel,
-    throwable: Throwable?,
-    stackDepth: Int,
-    msg: String,
-    vararg formatArgs: Any
-  ) {}
+    throwable: Throwable?
+  ) = false
+  override fun isLoggable(level: LogLevel, marker: Marker?, throwable: Throwable?) = false
   override fun logImmediate(record: LogRecord) {}
 }

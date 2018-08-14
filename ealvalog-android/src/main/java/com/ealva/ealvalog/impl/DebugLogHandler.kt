@@ -18,6 +18,7 @@
 
 package com.ealva.ealvalog.impl
 
+import com.ealva.ealvalog.LogLevel
 import com.ealva.ealvalog.Marker
 
 /**
@@ -27,13 +28,18 @@ import com.ealva.ealvalog.Marker
  * Created by Eric A. Snell on 3/3/17.
  */
 class DebugLogHandler : BaseLogHandler() {
-  override fun isLoggable(tag: String, level: Int): Boolean {
-    return true
+  override fun isLoggable(
+    tag: String,
+    logLevel: LogLevel,
+    marker: Marker?,
+    throwable: Throwable?
+  ): Boolean {
+    return logLevel != LogLevel.NONE
   }
 
   override fun shouldIncludeLocation(
     tag: String,
-    level: Int,
+    androidLevel: Int,
     marker: Marker?,
     throwable: Throwable?
   ): Boolean {

@@ -18,8 +18,9 @@
 
 package com.ealva.ealvalog.impl
 
-import com.ealva.ealvalog.BaseLoggerFactory
+import com.ealva.ealvalog.LoggerFactory
 import com.ealva.ealvalog.Marker
+import org.jetbrains.annotations.TestOnly
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentMap
 
@@ -28,10 +29,15 @@ import java.util.concurrent.ConcurrentMap
  *
  * Created by Eric A. Snell on 3/4/17.
  */
-object AndroidLoggerFactory : BaseLoggerFactory() {
+object AndroidLoggerFactory : LoggerFactory {
   private val loggerMap: ConcurrentMap<String, AndroidLogger> = ConcurrentHashMap()
 
   override fun get(name: String, marker: Marker?, includeLocation: Boolean): AndroidLogger {
     return loggerMap.getOrPut(name) { AndroidLogger(name, marker, includeLocation) }
+  }
+
+  @TestOnly
+  fun clearLoggerCache() {
+    loggerMap.clear()
   }
 }

@@ -34,7 +34,7 @@ enum class LogLevel(private val value: Int, val jdkLevel: Level) {
   WARN(4000, Level.WARNING),
   ERROR(5000, Level.SEVERE),
   CRITICAL(6000, object : Level("CRITICAL", 1100) {}),
-  NONE(Integer.MAX_VALUE, java.util.logging.Level.OFF);
+  NONE(Integer.MAX_VALUE, Level.OFF);
 
   fun shouldNotLogAtLevel(jdkLevel: Int): Boolean {
     return value < jdkLevel || jdkLevel == Level.OFF.intValue()

@@ -29,6 +29,26 @@ import android.util.Log
 import java.util.Locale
 import java.util.logging.LogRecord
 
+private const val ANDROID_LOG_OFF = -1
+
+/**
+ * Returns corresponding android [android.util.Log] level. If not in [Log.VERBOSE]..[Log.ASSERT]
+ * it is considered OFF = nothing should be logged
+ *
+ */
+internal fun LogLevel.toAndroid(): Int {
+  return when (this) {
+    LogLevel.ALL -> Log.VERBOSE
+    LogLevel.TRACE -> Log.VERBOSE
+    LogLevel.DEBUG -> Log.DEBUG
+    LogLevel.INFO -> Log.INFO
+    LogLevel.WARN -> Log.WARN
+    LogLevel.ERROR -> Log.ERROR
+    LogLevel.CRITICAL -> Log.ASSERT
+    LogLevel.NONE -> ANDROID_LOG_OFF
+  }
+}
+
 /**
  * Base handler prepares a default style message including log call site information
  *
@@ -46,7 +66,7 @@ abstract class BaseLogHandler : LogHandler {
 
   override fun prepareLog(record: LogRecord) {
     log(
-      Levels.toAndroidLevel(LogLevel.fromLevel(record.level)),
+      LogLevel.fromLevel(record.level).toAndroid(),
       record.loggerName,
       formatter.format(record),
       record.thrown
@@ -55,7 +75,7 @@ abstract class BaseLogHandler : LogHandler {
 
   override fun prepareLog(
     tag: String,
-    level: Int,
+    androidLevel: Int,
     marker: Marker?,
     throwable: Throwable?,
     callerLocation: StackTraceElement?,
@@ -72,7 +92,7 @@ abstract class BaseLogHandler : LogHandler {
     }
     val logMessage = formatter.append(locale, msg, *formatArgs)
       .toString()
-    log(level, tag, logMessage, throwable)
+    log(androidLevel, tag, logMessage, throwable)
   }
 
   private fun log(
@@ -88,7 +108,6 @@ abstract class BaseLogHandler : LogHandler {
       Log.WARN -> Log.w(tag, logMessage, throwable)
       Log.ERROR -> Log.e(tag, logMessage, throwable)
       Log.ASSERT -> Log.wtf(tag, logMessage, throwable)
-      else -> Log.wtf(tag, "LOGGER CONFIG ERROR ($level) $logMessage", throwable)
     }
   }
 

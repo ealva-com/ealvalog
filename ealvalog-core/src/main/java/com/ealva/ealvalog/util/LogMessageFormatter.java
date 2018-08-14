@@ -26,11 +26,11 @@ import java.util.Locale;
 /**
  * Created by Eric A. Snell on 6/27/18.
  */
-@SuppressWarnings({"UnusedReturnValue", "unused"})
 public interface LogMessageFormatter extends Appendable {
   /**
    * Reset the message, ie. {@code setLength(0)}
    */
+  @SuppressWarnings("UnusedReturnValue")
   @NotNull LogMessageFormatter reset();
 
   @NotNull LogMessageFormatter append(@NotNull String str);

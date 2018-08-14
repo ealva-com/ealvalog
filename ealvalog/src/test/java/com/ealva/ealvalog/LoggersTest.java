@@ -57,7 +57,7 @@ public class LoggersTest {
     given(mockFactory.get(LoggersTest.class.getName(), null, false)).willReturn(mockLogger);
 
     // when
-    final Logger logger = Loggers.INSTANCE.get();
+    final Logger logger = Loggers.INSTANCE.get(LoggersTest.class.getName(), null, false);
 
     then(mockFactory).should(only()).get(LoggersTest.class.getName(), null, false);
     assertThat(logger, is(mockLogger));  // not really testing anything, but using that variable

@@ -31,6 +31,12 @@ import com.ealva.ealvalog.Marker
  */
 object AlwaysAcceptFilter : LoggerFilter {
   override fun isLoggable(logger: Logger, level: LogLevel) = ACCEPT
-  override fun isLoggable(logger: Logger, level: LogLevel, marker: Marker?, throwable: Throwable?) =
+  override fun isLoggable(logger: Logger, logLevel: LogLevel, marker: Marker?, throwable: Throwable?) =
     ACCEPT
+
+  override fun shouldIncludeLocation(
+    level: LogLevel,
+    marker: Marker?,
+    throwable: Throwable?
+  ): Boolean = false
 }

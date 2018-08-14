@@ -35,10 +35,10 @@ import org.jetbrains.annotations.TestOnly
  * Created by Eric A. Snell on 2/28/17.
  */
 class JdkLogger internal constructor(
-  name: String,
-  marker: Marker?,
+  override val name: String,
+  override var marker: Marker?,
   private var config: JdkLoggerConfiguration
-) : CoreLogger<JdkBridge>(name, config.getBridge(name), marker) {
+) : CoreLogger<JdkBridge>(config.getBridge(name)) {
 
   override var logLevel: LogLevel?
     get() = bridge.getLevelForLogger(this)
@@ -50,6 +50,14 @@ class JdkLogger internal constructor(
   override var includeLocation: Boolean
     get() = bridge.includeLocation
     set(includeLocation) = config.setIncludeLocation(this, includeLocation)
+
+  override fun resolveLocation(
+    logLevel: LogLevel,
+    marker: Marker?,
+    throwable: Throwable?
+  ): Boolean {
+    return bridge.shouldIncludeLocation(logLevel, marker, throwable)
+  }
 
   override var logToParent: Boolean
     get() = bridge.logToParent

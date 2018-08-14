@@ -54,7 +54,7 @@ public class JdkLoggerFactoryTest {
 
   @Test
   public void testGetRootLogger() {
-    final Logger rootByName = Loggers.INSTANCE.get("");
+    final Logger rootByName = Loggers.INSTANCE.get("", null, false);
     assertThat(rootByName, is(notNullValue()));
     assertThat(theRootLogger, is(rootByName));
     assertThat(theRootLogger.getBridgeForTest(), is(theRootBridge));
@@ -86,7 +86,7 @@ public class JdkLoggerFactoryTest {
 
   @Test
   public void testBridgeIsRoot() {
-    final Logger logger = Loggers.INSTANCE.get();
+    final Logger logger = Loggers.INSTANCE.get(this.getClass().getName(), null, false);
 
     final JdkLogger jdkLogger = JdkLoggerFactory.INSTANCE.getForTest(this.getClass().getName());
     assertThat(jdkLogger, is(logger));
@@ -97,7 +97,7 @@ public class JdkLoggerFactoryTest {
 
   @Test
   public void testSetFilter() {
-    final Logger logger = Loggers.INSTANCE.get();
+    final Logger logger = Loggers.INSTANCE.get(this.getClass().getName(), null, false);
 
     final JdkLogger jdkLogger = JdkLoggerFactory.INSTANCE.getForTest(this.getClass().getName());
     assertThat(jdkLogger, is(logger));

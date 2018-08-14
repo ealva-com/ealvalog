@@ -19,6 +19,7 @@
 package com.ealva.ealvalog.impl;
 
 import com.ealva.ealvalog.ExtLogRecord;
+import com.ealva.ealvalog.LogLevel;
 
 import static com.ealva.ealvalog.LogLevel.CRITICAL;
 import static com.ealva.ealvalog.LogLevel.ERROR;
@@ -42,7 +43,6 @@ import static org.mockito.Mockito.only;
 import static org.mockito.Mockito.verify;
 
 import java.util.logging.LogManager;
-import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 /**
@@ -81,53 +81,63 @@ public class JdkLoggerTest {
 
   @Test
   public void testChildLogsToRootHandler() {
-    childLogger.log(CRITICAL, MSG);
+    try (ExtLogRecord extRecord = ExtLogRecord.get(CRITICAL, CHILD_NAME, null, null)) {
+      extRecord.append(MSG);
+      childLogger.logImmediate(extRecord);
 
-    ArgumentCaptor<ExtLogRecord> recordCaptor = ArgumentCaptor.forClass(ExtLogRecord.class);
-    then(rootHandler).should(only()).publish(recordCaptor.capture());
+      ArgumentCaptor<ExtLogRecord> recordCaptor = ArgumentCaptor.forClass(ExtLogRecord.class);
+      then(rootHandler).should(only()).publish(recordCaptor.capture());
 
-    final ExtLogRecord record = recordCaptor.getValue();
-    assertThat(record, is(notNullValue()));
-    assertThat(record.getLevel(), is(CRITICAL.getJdkLevel()));
-    assertThat(record.getMessage(), is(equalTo(MSG)));
+      final ExtLogRecord record = recordCaptor.getValue();
+      assertThat(record, is(notNullValue()));
+      assertThat(record.getLevel(), is(CRITICAL.getJdkLevel()));
+      assertThat(record.getMessage(), is(equalTo(MSG)));
+    }
   }
 
 
   @Test
   public void testSetLogLevel() {
     rootLogger.setLogLevel(TRACE);
-    childLogger.log(TRACE, MSG);
+    try (ExtLogRecord extRecord = ExtLogRecord.get(TRACE, CHILD_NAME, null, null)) {
+      extRecord.append(MSG);
+      childLogger.logImmediate(extRecord);
 
-    ArgumentCaptor<ExtLogRecord> recordCaptor = ArgumentCaptor.forClass(ExtLogRecord.class);
-    then(rootHandler).should(only()).publish(recordCaptor.capture());
+      ArgumentCaptor<ExtLogRecord> recordCaptor = ArgumentCaptor.forClass(ExtLogRecord.class);
+      then(rootHandler).should(only()).publish(recordCaptor.capture());
 
-    final ExtLogRecord record = recordCaptor.getValue();
-    assertThat(record, is(notNullValue()));
-    assertThat(record.getLevel(), is(TRACE.getJdkLevel()));
-    assertThat(record.getMessage(), is(equalTo(MSG)));
+      final ExtLogRecord record = recordCaptor.getValue();
+      assertThat(record, is(notNullValue()));
+      assertThat(record.getLevel(), is(TRACE.getJdkLevel()));
+      assertThat(record.getMessage(), is(equalTo(MSG)));
+    }
   }
 
   @Test
   public void testChildLogsToHandlerAndRootHandler() {
     childLogger.addHandler(childHandler);
     assertThat(childLogger.shouldLogToParent(), is(true));
-    childLogger.log(WARN, MSG);
 
-    ArgumentCaptor<ExtLogRecord> rootCaptor = ArgumentCaptor.forClass(ExtLogRecord.class);
-    then(rootHandler).should(only()).publish(rootCaptor.capture());
+    try (ExtLogRecord extRecord = ExtLogRecord.get(WARN, CHILD_NAME, null, null)) {
+      extRecord.append(MSG);
+      childLogger.logImmediate(extRecord);
 
-    final ExtLogRecord rootRecord = rootCaptor.getValue();
-    assertThat(rootRecord, is(notNullValue()));
-    assertThat(rootRecord.getLevel(), is(WARN.getJdkLevel()));
-    assertThat(rootRecord.getMessage(), is(equalTo(MSG)));
+      ArgumentCaptor<ExtLogRecord> rootCaptor = ArgumentCaptor.forClass(ExtLogRecord.class);
+      then(rootHandler).should(only()).publish(rootCaptor.capture());
 
-    ArgumentCaptor<ExtLogRecord> childCaptor = ArgumentCaptor.forClass(ExtLogRecord.class);
-    then(childHandler).should(only()).publish(childCaptor.capture());
+      final ExtLogRecord rootRecord = rootCaptor.getValue();
+      assertThat(rootRecord, is(notNullValue()));
+      assertThat(rootRecord.getLevel(), is(LogLevel.WARN.getJdkLevel()));
+      assertThat(rootRecord.getMessage(), is(equalTo(MSG)));
 
-    final ExtLogRecord childRecord = childCaptor.getValue();
-    assertThat(childRecord, is(notNullValue()));
-    assertThat(childRecord.getLevel(), is(WARN.getJdkLevel()));
-    assertThat(childRecord.getMessage(), is(equalTo(MSG)));
+      ArgumentCaptor<ExtLogRecord> childCaptor = ArgumentCaptor.forClass(ExtLogRecord.class);
+      then(childHandler).should(only()).publish(childCaptor.capture());
+
+      final ExtLogRecord childRecord = childCaptor.getValue();
+      assertThat(childRecord, is(notNullValue()));
+      assertThat(childRecord.getLevel(), is(LogLevel.WARN.getJdkLevel()));
+      assertThat(childRecord.getMessage(), is(equalTo(MSG)));
+    }
   }
 
   @Test
@@ -149,23 +159,26 @@ public class JdkLoggerTest {
     childLogger.addHandler(childHandler);
     childLogger.setLogLevel(TRACE);
 
-    childLogger.log(TRACE, MSG);
+    try (ExtLogRecord extRecord = ExtLogRecord.get(TRACE, CHILD_NAME, null, null)) {
+      extRecord.append(MSG);
+      childLogger.logImmediate(extRecord);
 
-    ArgumentCaptor<ExtLogRecord> childCaptor = ArgumentCaptor.forClass(ExtLogRecord.class);
-    then(childHandler).should(only()).publish(childCaptor.capture());
+      ArgumentCaptor<ExtLogRecord> childCaptor = ArgumentCaptor.forClass(ExtLogRecord.class);
+      then(childHandler).should(only()).publish(childCaptor.capture());
 
-    final ExtLogRecord childRecord = childCaptor.getValue();
-    assertThat(childRecord, is(notNullValue()));
-    assertThat(childRecord.getLevel(), is(TRACE.getJdkLevel()));
-    assertThat(childRecord.getMessage(), is(equalTo(MSG)));
+      final ExtLogRecord childRecord = childCaptor.getValue();
+      assertThat(childRecord, is(notNullValue()));
+      assertThat(childRecord.getLevel(), is(TRACE.getJdkLevel()));
+      assertThat(childRecord.getMessage(), is(equalTo(MSG)));
 
-    ArgumentCaptor<ExtLogRecord> rootCaptor = ArgumentCaptor.forClass(ExtLogRecord.class);
-    then(rootHandler).should(only()).publish(rootCaptor.capture());
+      ArgumentCaptor<ExtLogRecord> rootCaptor = ArgumentCaptor.forClass(ExtLogRecord.class);
+      then(rootHandler).should(only()).publish(rootCaptor.capture());
 
-    final ExtLogRecord rootRecord = rootCaptor.getValue();
-    assertThat(rootRecord, is(notNullValue()));
-    assertThat(rootRecord.getLevel(), is(TRACE.getJdkLevel()));
-    assertThat(rootRecord.getMessage(), is(equalTo(MSG)));
+      final ExtLogRecord rootRecord = rootCaptor.getValue();
+      assertThat(rootRecord, is(notNullValue()));
+      assertThat(rootRecord.getLevel(), is(TRACE.getJdkLevel()));
+      assertThat(rootRecord.getMessage(), is(equalTo(MSG)));
+    }
   }
 
   @Test
@@ -175,20 +188,26 @@ public class JdkLoggerTest {
     childLogger.addHandler(childHandler);
     childLogger.setLogLevel(ERROR);
 
-    childLogger.log(TRACE, MSG);
+    try (ExtLogRecord extRecord = ExtLogRecord.get(TRACE, CHILD_NAME, null, null)) {
+      extRecord.append(MSG);
+      childLogger.logImmediate(extRecord);
 
-    verify(rootHandler, never()).publish(any(LogRecord.class));
-    verify(childHandler, never()).publish(any(LogRecord.class));
+
+      verify(rootHandler, never()).publish(any(ExtLogRecord.class));
+      verify(childHandler, never()).publish(any(ExtLogRecord.class));
+    }
   }
 
   @Test
   public void testDoNotLogToParent() {
     childLogger.setLogToParent(false);
-    childLogger.log(CRITICAL, MSG);
+    try (ExtLogRecord extRecord = ExtLogRecord.get(CRITICAL, CHILD_NAME, null, null)) {
+      extRecord.append(MSG);
+      childLogger.logImmediate(extRecord);
 
-    verify(rootHandler, never()).publish(any(LogRecord.class));
-    verify(childHandler, never()).publish(any(LogRecord.class));
+      verify(rootHandler, never()).publish(any(ExtLogRecord.class));
+      verify(childHandler, never()).publish(any(ExtLogRecord.class));
+    }
   }
-
 
 }

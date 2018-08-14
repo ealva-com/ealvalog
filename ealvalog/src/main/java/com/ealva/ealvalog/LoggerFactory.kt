@@ -27,41 +27,6 @@ package com.ealva.ealvalog
 interface LoggerFactory {
 
   /**
-   * Get a Logger instance with the given [name]
-   *
-   * @param name the name of the logger. This name will be treated as if it were a class name with
-   * the canonical package hierarchy
-   *
-   * @return [Logger] instance
-   */
-  operator fun get(name: String): Logger
-
-  /**
-   * Get a Logger instance with the given [name]
-   *
-   * @param name            the name of the logger. This name will be treated as if it were a class name with the canonical package
-   * hierarchy
-   * @param includeLocation include call site location in every log call. Formatters must be configured to display this optional
-   * information.
-   *
-   * @return [Logger] instance
-   */
-  operator fun get(name: String, includeLocation: Boolean): Logger
-
-  /**
-   * Get a Logger instance with the given [name] that always logs [marker]
-   *
-   * @param name   the name of the logger. This name will be treated as if it were a class name with the canonical package hierarchy
-   * @param marker every log from the returned [Logger] will use this as it's [Marker] unless overridden on a per method basis
-   *
-   * @return [Logger] instance
-   *
-   * @see Logger.log
-   * @see Logger.log
-   */
-  operator fun get(name: String, marker: Marker): Logger
-
-  /**
    * Get a Logger instance with the given [name] that always logs [marker]
    *
    * @param name   the name of the logger. This name will be treated as if it were a class name
@@ -69,12 +34,11 @@ interface LoggerFactory {
    * @param marker optional [Marker] - every log from the returned [Logger] will use this as
    * it's marker unless overridden on a per method basis
    * @param includeLocation include call site location in every log call. Formatters must be
-   * configured to display this optional
-   * information.
+   * configured to display this optional information.
    *
    * @return [Logger] instance
    */
-  operator fun get(name: String, marker: Marker?, includeLocation: Boolean): Logger
+  operator fun get(name: String, marker: Marker? = null, includeLocation: Boolean = false): Logger
 
   companion object {
     const val ROOT_LOGGER_NAME = ""

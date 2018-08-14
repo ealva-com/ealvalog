@@ -16,18 +16,17 @@
  * limitations under the License.
  */
 
-package com.ealva.ealvalog
+package com.ealva.ealvalog.java
 
-abstract class BaseLoggerFactory : LoggerFactory {
-    override fun get(name: String): Logger {
-        return get(name, null, false)
-    }
+import com.ealva.ealvalog.LoggerFactory
+import com.ealva.ealvalog.Loggers
+import com.ealva.ealvalog.Marker
 
-    override fun get(name: String, includeLocation: Boolean): Logger {
-        return get(name, null, includeLocation)
-    }
-
-    override fun get(name: String, marker: Marker): Logger {
-        return get(name, marker, false)
-    }
+/**
+ * Created by Eric A. Snell on 8/10/18.
+ */
+open class JLoggerFactoryImpl : LoggerFactory, JLoggerFactory<JLogger> {
+  override fun get(name: String, marker: Marker?, includeLocation: Boolean): JLogger {
+    return JLoggerImpl(Loggers[name, marker, includeLocation])
+  }
 }

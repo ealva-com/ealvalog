@@ -35,7 +35,7 @@ repositories {
 
 dependencies {
     implementation 'org.jetbrains:annotations:16.0.2'
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:${versions.kotlin}"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     // Test libraries
     testImplementation 'org.jetbrains:annotations:16.0.2'
     testImplementation('junit:junit:4.12') {
@@ -48,9 +48,6 @@ dependencies {
 }
 
 compileKotlin {
-    sourceCompatibility = JavaVersion.VERSION_1_6
-    targetCompatibility = JavaVersion.VERSION_1_6
-
     kotlinOptions {
         jvmTarget = "1.6"
         apiVersion = "1.2"
@@ -59,9 +56,6 @@ compileKotlin {
 }
 
 compileTestKotlin {
-    sourceCompatibility = JavaVersion.VERSION_1_6
-    targetCompatibility = JavaVersion.VERSION_1_6
-
     kotlinOptions {
         jvmTarget = "1.6"
         apiVersion = "1.2"

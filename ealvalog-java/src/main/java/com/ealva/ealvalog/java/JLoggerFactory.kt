@@ -16,28 +16,14 @@
  * limitations under the License.
  */
 
-package com.ealva.ealvalog.util
+package com.ealva.ealvalog.java
 
-import com.ealva.ealvalog.LogLevel
-
-import android.util.Log
+import com.ealva.ealvalog.LoggerFactory
+import com.ealva.ealvalog.Marker
 
 /**
- * Utility methods
- *
- * Created by Eric A. Snell on 3/14/17.
+ * Created by Eric A. Snell on 8/10/18.
  */
-object Levels {
-  // same as in ealvalog-android, but we don't want a dependency or to factor out a lib with only this
-  fun toAndroidLevel(level: LogLevel): Int {
-    return when (level) {
-      LogLevel.TRACE -> Log.VERBOSE
-      LogLevel.DEBUG -> Log.DEBUG
-      LogLevel.INFO -> Log.INFO
-      LogLevel.WARN -> Log.WARN
-      LogLevel.ERROR -> Log.ERROR
-      LogLevel.CRITICAL -> Log.ASSERT
-      else -> throw IllegalArgumentException("Illegal Level to map to Android")
-    }
-  }
+interface JLoggerFactory <T : JLogger> : LoggerFactory {
+  override fun get(name: String, marker: Marker?, includeLocation: Boolean): T
 }

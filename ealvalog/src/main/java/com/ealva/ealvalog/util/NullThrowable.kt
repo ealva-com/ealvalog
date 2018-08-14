@@ -23,4 +23,4 @@ package com.ealva.ealvalog.util
  *
  * Created by Eric A. Snell on 3/13/17.
  */
-object NullThrowable: Throwable()
+object NullThrowable: Throwable("NullThrowable")

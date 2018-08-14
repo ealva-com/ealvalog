@@ -33,7 +33,7 @@ public class LogMessageFormatterImpl implements com.ealva.ealvalog.util.LogMessa
   private final StringBuilder builder;
   private final Formatter formatter;
 
-  public LogMessageFormatterImpl() {
+  @SuppressWarnings("WeakerAccess") public LogMessageFormatterImpl() {
     builder = new StringBuilder(1024);
     formatter = new Formatter(builder);
   }
