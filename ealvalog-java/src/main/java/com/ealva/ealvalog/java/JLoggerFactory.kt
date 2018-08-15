@@ -24,6 +24,8 @@ import com.ealva.ealvalog.Marker
 /**
  * Created by Eric A. Snell on 8/10/18.
  */
-interface JLoggerFactory <T : JLogger> : LoggerFactory {
+interface JLoggerFactory<T : JLogger> : LoggerFactory {
   override fun get(name: String, marker: Marker?, includeLocation: Boolean): T
+
+  override fun get(name: String): T
 }

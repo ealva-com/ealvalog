@@ -16,16 +16,20 @@
  * limitations under the License.
  */
 
-package com.ealva.ealvalog
+package com.ealva.javaapp;
+
+import org.junit.Test;
+
+import static org.junit.Assert.*;
 
 /**
- * A no-op [LoggerFactory] instance - returns only [NullLogger]
+ * Example local unit test, which will execute on the development machine (host).
  *
- * Created by Eric A. Snell on 2/28/17.
+ * @see <a href="http://d.android.com/tools/testing">Testing documentation</a>
  */
-object NullLoggerFactory : com.ealva.ealvalog.LoggerFactory {
-  override fun get(name: String, marker: Marker?, includeLocation: Boolean) = NullLogger
-
-  override fun get(name: String) = NullLogger
-
+public class ExampleUnitTest {
+  @Test
+  public void addition_isCorrect() {
+    assertEquals(4, 2 + 2);
+  }
 }

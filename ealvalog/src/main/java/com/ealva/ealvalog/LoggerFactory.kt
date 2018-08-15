@@ -38,7 +38,9 @@ interface LoggerFactory {
    *
    * @return [Logger] instance
    */
-  operator fun get(name: String, marker: Marker? = null, includeLocation: Boolean = false): Logger
+  fun get(name: String, marker: Marker?, includeLocation: Boolean): Logger
+
+  fun get(name: String): Logger
 
   companion object {
     const val ROOT_LOGGER_NAME = ""

@@ -36,6 +36,10 @@ object AndroidLoggerFactory : LoggerFactory {
     return loggerMap.getOrPut(name) { AndroidLogger(name, marker, includeLocation) }
   }
 
+  override fun get(name: String): AndroidLogger {
+    return get(name, null, false)
+  }
+
   @TestOnly
   fun clearLoggerCache() {
     loggerMap.clear()

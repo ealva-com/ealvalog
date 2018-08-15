@@ -147,7 +147,8 @@ public interface JLogger extends Logger {
            @NotNull Object... remaining);
 
   /**
-   * Used to log an exception being caught where no message is needed
+   * Used to log an exception being caught where no message is needed. Logs:
+   * "Caught: [throwable.getClass().toString()]"
    *
    * @param level     log level to use
    * @param throwable the throwable that was caught
@@ -155,14 +156,16 @@ public interface JLogger extends Logger {
   void caught(@NotNull LogLevel level, @NotNull Throwable throwable);
 
   /**
-   * Log a throwable being thrown at the log site.
+   * Log a throwable being thrown at the log site. Logs:
+   * "Throwing: [throwable.getClass().toString()]
+   * <p><p>
    * <p>
    * {@code
    * throw LOG.throwing(LogLevel.ERROR, new MyException("Important Info"));
    * }
    *
    * @param level     level at which to log
-   * @param throwable the Throwable/Exception/Error to log
+   * @param throwable the Throwable to log
    *
    * @return returns the throwable for convenience
    */

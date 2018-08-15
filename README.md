@@ -8,9 +8,10 @@ Libraries
 
   - elavalog             - the API and some framework functionality. Used by library developers. Required for all clients
   - ealvalog-core        - adds a little more as a base for some facade implementations. Required for all clients
+  - ealvalog-java        - provides JLogger for java clients (fat interface, extensible). Requires ealvalog and ealvalog-core libs
   - ealvalog-android     - very thin facade over the Android logger. Requires ealvalog and ealvalog-core libs
   - ealvalog-jdk         - facade implementation using java.util.logging. Requires ealvalog and ealvalog-core libs
-  - ealvalog-jdk-android - adds an Android handler to be used with ealvalog-jdk when more functionality is required over ealvalog-android
+  - ealvalog-jdk-android - adds an Android handler to be used with ealvalog-jdk. Used when more functionality is required over ealvalog-android
   
   If you wish to create another facade implementation, it's recommended you start at the ealvalog-core level. We also hope you'd 
   contribute it back to this library.
@@ -21,9 +22,9 @@ Quick Start
 - Android Setup
 ```groovy
 dependencies {
-    compile 'com.ealva:ealvalog:0.0.9'
-    compile 'com.ealva:ealvalog-core:0.0.9'
-    compile 'com.ealva:ealvalog-android:0.0.9'
+    compile 'com.ealva:ealvalog:0.02.00-SNAPSHOT'
+    compile 'com.ealva:ealvalog-core:0.02.00-SNAPSHOT'
+    compile 'com.ealva:ealvalog-android:0.02.00-SNAPSHOT'
 }
 ```
 ```java
@@ -38,10 +39,10 @@ public class MyApp extends Application {
 - Facade Over java.util.logging Setup (example also contains Android code)
 ```groovy
 dependencies {
-    compile 'com.ealva:ealvalog:0.0.9'
-    compile 'com.ealva:ealvalog-core:0.0.9'
-    compile 'com.ealva:ealvalog-jdk:0.0.9'
-    compile 'com.ealva:ealvalog-jdk-android:0.0.9'
+    compile 'com.ealva:ealvalog:0.02.00-SNAPSHOT'
+    compile 'com.ealva:ealvalog-core:0.02.00-SNAPSHOT'
+    compile 'com.ealva:ealvalog-jdk:0.02.00-SNAPSHOT'
+    compile 'com.ealva:ealvalog-jdk-android:0.02.00-SNAPSHOT'
 }
 ```
 ```java

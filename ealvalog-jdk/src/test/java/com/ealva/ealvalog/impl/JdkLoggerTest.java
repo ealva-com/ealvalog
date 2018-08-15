@@ -74,7 +74,7 @@ public class JdkLoggerTest {
 
     rootLogger = loggerFactory.getRoot();
 //    parentLogger = loggerFactory.get(PARENT_NAME);
-    childLogger = loggerFactory.getForTest(CHILD_NAME);
+    childLogger = loggerFactory.get(CHILD_NAME);
 
     rootLogger.addHandler(rootHandler);
   }

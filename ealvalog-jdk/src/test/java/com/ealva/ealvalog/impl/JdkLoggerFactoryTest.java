@@ -47,7 +47,7 @@ public class JdkLoggerFactoryTest {
   @Before
   public void setup() {
     final JdkLoggerFactory loggerFactory = JdkLoggerFactory.INSTANCE;
-    theRootLogger = JdkLoggerFactory.INSTANCE.getForTest(ROOT_LOGGER_NAME);
+    theRootLogger = JdkLoggerFactory.INSTANCE.get(ROOT_LOGGER_NAME);
     theRootBridge = theRootLogger.getBridgeForTest();
     Loggers.INSTANCE.setFactory(loggerFactory);
   }
@@ -65,11 +65,11 @@ public class JdkLoggerFactoryTest {
     assertThat(root, is(rootByName));
     assertThat(rootByName.getName(), is(equalTo(ROOT_LOGGER_NAME)));
 
-    JdkLogger directRoot = JdkLoggerFactory.INSTANCE.getForTest("");
+    JdkLogger directRoot = JdkLoggerFactory.INSTANCE.get("");
     assertThat(directRoot, is(notNullValue()));
     assertThat(directRoot, is(root));
 
-    JdkLogger anotherDirect = JdkLoggerFactory.INSTANCE.getForTest("");
+    JdkLogger anotherDirect = JdkLoggerFactory.INSTANCE.get("");
     assertThat(anotherDirect, is(notNullValue()));
     assertThat(anotherDirect, is(directRoot));
 
@@ -88,7 +88,7 @@ public class JdkLoggerFactoryTest {
   public void testBridgeIsRoot() {
     final Logger logger = Loggers.INSTANCE.get(this.getClass().getName(), null, false);
 
-    final JdkLogger jdkLogger = JdkLoggerFactory.INSTANCE.getForTest(this.getClass().getName());
+    final JdkLogger jdkLogger = JdkLoggerFactory.INSTANCE.get(this.getClass().getName());
     assertThat(jdkLogger, is(logger));
 
     final JdkBridge bridge = jdkLogger.getBridgeForTest();
@@ -99,7 +99,7 @@ public class JdkLoggerFactoryTest {
   public void testSetFilter() {
     final Logger logger = Loggers.INSTANCE.get(this.getClass().getName(), null, false);
 
-    final JdkLogger jdkLogger = JdkLoggerFactory.INSTANCE.getForTest(this.getClass().getName());
+    final JdkLogger jdkLogger = JdkLoggerFactory.INSTANCE.get(this.getClass().getName());
     assertThat(jdkLogger, is(logger));
 
     JdkBridge bridge = jdkLogger.getBridgeForTest();
@@ -118,7 +118,7 @@ public class JdkLoggerFactoryTest {
 
   @Test
   public void testReset() {
-    JdkLogger jdkLogger = JdkLoggerFactory.INSTANCE.getForTest(this.getClass().getName());
+    JdkLogger jdkLogger = JdkLoggerFactory.INSTANCE.get(this.getClass().getName());
 
     JdkBridge bridge = jdkLogger.getBridgeForTest();
     assertThat(bridge, is(theRootBridge));  // no filter set so will be the root
@@ -131,7 +131,7 @@ public class JdkLoggerFactoryTest {
     assertThat(bridge.getParent(), is(theRootBridge));
 
     JdkLoggerFactory.INSTANCE.reset();
-    jdkLogger = JdkLoggerFactory.INSTANCE.getForTest(this.getClass().getName());
+    jdkLogger = JdkLoggerFactory.INSTANCE.get(this.getClass().getName());
     bridge = jdkLogger.getBridgeForTest();
     assertThat(bridge, is(theRootBridge));  // no filter set so will be the root
   }

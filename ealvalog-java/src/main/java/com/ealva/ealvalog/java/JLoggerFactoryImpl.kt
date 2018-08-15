@@ -27,6 +27,11 @@ import com.ealva.ealvalog.Marker
  */
 open class JLoggerFactoryImpl : LoggerFactory, JLoggerFactory<JLogger> {
   override fun get(name: String, marker: Marker?, includeLocation: Boolean): JLogger {
-    return JLoggerImpl(Loggers[name, marker, includeLocation])
+    return JLoggerImpl(Loggers.get(name, marker, includeLocation))
   }
+
+  override fun get(name: String): JLogger {
+    return get(name, null, false)
+  }
+
 }

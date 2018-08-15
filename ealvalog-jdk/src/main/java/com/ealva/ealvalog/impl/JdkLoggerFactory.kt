@@ -23,7 +23,6 @@ import com.ealva.ealvalog.Logger
 import com.ealva.ealvalog.LoggerFactory
 import com.ealva.ealvalog.LoggerFilter
 import com.ealva.ealvalog.Marker
-import org.jetbrains.annotations.TestOnly
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentMap
 import java.util.concurrent.locks.ReentrantLock
@@ -67,15 +66,15 @@ object JdkLoggerFactory : LoggerFactory {
     }
   }
 
-  val root = JdkLogger(LoggerFactory.ROOT_LOGGER_NAME, null, configuration)
-
-  @TestOnly
-  fun getForTest(name: String): JdkLogger {
-    return get(name, null, false)
+  init {
+    reset()
   }
 
+  val root = JdkLogger(LoggerFactory.ROOT_LOGGER_NAME, null, configuration)
+
   /**
-   * Resets all loggers, removing filters and underlying handlers from the java.util.logging Loggers
+   * Typically not necessary for clients to call this as it's done on init. Resets all loggers,
+   * removing filters and underlying handlers from the java.util.logging Loggers
    */
   fun reset() {
     LogManager.getLogManager().reset()
@@ -117,6 +116,10 @@ object JdkLoggerFactory : LoggerFactory {
     } finally {
       bridgeTreeLock.unlock()
     }
+  }
+
+  override fun get(name: String): JdkLogger {
+    return get(name, null, false)
   }
 
   private fun setFilter(logger: Logger, filter: LoggerFilter) {

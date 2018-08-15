@@ -52,7 +52,7 @@ open class HandlerWrapper internal constructor(
   override fun publish(record: LogRecord) {
     val thrown = record.thrown
     if (isLoggable(
-        Loggers[record.loggerName],
+        Loggers.get(record.loggerName),
         LogLevel.fromLevel(record.level),
         getRecordMarker(record),
         thrown ?: NullThrowable

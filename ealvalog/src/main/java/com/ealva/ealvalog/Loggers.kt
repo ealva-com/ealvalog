@@ -28,23 +28,23 @@ import kotlin.reflect.KClass
  * Created by Eric A. Snell on 8/8/18.
  */
 fun logger(name: String, marker: Marker? = null, includeLocation: Boolean = false): Logger {
-  return Loggers[name, marker, includeLocation]
+  return Loggers.get(name, marker, includeLocation)
 }
 
 fun <T : Any> logger(forClass: Class<T>, marker: Marker? = null, includeLocation: Boolean = false): Logger {
-  return Loggers[forClass.simpleName, marker, includeLocation]
+  return Loggers.get(forClass.simpleName, marker, includeLocation)
 }
 
 fun <T : Any> lazyLogger(forClass: KClass<T>, marker: Marker? = null, includeLocation: Boolean = false): Lazy<Logger> {
-  return lazy { Loggers[forClass.java.simpleName, marker, includeLocation] }
+  return lazy { Loggers.get(forClass.java.simpleName, marker, includeLocation) }
 }
 
 fun <T : Any> T.logger(marker: Marker? = null, includeLocation: Boolean = false): Logger {
-  return logger(this.javaClass, marker, includeLocation)
+  return logger(javaClass, marker, includeLocation)
 }
 
 fun <T : Any> T.lazyLogger(marker: Marker? = null, includeLocation: Boolean = false): Lazy<Logger> {
-  return lazy { logger(this.javaClass, marker, includeLocation) }
+  return lazy { logger(javaClass, marker, includeLocation) }
 }
 
 inline fun Logger.t(
@@ -125,7 +125,6 @@ inline fun Logger.wtf(
   }
 }
 
-
 /**
  * This is where [Logger] instances are obtained. This singleton must be configured with a concrete
  * implementation of [LoggerFactory] before use. Setting this factory is the
@@ -167,15 +166,15 @@ object Loggers {
    * @return the root logger
    */
   val root: Logger
-    get() = loggerFactory[LoggerFactory.ROOT_LOGGER_NAME]
+    get() = loggerFactory.get(LoggerFactory.ROOT_LOGGER_NAME)
 
   /** Set the [LoggerFactory] to be used for all calls to obtain a Logger  */
   fun setFactory(factory: LoggerFactory) {
     loggerFactory = factory
   }
 
-  operator fun get(name: String, marker: Marker? = null, includeLocation: Boolean = false): Logger {
-    return loggerFactory[name, marker, includeLocation]
+  fun get(name: String, marker: Marker? = null, includeLocation: Boolean = false): Logger {
+    return loggerFactory.get(name, marker, includeLocation)
   }
 
   /**
@@ -184,6 +183,6 @@ object Loggers {
    * @return a logger for for the caller's class
    */
   fun get(marker: Marker? = null, includeLocation: Boolean = false): Logger {
-    return loggerFactory[LogUtil.getCallerClassName(STACK_DEPTH), marker, includeLocation]
+    return loggerFactory.get(LogUtil.getCallerClassName(STACK_DEPTH), marker, includeLocation)
   }
 }
