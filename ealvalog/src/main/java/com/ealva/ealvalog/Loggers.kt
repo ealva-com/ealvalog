@@ -31,12 +31,28 @@ fun logger(name: String, marker: Marker? = null, includeLocation: Boolean = fals
   return Loggers.get(name, marker, includeLocation)
 }
 
-fun <T : Any> logger(forClass: Class<T>, marker: Marker? = null, includeLocation: Boolean = false): Logger {
-  return Loggers.get(forClass.simpleName, marker, includeLocation)
+fun <T : Any> logger(
+  forClass: Class<T>,
+  marker: Marker? = null,
+  includeLocation: Boolean = false
+): Logger {
+  return logger(forClass.name, marker, includeLocation)
 }
 
-fun <T : Any> lazyLogger(forClass: KClass<T>, marker: Marker? = null, includeLocation: Boolean = false): Lazy<Logger> {
-  return lazy { Loggers.get(forClass.java.simpleName, marker, includeLocation) }
+fun <T : Any> logger(
+  forClass: KClass<T>,
+  marker: Marker? = null,
+  includeLocation: Boolean = false
+): Logger {
+  return logger(forClass.java, marker, includeLocation)
+}
+
+fun <T : Any> lazyLogger(
+  forClass: KClass<T>,
+  marker: Marker? = null,
+  includeLocation: Boolean = false
+): Lazy<Logger> {
+  return lazy { logger(forClass.java, marker, includeLocation) }
 }
 
 fun <T : Any> T.logger(marker: Marker? = null, includeLocation: Boolean = false): Logger {
@@ -157,7 +173,7 @@ inline fun Logger.wtf(
  * Created by Eric A. Snell on 2/28/17.
  */
 object Loggers {
-  private const val STACK_DEPTH = 2
+  private const val STACK_DEPTH = 1
   @Volatile private var loggerFactory: LoggerFactory = NullLoggerFactory
 
   /**
@@ -178,11 +194,15 @@ object Loggers {
   }
 
   /**
-   * Convenience method to obtain a [Logger] for the current object's class. The follow are equivalent:
+   * Convenience method to obtain a [Logger] for the current object's class.
    *
    * @return a logger for for the caller's class
    */
-  fun get(marker: Marker? = null, includeLocation: Boolean = false): Logger {
-    return loggerFactory.get(LogUtil.getCallerClassName(STACK_DEPTH), marker, includeLocation)
+  fun get(marker: Marker? = null, includeLocation: Boolean = false, stackDepth: Int = 1): Logger {
+    return loggerFactory.get(
+      LogUtil.getCallerClassName(STACK_DEPTH + stackDepth),
+      marker,
+      includeLocation
+    )
   }
 }

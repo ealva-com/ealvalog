@@ -21,12 +21,14 @@ package com.ealva.ealvalog
 import java.util.Formatter
 import java.util.Locale
 
-operator fun LogRecordBuilder.invoke(format: String) {
+operator fun LogRecordBuilder.invoke(format: String): LogRecordBuilder {
   append(format)
+  return this
 }
 
-operator fun LogRecordBuilder.invoke(format: String, vararg args: Any) {
+operator fun LogRecordBuilder.invoke(format: String, vararg args: Any): LogRecordBuilder {
   append(format, *args)
+  return this
 }
 
 operator fun LogRecordBuilder.unaryPlus() {

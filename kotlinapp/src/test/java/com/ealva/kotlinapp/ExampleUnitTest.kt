@@ -16,7 +16,20 @@
  * limitations under the License.
  */
 
-include ':ealvalog', ':ealvalog-core', ':ealvalog-java', ':ealvalog-jdk', ':ealvalog-android', ':ealvalog-jdk-android', ':javaapp', ':kotlinapp'
+package com.ealva.kotlinapp
 
-rootProject.name = 'ealvalog-parent'
+import org.junit.Test
 
+import org.junit.Assert.*
+
+/**
+ * Example local unit test, which will execute on the development machine (host).
+ *
+ * See [testing documentation](http://d.android.com/tools/testing).
+ */
+class ExampleUnitTest {
+  @Test
+  fun addition_isCorrect() {
+    assertEquals(4, 2 + 2)
+  }
+}

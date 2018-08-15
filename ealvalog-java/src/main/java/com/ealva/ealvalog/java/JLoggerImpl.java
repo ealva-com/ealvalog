@@ -295,7 +295,7 @@ public class JLoggerImpl implements JLogger {
         if (realLogger.resolveLocation(level, realLogger.getMarker(), null)) {
           record.addLocation(STACK_DEPTH);
         }
-        record.append("Caught: %s", throwable.getClass());
+        record.append("Caught: %s", throwable.getMessage());
         logImmediate(record);
       }
     }
@@ -312,7 +312,7 @@ public class JLoggerImpl implements JLogger {
         if (realLogger.resolveLocation(level, realLogger.getMarker(), null)) {
           record.addLocation(STACK_DEPTH);
         }
-        record.append("Throwing: %s", throwable.getClass());
+        record.append("Throwing: %s", throwable.getMessage());
         logImmediate(record);
       }
     }

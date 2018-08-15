@@ -47,5 +47,15 @@ public class MainActivity extends AppCompatActivity {
   @Override protected void onResume() {
     super.onResume();
     LOG.log(LogLevel.WARN, "onResume %.6f", Math.PI);
+
+    try {
+      throwsSomething();
+    } catch (Exception ex) {
+      LOG.caught(LogLevel.ERROR, ex);
+    }
+  }
+
+  private void throwsSomething() {
+    throw LOG.throwing(LogLevel.ERROR, new RuntimeException("Exception Message"));
   }
 }

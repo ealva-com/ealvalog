@@ -17,14 +17,14 @@
  */
 
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
 
 android {
     compileSdkVersion 27
 
-
-
     defaultConfig {
-        applicationId "com.ealva.javaapp"
+        applicationId "com.ealva.kotlinapp"
         minSdkVersion 21
         targetSdkVersion 27
         versionCode 1
@@ -44,14 +44,15 @@ android {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation project(path: ':ealvalog')
-    implementation project(path: ':ealvalog-java')
     implementation project(path: ':ealvalog-core')
     implementation project(path: ':ealvalog-jdk')
     implementation project(path: ':ealvalog-jdk-android')
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
 
     implementation "com.android.support:appcompat-v7:${versions.support_library}"
+    implementation 'com.android.support.constraint:constraint-layout:1.1.2'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'com.android.support.constraint:constraint-layout:1.1.2'
 
     testImplementation 'junit:junit:4.12'

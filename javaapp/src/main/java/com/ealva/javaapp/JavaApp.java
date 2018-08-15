@@ -38,8 +38,8 @@ public class JavaApp extends Application {
     Loggers.INSTANCE.setFactory(factory);
 
     // Configure the underlying root java.util.logging.Logger
-    JdkLogger rootLogger = factory.get(JdkLoggerFactory.ROOT_LOGGER_NAME);
-    // rootLogger.setIncludeLocation(true); // makes logging more expensive
+    JdkLogger rootLogger = JdkLoggerFactory.INSTANCE.getRoot();
+    rootLogger.setIncludeLocation(true); // makes logging more expensive
 
     if (BuildConfig.DEBUG) {
 //      Fabric.with(this, CrashlyticsCore.Builder().disabled(BuildConfig.DEBUG).build())
