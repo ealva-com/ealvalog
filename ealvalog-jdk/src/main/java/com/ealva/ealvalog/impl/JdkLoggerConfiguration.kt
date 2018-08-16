@@ -21,6 +21,7 @@ package com.ealva.ealvalog.impl
 import com.ealva.ealvalog.LogLevel
 import com.ealva.ealvalog.Logger
 import com.ealva.ealvalog.LoggerFilter
+import java.util.logging.Handler
 
 /**
  *
@@ -29,7 +30,7 @@ import com.ealva.ealvalog.LoggerFilter
 internal interface JdkLoggerConfiguration {
   fun setLoggerFilter(logger: Logger, filter: LoggerFilter)
 
-  fun addLoggerHandler(logger: Logger, loggerHandler: BaseLoggerHandler)
+  fun addLoggerHandler(logger: Logger, loggerHandler: Handler)
 
   fun setLogLevel(logger: Logger, logLevel: LogLevel)
 

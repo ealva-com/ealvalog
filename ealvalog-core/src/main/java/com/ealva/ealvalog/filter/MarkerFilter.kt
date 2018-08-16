@@ -35,7 +35,7 @@ import com.ealva.ealvalog.FilterResult.NEUTRAL
  *
  * Created by Eric A. Snell on 3/13/17.
  */
-class MarkerFilter internal constructor(
+class MarkerFilter(
   private val marker: Marker,
   whenMatched: FilterResult = NEUTRAL,
   whenDiffer: FilterResult = DENY,

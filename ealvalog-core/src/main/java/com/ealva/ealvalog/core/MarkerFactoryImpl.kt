@@ -20,7 +20,6 @@ package com.ealva.ealvalog.core
 
 import com.ealva.ealvalog.Marker
 import com.ealva.ealvalog.MarkerFactory
-
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentMap
 
@@ -53,6 +52,6 @@ class MarkerFactoryImpl : MarkerFactory {
   }
 
   override fun makeOrphan(name: String): Marker {
-    return com.ealva.ealvalog.core.MarkerImpl(name, this)
+    return MarkerImpl(name, this)
   }
 }

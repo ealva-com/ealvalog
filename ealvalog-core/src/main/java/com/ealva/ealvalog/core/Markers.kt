@@ -16,21 +16,24 @@
  * limitations under the License.
  */
 
-package com.ealva.ealvalog
+package com.ealva.ealvalog.core
+
+import com.ealva.ealvalog.Marker
+import com.ealva.ealvalog.MarkerFactory
+import com.ealva.ealvalog.NullMarkerFactory
 
 /**
- * This is where [Marker] instances are obtained. This singleton must be configured with a concrete implementation of
- * [MarkerFactory] before use.
- *
- *
- * This class has a dependency on a concrete [MarkerFactory] instance which must be set before use. Setting and using this factory
- * is not thread safe - this is the responsibility of the client. It's expected this will be done during application load.
- *
+ * This is where [Marker] instances are obtained. This singleton defaults to using
+ * [MarkerFactoryImpl] to create markers. To specialize the type of marker created, a concrete
+ * [MarkerFactory] instance which must be set  before use. Setting and using this factory is not
+ * thread safe - this is the responsibility of the client. It's expected this will be done during
+ * application load.
  *
  * Created by Eric A. Snell on 2/28/17.
  */
 object Markers {
-  private var markerFactory: MarkerFactory = NullMarkerFactory
+  private var markerFactory: MarkerFactory =
+    MarkerFactoryImpl()
 
   @Suppress("unused")
   fun setFactory(factory: MarkerFactory?) {

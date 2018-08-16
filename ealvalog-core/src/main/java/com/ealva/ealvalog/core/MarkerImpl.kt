@@ -35,7 +35,8 @@ import java.util.concurrent.CopyOnWriteArrayList
  *
  * Created by Eric A. Snell on 2/28/17.
  */
-class MarkerImpl(_name: String, private val markerFactory: MarkerFactory) : Marker {
+class MarkerImpl(_name: String, private val markerFactory: MarkerFactory) :
+  Marker {
   override var name: String = _name
     private set(value) {
       field = value

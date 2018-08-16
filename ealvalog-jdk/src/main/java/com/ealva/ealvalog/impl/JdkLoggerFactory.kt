@@ -26,6 +26,7 @@ import com.ealva.ealvalog.Marker
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentMap
 import java.util.concurrent.locks.ReentrantLock
+import java.util.logging.Handler
 import java.util.logging.LogManager
 
 /**
@@ -45,7 +46,7 @@ object JdkLoggerFactory : LoggerFactory {
       setFilter(logger, filter)
     }
 
-    override fun addLoggerHandler(logger: Logger, loggerHandler: BaseLoggerHandler) {
+    override fun addLoggerHandler(logger: Logger, loggerHandler: Handler) {
       addHandler(logger, loggerHandler)
     }
 
@@ -137,7 +138,7 @@ object JdkLoggerFactory : LoggerFactory {
     }
   }
 
-  private fun addHandler(logger: Logger, loggerHandler: BaseLoggerHandler) {
+  private fun addHandler(logger: Logger, loggerHandler: Handler) {
     bridgeTreeLock.lock()
     try {
       val loggerName = logger.name
@@ -201,7 +202,7 @@ object JdkLoggerFactory : LoggerFactory {
     parent: JdkBridge,
     loggerName: String,
     filter: LoggerFilter?,
-    handler: BaseLoggerHandler?,
+    handler: Handler?,
     logLevel: LogLevel?
   ): JdkBridge {
     val newBridge = JdkBridge(loggerName, filter, handler, logLevel)

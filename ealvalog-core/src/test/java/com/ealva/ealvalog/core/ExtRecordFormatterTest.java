@@ -22,8 +22,6 @@ import com.ealva.ealvalog.ExtLogRecord;
 import com.ealva.ealvalog.LogLevel;
 import com.ealva.ealvalog.Marker;
 import com.ealva.ealvalog.MarkerFactory;
-import com.ealva.ealvalog.Markers;
-import com.ealva.ealvalog.util.LogUtil;
 
 import org.junit.After;
 import org.junit.Before;
@@ -234,7 +232,7 @@ public class ExtRecordFormatterTest {
   public void testMarker() {
     com.ealva.ealvalog.core.ExtRecordFormatter formatter = new ExtRecordFormatter("%11$s");
     final String markerName = "MarkerName";
-    final com.ealva.ealvalog.core.MarkerImpl marker = new MarkerImpl(markerName, markerFactory);
+    final MarkerImpl marker = new MarkerImpl(markerName, markerFactory);
     record.setMarker(marker);
     assertThat(formatter.format(record), is(equalTo(markerName)));
   }

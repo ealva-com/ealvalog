@@ -135,7 +135,8 @@ class FileHandlerWrapper(
         append,
         formatterPattern,
         formatterLogErrors,
-        filter
+        filter,
+        errorManager
       )
     }
   }

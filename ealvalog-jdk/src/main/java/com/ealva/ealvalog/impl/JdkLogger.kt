@@ -27,6 +27,7 @@ import com.ealva.ealvalog.NullMarker
 import com.ealva.ealvalog.core.CoreLogger
 import com.ealva.ealvalog.util.NullThrowable
 import org.jetbrains.annotations.TestOnly
+import java.util.logging.Handler
 
 /**
  * Implementation that uses [java.util.logging.Logger]
@@ -68,7 +69,7 @@ class JdkLogger internal constructor(
     bridge = configuration.getBridge(name)
   }
 
-  fun addHandler(handler: BaseLoggerHandler) {
+  fun addHandler(handler: Handler) {
     config.addLoggerHandler(this, handler)
   }
 

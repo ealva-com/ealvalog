@@ -1,14 +1,14 @@
 eAlvaLog
 ========
 
-*eAlvaLog* is a Kotlin/Java logging facade and implementation intially inspired by various other logging frameworks
+*eAlvaLog* is a Kotlin/Java logging facade and implementation initially inspired by various other logging frameworks
 
 Libraries
 ---------
 
-  - elavalog             - the API and some framework functionality. Required for libraries written in Kotlin
-  - ealvalog-java        - provides JLogger for java clients (fat interface, extensible). Required for libraries or apps written in Java. Requires ealvalog
-  - ealvalog-core        - adds a little more as a base for some facade implementations. Required for all apps
+  - elavalog             - the API and some framework functionality
+  - ealvalog-java        - provides JLogger for java clients (fat interface, extensible). Requires ealvalog lib
+  - ealvalog-core        - adds CoreLogger as base for bridging to other frameworks and Marker implementation. Requires ealvalog lib
   - ealvalog-android     - very thin facade over the Android logger. Requires ealvalog and ealvalog-core libs
   - ealvalog-jdk         - facade implementation using java.util.logging. Requires ealvalog and ealvalog-core libs
   - ealvalog-jdk-android - adds an Android handler to be used with ealvalog-jdk. Used with ealvalog-jdk when more functionality is required over ealvalog-android
@@ -16,8 +16,22 @@ Libraries
   If you wish to create another facade implementation, it's recommended you start at the ealvalog-core level. We also hope you'd 
   contribute it back to this library.
 
+  When to use each library:
+  1. Kotlin Library: ealvalog. Add ealvalog-core if Markers are needed
+  2. Java Library: ealvalog and ealvalog-java. Add ealvalog-core if Markers are needed
+  3. Kotlin Android app with android logging only: ealvalog-android, ealvalog-core, and ealvalog
+  4. Java Android app with android logging only: ealvalog-android, ealvalog-java, ealvalog-core, and ealvalog
+  5. App requiring java.util.logging (JUL) functionality: ealvalog-jdk and #3 or #4
+  6. App requiring JUL and android logging: ealvalog-jdk-android and #5
+  7. Extending/customizing java logging: ealvalog-java, ealvalog-core, and ealvalog
+  8. Implementing a facade over another logging framework: ealvalog-core and ealvalog. See ealvalog-jdk as an example.
+  
+  See the sample apps for use and required libs (build.gradle)  
+
 Quick Start
 ===========
+
+
 
 - Android Setup
 ```groovy
@@ -153,7 +167,7 @@ Why?
    
 This library was originally written in Java but has been ported to Kotlin. The original Java API was very much like other logging
 frameworks, very fat with lots of convenience methods. The Kotlin version strips away most of this API and moves the fat interface
-into a separate module for Java clients. The Java interface, which is build on top of the Kotlin interface, is also extensible
+into a separate module for Java clients. The Java interface, which is built on top of the Kotlin interface, is also extensible
 to provide custom logging methods.
    
  Result
@@ -163,7 +177,7 @@ to provide custom logging methods.
   creation, calculations for log info, or formatting, occurs until level checks and filters pass. For Java, if a custom JLogger subclass 
   is developed by the client, even logging primitives as format arguments will create zero objects unless the logging passes level 
   checks and filters. A JLogger subclass requires minimal code and is entirely optional.
-  2. eAlvaLog provides filtering using LogLevel, Throwable, and Markers at the most outer layer to short-circuit logging as quickly as 
+  2. eAlvaLog provides filtering using LogLevel, Throwable, and Markers to short-circuit logging as quickly as 
   possible. If the statement will not ultimately be logged, objects are not created. 
   3. Object creation inside the framework is minimized via thread local Formatter/StringBuilder/log records.
   4. Android clients may use the eAlvaLog-android library alone, which is a very thin facade over Android logging. It handles such 
