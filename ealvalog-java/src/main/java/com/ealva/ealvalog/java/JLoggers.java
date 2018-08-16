@@ -19,6 +19,7 @@
 package com.ealva.ealvalog.java;
 
 import com.ealva.ealvalog.Marker;
+import com.ealva.ealvalog.util.LogUtil;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -77,5 +78,20 @@ public final class JLoggers {
                             final @NotNull Marker marker,
                             final boolean includeLocation) {
     return factory.get(clazz.getName(), marker, includeLocation);
+  }
+
+  @NotNull
+  public static JLogger get() {
+    return factory.get(LogUtil.getCallerClassName(1), null, false);
+  }
+
+  @NotNull
+  public static JLogger get(final @NotNull Marker marker) {
+    return factory.get(LogUtil.getCallerClassName(1), marker, false);
+  }
+
+  @NotNull
+  public static JLogger get(final @NotNull Marker marker, final boolean includeLocation) {
+    return factory.get(LogUtil.getCallerClassName(1), marker, includeLocation);
   }
 }

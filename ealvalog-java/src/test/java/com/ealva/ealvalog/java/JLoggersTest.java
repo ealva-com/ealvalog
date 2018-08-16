@@ -105,4 +105,29 @@ public class JLoggersTest {
     assertThat(logger.getMarker(), is(MARKER));
     assertThat(logger.getIncludeLocation(), is(true));
   }
+
+  @Test
+  public void get() {
+    JLogger logger = JLoggers.get();
+    assertThat(logger.getName(), is(JLoggersTest.class.getName()));
+    assertThat(logger.getMarker(), is(nullValue()));
+    assertThat(logger.getIncludeLocation(), is(false));
+  }
+
+  @Test
+  public void getMarker() {
+    JLogger logger = JLoggers.get(MARKER);
+    assertThat(logger.getName(), is(JLoggersTest.class.getName()));
+    assertThat(logger.getMarker(), is(MARKER));
+    assertThat(logger.getIncludeLocation(), is(false));
+  }
+
+  @Test
+  public void getMarkerLocation() {
+    JLogger logger = JLoggers.get(MARKER, true);
+    assertThat(logger.getName(), is(JLoggersTest.class.getName()));
+    assertThat(logger.getMarker(), is(MARKER));
+    assertThat(logger.getIncludeLocation(), is(true));
+  }
+
 }
