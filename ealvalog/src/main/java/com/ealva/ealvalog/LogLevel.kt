@@ -36,10 +36,6 @@ enum class LogLevel(private val value: Int, val jdkLevel: Level) {
   CRITICAL(6000, object : Level("CRITICAL", 1100) {}),
   NONE(Integer.MAX_VALUE, Level.OFF);
 
-  fun shouldNotLogAtLevel(jdkLevel: Int): Boolean {
-    return value < jdkLevel || jdkLevel == Level.OFF.intValue()
-  }
-
   @Suppress("unused")
   fun isAtLeast(level: LogLevel): Boolean {
     return value >= level.value
@@ -52,7 +48,7 @@ enum class LogLevel(private val value: Int, val jdkLevel: Level) {
       }
 
     fun fromLevel(level: Level): LogLevel {
-      return levelToLogLevelMap[level] ?: NONE
+      return levelToLogLevelMap[level] ?: ALL
     }
   }
 }

@@ -21,6 +21,7 @@ package com.ealva.ealvalog.core
 import com.ealva.ealvalog.LogLevel
 import com.ealva.ealvalog.Logger
 import com.ealva.ealvalog.LoggerFilter
+import com.ealva.ealvalog.Marker
 import java.util.logging.LogRecord
 
 /**
@@ -47,6 +48,8 @@ interface Bridge : LoggerFilter {
    */
   val logLevel: LogLevel
 
+  fun shouldIncludeLocation(level: LogLevel, marker: Marker?, throwable: Throwable?): Boolean
+
   fun shouldLogToParent(jdkLogger: Logger): Boolean
 
   fun setLogToParent(logToParent: Boolean)
@@ -54,7 +57,8 @@ interface Bridge : LoggerFilter {
   fun log(record: LogRecord)
 
   /**
-   * If this bridge is for `logger`, then return any set level. Otherwise, this bridge is for a parent and null will be returned.
+   * If this bridge is for `logger`, then return any set level. Otherwise, this bridge is for a
+   * parent and null will be returned.
    *
    * @param logger logger invoking method
    *

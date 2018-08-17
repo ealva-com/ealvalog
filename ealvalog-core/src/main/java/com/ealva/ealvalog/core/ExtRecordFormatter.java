@@ -21,6 +21,7 @@ package com.ealva.ealvalog.core;
 
 import com.ealva.ealvalog.ExtLogRecord;
 import com.ealva.ealvalog.LogLevel;
+import com.ealva.ealvalog.Marker;
 import com.ealva.ealvalog.NullMarker;
 import com.ealva.ealvalog.util.FormattableStackTraceElement;
 import com.ealva.ealvalog.util.FormattableThrowable;
@@ -268,7 +269,8 @@ public class ExtRecordFormatter extends Formatter {
     setBaseArgs(record, msg, formatterArgs);
     ((FormattableStackTraceElement)formatterArgs[LOCATION_INDEX]).setElement(record.getCallLocation());
     formatterArgs[THREAD_NAME_INDEX] = record.getThreadName();
-    formatterArgs[MARKER_INDEX] = record.getMarker();
+    final Marker marker = record.getMarker();
+    formatterArgs[MARKER_INDEX] = marker == null ? NullMarker.INSTANCE : marker;
   }
 
   private void setBaseArgs(@NotNull final LogRecord record,

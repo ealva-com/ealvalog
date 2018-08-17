@@ -18,14 +18,11 @@
 
 package com.ealva.ealvalog.impl
 
-import com.ealva.ealvalog.FilterResult
 import com.ealva.ealvalog.LogLevel
 import com.ealva.ealvalog.LogLevel.NONE
 import com.ealva.ealvalog.LoggerFilter
 import com.ealva.ealvalog.Marker
-import com.ealva.ealvalog.NullMarker
 import com.ealva.ealvalog.core.CoreLogger
-import com.ealva.ealvalog.util.NullThrowable
 import org.jetbrains.annotations.TestOnly
 import java.util.logging.Handler
 
@@ -78,12 +75,7 @@ class JdkLogger internal constructor(
     marker: Marker?,
     throwable: Throwable?
   ): Boolean {
-    return bridge.isLoggable(
-      this,
-      level,
-      marker ?: NullMarker,
-      throwable ?: NullThrowable
-    ) !== FilterResult.DENY
+    return bridge.isLoggable(name, level, marker, throwable).shouldProceed
   }
 
   override fun shouldLogToParent(): Boolean {

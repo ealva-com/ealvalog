@@ -21,14 +21,10 @@
 package com.ealva.ealvalog.filter
 
 import com.ealva.ealvalog.FilterResult
-import com.ealva.ealvalog.LogLevel
-import com.ealva.ealvalog.Logger
-import com.ealva.ealvalog.Marker
-import com.ealva.ealvalog.NullMarker
-import com.ealva.ealvalog.util.NullThrowable
-
 import com.ealva.ealvalog.FilterResult.DENY
 import com.ealva.ealvalog.FilterResult.NEUTRAL
+import com.ealva.ealvalog.LogLevel
+import com.ealva.ealvalog.Marker
 
 /**
  * Filter which checks Marker equality
@@ -38,9 +34,8 @@ import com.ealva.ealvalog.FilterResult.NEUTRAL
 class MarkerFilter(
   private val marker: Marker,
   whenMatched: FilterResult = NEUTRAL,
-  whenDiffer: FilterResult = DENY,
-  includeLocation: Boolean = false
-) : BaseFilter(whenMatched, whenDiffer, includeLocation) {
+  whenDiffer: FilterResult = DENY
+) : BaseFilter(whenMatched, whenDiffer) {
 
   /** For Java clients */
   class Builder(val marker: Marker) {
@@ -67,17 +62,13 @@ class MarkerFilter(
 
   }
 
-  override fun isLoggable(logger: Logger, level: LogLevel): FilterResult {
-    return isLoggable(logger, level, NullMarker, NullThrowable)
-  }
-
   override fun isLoggable(
-    logger: Logger,
+    loggerName: String,
     logLevel: LogLevel,
     marker: Marker?,
     throwable: Throwable?
   ): FilterResult {
-    return result(if (marker != null) this.marker.isOrContains(marker) else false)
+    return result { if (marker != null) this.marker.isOrContains(marker) else false }
   }
 
   companion object {

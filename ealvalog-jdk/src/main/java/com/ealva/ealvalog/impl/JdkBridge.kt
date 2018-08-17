@@ -20,15 +20,13 @@ package com.ealva.ealvalog.impl
 
 import com.ealva.ealvalog.FilterResult
 import com.ealva.ealvalog.FilterResult.DENY
-import com.ealva.ealvalog.FilterResult.NEUTRAL
 import com.ealva.ealvalog.LogLevel
 import com.ealva.ealvalog.LoggerFilter
 import com.ealva.ealvalog.Marker
-import com.ealva.ealvalog.NullMarker
 import com.ealva.ealvalog.core.Bridge
 import com.ealva.ealvalog.core.CoreLogger
 import com.ealva.ealvalog.filter.AlwaysNeutralFilter
-import com.ealva.ealvalog.util.NullThrowable
+import com.ealva.ealvalog.shouldBePublished
 import java.util.logging.Handler
 import java.util.logging.LogRecord
 
@@ -40,16 +38,16 @@ import java.util.logging.LogRecord
  */
 class JdkBridge internal constructor(
   name: String,
-  aFilter: LoggerFilter? = AlwaysNeutralFilter,
+  private var filter: LoggerFilter = AlwaysNeutralFilter,
   handler: Handler? = null,
   logLevel: LogLevel? = null
 ) : Bridge {
-  private var filter: LoggerFilter = aFilter ?: AlwaysNeutralFilter
   @Volatile var parent: JdkBridge? = null  // root bridge will have a null parent
-  private val jdkLogger: java.util.logging.Logger = java.util.logging.Logger.getLogger(name).apply {
-    if (handler != null) addHandler(handler)
-    if (logLevel != null) level = logLevel.jdkLevel
-  }
+  private val jdkLogger: java.util.logging.Logger =
+    java.util.logging.Logger.getLogger(name).apply {
+      handler?.let { addHandler(it) }
+      level = logLevel?.jdkLevel
+    }
 
   override var logLevel: LogLevel
     get() = LogLevel.fromLevel(jdkLogger.level)
@@ -65,7 +63,7 @@ class JdkBridge internal constructor(
   val logToParent: Boolean
     get() = jdkLogger.useParentHandlers
 
-  fun getFilter(): LoggerFilter? {
+  fun getFilter(): LoggerFilter {
     return filter
   }
 
@@ -89,8 +87,8 @@ class JdkBridge internal constructor(
     jdkLogger.useParentHandlers = logToParent
   }
 
-  override fun isLoggable(logger: com.ealva.ealvalog.Logger, level: LogLevel): FilterResult {
-    return isLoggable(logger, level, NullMarker, NullThrowable)
+  override fun isLoggable(record: LogRecord?): Boolean {
+    return record?.shouldBePublished(filter) == true
   }
 
   /**
@@ -100,7 +98,7 @@ class JdkBridge internal constructor(
    * If the level check passes and any contained filter does not deny, then accepted
    */
   override fun isLoggable(
-    logger: com.ealva.ealvalog.Logger,
+    loggerName: String,
     logLevel: LogLevel,
     marker: Marker?,
     throwable: Throwable?
@@ -108,10 +106,7 @@ class JdkBridge internal constructor(
     if (!jdkLogger.isLoggable(logLevel.jdkLevel)) {
       return DENY
     }
-    val filterResult = filter.isLoggable(logger, logLevel, marker, throwable)
-    return if (filterResult === DENY) {
-      DENY
-    } else NEUTRAL
+    return filter.isLoggable(loggerName, logLevel, marker, throwable).acceptIfNeutral()
   }
 
   override fun log(record: LogRecord) {

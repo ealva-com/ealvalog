@@ -47,19 +47,41 @@ public class MarkerFilterTest {
   }
 
   @Test
-  public void testBuilder() {
+  public void testBuilderMatch() {
+    when(logger.getName()).thenReturn("com.package.LoggerName");
     when(marker.isOrContains(marker)).thenReturn(true);
-    final com.ealva.ealvalog.filter.MarkerFilter filter = MarkerFilter.Companion.builder(marker)
-                                                                                .build();
-    assertThat(filter.isLoggable(logger, LogLevel.CRITICAL, marker, null),
+    final MarkerFilter filter = MarkerFilter.Companion.builder(marker)
+                                                      .build();
+    assertThat(filter.isLoggable(logger.getName(), LogLevel.CRITICAL, marker, null),
                is(FilterResult.NEUTRAL));
   }
 
   @Test
   public void testMarkerDoesNotMatch() {
+    when(logger.getName()).thenReturn("com.package.LoggerName");
     when(marker.isOrContains(marker)).thenReturn(false);
-    final com.ealva.ealvalog.filter.MarkerFilter filter = MarkerFilter.Companion.builder(marker)
-                                                                                .build();
-    assertThat(filter.isLoggable(logger, LogLevel.CRITICAL, marker, null), is(FilterResult.DENY));
+    final MarkerFilter filter = MarkerFilter.Companion.builder(marker)
+                                                       .build();
+    assertThat(filter.isLoggable(logger.getName(), LogLevel.CRITICAL, marker, null),
+               is(FilterResult.DENY));
   }
+
+  @Test
+  public void testFilterMatched() {
+    when(logger.getName()).thenReturn("com.package.LoggerName");
+    when(marker.isOrContains(marker)).thenReturn(true);
+    final MarkerFilter filter = new MarkerFilter(marker, FilterResult.DENY, FilterResult.ACCEPT);
+    assertThat(filter.isLoggable(logger.getName(), LogLevel.CRITICAL, marker, null),
+               is(FilterResult.DENY));
+  }
+
+  @Test
+  public void testFilterDiffer() {
+    when(logger.getName()).thenReturn("com.package.LoggerName");
+    when(marker.isOrContains(marker)).thenReturn(false);
+    final MarkerFilter filter = new MarkerFilter(marker, FilterResult.ACCEPT, FilterResult.DENY);
+    assertThat(filter.isLoggable(logger.getName(), LogLevel.CRITICAL, marker, null),
+               is(FilterResult.DENY));
+  }
+
 }

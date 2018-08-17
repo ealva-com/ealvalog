@@ -64,7 +64,7 @@ public class ExtLogRecord extends LogRecord
   // Everything is transient as we will handle read/write during serialization
   private transient @NotNull LogLevel logLevel;
   private transient @NotNull String threadName;
-  private transient @NotNull Marker marker;
+  private transient @Nullable Marker marker;
   private transient @Nullable StackTraceElement location;
   private transient int parameterCount;   // actual number of parameters, array might be over-sized
   private transient boolean reserved;
@@ -74,8 +74,10 @@ public class ExtLogRecord extends LogRecord
   /**
    * Sets the maximum size in bytes of the StringBuilder used to build log messages. If necessary,
    * a builder will be trimmed sometime after it's used but before it's is reused.
+   *
    * @param max the maximum size of the cached thread builder. Don't set this too high as you'll
    *            this much memory for every thread that logs
+   *
    * @return the new max size which is maximum of DEFAULT_STRING_BUILDER_SIZE and max
    */
   @SuppressWarnings("unused")
@@ -85,7 +87,6 @@ public class ExtLogRecord extends LogRecord
   }
 
   /**
-   *
    * @return the current maximum cached string builder size
    */
   @SuppressWarnings("unused")
@@ -133,7 +134,7 @@ public class ExtLogRecord extends LogRecord
     setParameters(EMPTY_PARAMS);
     logLevel = LogLevel.NONE;
     threadName = Thread.currentThread().getName();
-    marker = NullMarker.INSTANCE;
+    marker = null;
     location = null;
     parameterCount = 0;
     reserved = false;
@@ -149,7 +150,7 @@ public class ExtLogRecord extends LogRecord
     reserved = true;
     super.setMessage(null);
     logLevel = LogLevel.NONE;
-    marker = NullMarker.INSTANCE;
+    marker = null;
     location = null;
     setParameters(null);
     setMillis(System.currentTimeMillis());
@@ -232,13 +233,12 @@ public class ExtLogRecord extends LogRecord
    *
    * @return the {@link Marker} set into this record, or {@link NullMarker#INSTANCE} if no contained marker
    */
-  @NotNull public Marker getMarker() {
+  @Nullable public Marker getMarker() {
     return marker;
   }
 
-  /** Set the marker, or clear it to {@link NullMarker#INSTANCE} if null is passed */
   public void setMarker(@Nullable final Marker marker) {
-    this.marker = marker == null ? NullMarker.INSTANCE : marker;
+    this.marker = marker;
   }
 
   public @Nullable StackTraceElement getCallLocation() {

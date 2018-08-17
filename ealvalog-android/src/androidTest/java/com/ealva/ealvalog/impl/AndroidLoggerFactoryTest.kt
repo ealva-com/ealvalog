@@ -33,20 +33,20 @@ import org.junit.runner.RunWith
  */
 @RunWith(AndroidJUnit4::class)
 class AndroidLoggerFactoryTest {
-    @Before
-    fun setup() {
-        Loggers.setFactory(AndroidLoggerFactory)
-    }
+  @Before
+  fun setup() {
+    Loggers.setFactory(AndroidLoggerFactory)
+  }
 
-    @After
-    fun tearDown() {
-        Loggers.setFactory(NullLoggerFactory)
-    }
+  @After
+  fun tearDown() {
+    Loggers.setFactory(NullLoggerFactory)
+  }
 
-    @Test
-    fun testGetRootLogger() {
-        val name = "Test"
-        val logger = Loggers[name]
-        assertThat(logger, sameInstance(Loggers[name]))
-    }
+  @Test
+  fun testGetRootLogger() {
+    val name = "Test"
+    val logger = Loggers.get(name)
+    assertThat(logger, sameInstance(Loggers.get(name)))
+  }
 }

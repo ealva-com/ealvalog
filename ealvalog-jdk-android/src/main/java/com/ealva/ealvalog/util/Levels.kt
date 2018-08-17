@@ -27,16 +27,16 @@ import com.ealva.ealvalog.LogLevel
  * Created by Eric A. Snell on 3/14/17.
  */
 object Levels {
-    fun toAndroidLevel(level: LogLevel): Int {
-        return when (level) {
-            LogLevel.TRACE -> Log.VERBOSE
-            LogLevel.DEBUG -> Log.DEBUG
-            LogLevel.INFO -> Log.INFO
-            LogLevel.WARN -> Log.WARN
-            LogLevel.ERROR -> Log.ERROR
-            LogLevel.CRITICAL -> Log.ASSERT
-            LogLevel.ALL -> Log.VERBOSE
-            LogLevel.NONE -> -1
-        }
+  fun toAndroidLevel(level: LogLevel): Int {
+    return when (level) {
+      LogLevel.TRACE -> Log.VERBOSE
+      LogLevel.DEBUG -> Log.DEBUG
+      LogLevel.INFO -> Log.INFO
+      LogLevel.WARN -> Log.WARN
+      LogLevel.ERROR -> Log.ERROR
+      LogLevel.CRITICAL -> Log.ASSERT
+      LogLevel.ALL -> Log.VERBOSE
+      LogLevel.NONE -> Int.MAX_VALUE
     }
+  }
 }

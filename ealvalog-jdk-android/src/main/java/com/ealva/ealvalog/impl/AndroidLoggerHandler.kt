@@ -18,33 +18,37 @@
 
 package com.ealva.ealvalog.impl
 
+import android.annotation.SuppressLint
 import android.util.Log
-import com.ealva.ealvalog.FilterResult
-import com.ealva.ealvalog.FilterResult.DENY
 import com.ealva.ealvalog.LogLevel
-import com.ealva.ealvalog.Logger
-import com.ealva.ealvalog.LoggerFilter
-import com.ealva.ealvalog.Marker
 import com.ealva.ealvalog.core.ExtRecordFormatter
 import com.ealva.ealvalog.filter.AlwaysNeutralFilter
 import com.ealva.ealvalog.util.LogUtil.tagFromName
 import java.util.logging.ErrorManager
+import java.util.logging.Filter
 import java.util.logging.Formatter
+import java.util.logging.Handler
+import java.util.logging.Level
 import java.util.logging.LogRecord
 
-private const val ANDROID_LOG_OFF = -1
+val LogRecord.tag: String
+  inline get() = tagFromName(loggerName)
 
-/** Returns corresponding android [android.util.Log] level or -1 for none */
-private fun LogLevel.toAndroid(): Int {
+/**
+ * Convert from an expected Jdk Level to the Android log level. So we don't have to do to
+ * map to LogLevel and back Android level. Unexpected maps to ERROR.
+ */
+private fun Level.toAndroid(): Int {
   return when (this) {
-    LogLevel.ALL -> Log.VERBOSE
-    LogLevel.TRACE -> Log.VERBOSE
-    LogLevel.DEBUG -> Log.DEBUG
-    LogLevel.INFO -> Log.INFO
-    LogLevel.WARN -> Log.WARN
-    LogLevel.ERROR -> Log.ERROR
-    LogLevel.CRITICAL -> Log.ASSERT
-    LogLevel.NONE -> ANDROID_LOG_OFF
+    LogLevel.ALL.jdkLevel -> Log.VERBOSE
+    LogLevel.TRACE.jdkLevel -> Log.VERBOSE
+    LogLevel.DEBUG.jdkLevel -> Log.DEBUG
+    LogLevel.INFO.jdkLevel -> Log.INFO
+    LogLevel.WARN.jdkLevel -> Log.WARN
+    LogLevel.ERROR.jdkLevel -> Log.ERROR
+    LogLevel.CRITICAL.jdkLevel -> Log.ASSERT
+    LogLevel.NONE.jdkLevel -> Int.MAX_VALUE
+    else -> Log.ERROR // unexpected error level in the log should flag this issue
   }
 }
 
@@ -54,45 +58,38 @@ private fun LogLevel.toAndroid(): Int {
  *
  * Created by Eric A. Snell on 3/10/17.
  */
-class AndroidLoggerHandler private constructor(
-  formatter: Formatter,
-  filter: LoggerFilter,
-  errorManager: ErrorManager
-) : BaseLoggerHandler(filter) {
+open class AndroidLoggerHandler(
+  aFormatter: Formatter,
+  loggerFilter: Filter,
+  anErrorMgr: ErrorManager
+) : Handler() {
 
   init {
-    setFormatter(formatter)
-    setErrorManager(errorManager)
+    formatter = aFormatter
+    filter = loggerFilter
+    errorManager = anErrorMgr
   }
 
-  override fun isLoggable(
-    logger: Logger,
-    logLevel: LogLevel,
-    marker: Marker?,
-    throwable: Throwable?
-  ): FilterResult {
-    return if (isLoggable(tagFromName(logger.name), logLevel.toAndroid())) {
-      loggerFilter.isLoggable(logger, logLevel, marker, throwable)
-    } else DENY
-  }
-
-  private fun isLoggable(tag: String, androidLevel: Int): Boolean {
-    return androidLevel in Log.VERBOSE..Log.ASSERT && Log.isLoggable(tag, androidLevel)
-  }
-
-  override fun publish(record: LogRecord) {
-    val androidLevel = LogLevel.fromLevel(record.level).toAndroid()
-    val tag = tagFromName(record.loggerName)
-    if (isLoggable(tag, androidLevel)) {
-      val msg = formatter.format(record)
-      when (androidLevel) {
-        Log.VERBOSE -> Log.v(tag, msg, record.thrown)
-        Log.DEBUG -> Log.d(tag, msg, record.thrown)
-        Log.INFO -> Log.i(tag, msg, record.thrown)
-        Log.WARN -> Log.w(tag, msg, record.thrown)
-        Log.ERROR -> Log.e(tag, msg, record.thrown)
-        Log.ASSERT -> Log.wtf(tag, msg, record.thrown)
+  @SuppressLint("LogTagMismatch")
+  override fun publish(record: LogRecord?) {
+    record?.let { logRecord ->
+      if (isLoggable(logRecord)) {
+        val tag = logRecord.tag
+        val msg: String = formatter.format(logRecord)
+        log(logRecord, tag, msg)
       }
+    }
+  }
+
+  protected open fun log(record: LogRecord, tag: String, msg: String) {
+    val androidLevel = record.level.toAndroid()
+    when (androidLevel) {
+      Log.VERBOSE -> Log.v(tag, msg, record.thrown)
+      Log.DEBUG -> Log.d(tag, msg, record.thrown)
+      Log.INFO -> Log.i(tag, msg, record.thrown)
+      Log.WARN -> Log.w(tag, msg, record.thrown)
+      Log.ERROR -> Log.e(tag, msg, record.thrown)
+      Log.ASSERT -> Log.wtf(tag, msg, record.thrown)
     }
   }
 
@@ -104,7 +101,7 @@ class AndroidLoggerHandler private constructor(
     @JvmOverloads
     fun make(
       formatter: Formatter = ExtRecordFormatter(ExtRecordFormatter.TYPICAL_ANDROID_FORMAT, true),
-      filter: LoggerFilter = AlwaysNeutralFilter,
+      filter: Filter = AlwaysNeutralFilter,
       errorManager: ErrorManager = ErrorManager()
     ): AndroidLoggerHandler {
       return AndroidLoggerHandler(formatter, filter, errorManager)

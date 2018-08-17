@@ -42,6 +42,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.only;
 import static org.mockito.Mockito.verify;
 
+import java.util.logging.Handler;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
@@ -55,9 +56,9 @@ public class JdkLoggerTest {
   private static final String CHILD_NAME = "parent.child";
   private static final String MSG = "=The Message=";
 
-  @SuppressWarnings("WeakerAccess") @Mock BaseLoggerHandler rootHandler;
+  @SuppressWarnings("WeakerAccess") @Mock Handler rootHandler;
   //  @SuppressWarnings("WeakerAccess") @Mock BaseLoggerHandler parentHandler;
-  @SuppressWarnings("WeakerAccess") @Mock BaseLoggerHandler childHandler;
+  @SuppressWarnings("WeakerAccess") @Mock Handler childHandler;
 //  @SuppressWarnings("WeakerAccess") @Mock Marker marker;
 //  @SuppressWarnings("WeakerAccess") @Mock Throwable throwable;
 

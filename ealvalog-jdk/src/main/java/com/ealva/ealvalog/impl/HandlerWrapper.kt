@@ -18,16 +18,9 @@
 
 package com.ealva.ealvalog.impl
 
-import com.ealva.ealvalog.ExtLogRecord
-import com.ealva.ealvalog.FilterResult
-import com.ealva.ealvalog.FilterResult.DENY
-import com.ealva.ealvalog.LogLevel
-import com.ealva.ealvalog.Logger
 import com.ealva.ealvalog.LoggerFilter
-import com.ealva.ealvalog.Loggers
-import com.ealva.ealvalog.Marker
-import com.ealva.ealvalog.NullMarker
-import com.ealva.ealvalog.util.NullThrowable
+import com.ealva.ealvalog.filter.AlwaysNeutralFilter
+import com.ealva.ealvalog.shouldBePublished
 import java.util.logging.Handler
 import java.util.logging.LogRecord
 
@@ -38,47 +31,14 @@ import java.util.logging.LogRecord
  */
 open class HandlerWrapper internal constructor(
   protected val realHandler: Handler,
-  private val filter: LoggerFilter
-) : BaseLoggerHandler(filter) {
-
-  override fun shouldIncludeLocation(
-    level: LogLevel,
-    marker: Marker?,
-    throwable: Throwable?
-  ): Boolean {
-    return filter.shouldIncludeLocation(level, marker, throwable)
-  }
+  private val loggerFilter: LoggerFilter = AlwaysNeutralFilter
+) : Handler() {
 
   override fun publish(record: LogRecord) {
-    val thrown = record.thrown
-    if (isLoggable(
-        Loggers.get(record.loggerName),
-        LogLevel.fromLevel(record.level),
-        getRecordMarker(record),
-        thrown ?: NullThrowable
-      ) !== DENY
-    ) {
+    // the realHandler will check log level, we only need filter
+    if (record.shouldBePublished(loggerFilter)) {
       realHandler.publish(record)
     }
-  }
-
-  override fun isLoggable(
-    logger: Logger,
-    logLevel: LogLevel,
-    marker: Marker?,
-    throwable: Throwable?
-  ): FilterResult {
-    return if (shouldNotLogAt(logLevel)) DENY else applyFilter(logger, logLevel, marker, throwable)
-  }
-
-  private fun applyFilter(logger: Logger, level: LogLevel, marker: Marker?, throwable: Throwable?) =
-    loggerFilter.isLoggable(logger, level, marker, throwable).acceptIfNeutral()
-
-  private fun shouldNotLogAt(level: LogLevel) =
-    level.shouldNotLogAtLevel(realHandler.level.intValue())
-
-  private fun getRecordMarker(record: LogRecord): Marker {
-    return (record as? ExtLogRecord)?.marker ?: NullMarker
   }
 
   override fun flush() {

@@ -23,6 +23,7 @@ import com.ealva.ealvalog.Logger
 import com.ealva.ealvalog.LoggerFactory
 import com.ealva.ealvalog.LoggerFilter
 import com.ealva.ealvalog.Marker
+import com.ealva.ealvalog.filter.AlwaysNeutralFilter
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentMap
 import java.util.concurrent.locks.ReentrantLock
@@ -205,7 +206,7 @@ object JdkLoggerFactory : LoggerFactory {
     handler: Handler?,
     logLevel: LogLevel?
   ): JdkBridge {
-    val newBridge = JdkBridge(loggerName, filter, handler, logLevel)
+    val newBridge = JdkBridge(loggerName, filter ?: AlwaysNeutralFilter, handler, logLevel)
     newBridge.parent = parent
     bridgeMap.putIfAbsent(loggerName, newBridge)
     setParents()

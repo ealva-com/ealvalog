@@ -16,26 +16,25 @@
  * limitations under the License.
  */
 
-package com.ealva.ealvalog.filter
+package com.ealva.ealvalog
 
-import com.ealva.ealvalog.FilterResult
-import com.ealva.ealvalog.LogLevel
-import com.ealva.ealvalog.LoggerFilter
-import com.ealva.ealvalog.Marker
 import java.util.logging.LogRecord
 
 /**
- * A filter that always responds true. Helps avoid null.
- *
- *
- * Created by Eric A. Snell on 3/8/17.
+ * Created by Eric A. Snell on 8/16/18.
  */
-object AlwaysNeutralFilter : LoggerFilter {
-  override fun isLoggable(record: LogRecord?) = record != null
-  override fun isLoggable(
-    loggerName: String,
-    logLevel: LogLevel,
-    marker: Marker?,
-    throwable: Throwable?
-  ) = FilterResult.NEUTRAL
+val LogRecord.logLevel: LogLevel
+    get() = (this as? ExtLogRecord)?.logLevel ?: LogLevel.fromLevel(level)
+
+val LogRecord.marker: Marker?
+    get() = (this as? ExtLogRecord)?.marker
+
+//fun LogRecord.isPublishedAt(level: Level): Boolean {
+//    val jdkLevel = level.intValue()
+//    return this.level.intValue() >= jdkLevel && jdkLevel != Level.OFF.intValue()
+//}
+
+fun LogRecord.shouldBePublished(filter: LoggerFilter): Boolean {
+    return filter.isLoggable(loggerName, logLevel, marker, thrown).shouldProceed
 }
+

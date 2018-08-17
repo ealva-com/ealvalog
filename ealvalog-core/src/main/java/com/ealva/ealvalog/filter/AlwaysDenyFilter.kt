@@ -16,33 +16,26 @@
  * limitations under the License.
  */
 
-package com.ealva.ealvalog.impl
+package com.ealva.ealvalog.filter
 
 import com.ealva.ealvalog.FilterResult
 import com.ealva.ealvalog.LogLevel
-import com.ealva.ealvalog.Logger
 import com.ealva.ealvalog.LoggerFilter
 import com.ealva.ealvalog.Marker
-import com.ealva.ealvalog.filter.AlwaysNeutralFilter
-import java.util.logging.Handler
+import java.util.logging.LogRecord
 
 /**
- * Base class implementation of a [Handler]
+ * A filter that always responds true. Helps avoid null.
  *
- * Created by Eric A. Snell on 3/13/17.
+ *
+ * Created by Eric A. Snell on 3/8/17.
  */
-abstract class BaseLoggerHandler(var loggerFilter: LoggerFilter = AlwaysNeutralFilter) : Handler(),
-  LoggerFilter {
-
-  override fun shouldIncludeLocation(
-    level: LogLevel,
+object AlwaysDenyFilter : LoggerFilter {
+  override fun isLoggable(record: LogRecord?) = false
+  override fun isLoggable(
+    loggerName: String,
+    logLevel: LogLevel,
     marker: Marker?,
     throwable: Throwable?
-  ): Boolean {
-    return loggerFilter.shouldIncludeLocation(level, marker, throwable)
-  }
-
-  override fun isLoggable(logger: Logger, level: LogLevel): FilterResult {
-    return isLoggable(logger, level, null, null)
-  }
+  ) = FilterResult.DENY
 }

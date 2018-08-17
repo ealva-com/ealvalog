@@ -76,7 +76,7 @@ public class AndroidLoggerTest {
     assertThat(record.getLogLevel(), is(LogLevel.CRITICAL));
     assertThat(record.getMessage(), is(msg));
     assertThat(record.getThrown(), is(nullValue()));
-    assertThat(record.getMarker(), is(CoreMatchers.<Marker>instanceOf(NullMarker.class)));
+    assertThat(record.getMarker(), is(nullValue()));
     assertThat(record.getCallLocation(), is(isNull()));
   }
 
@@ -98,7 +98,7 @@ public class AndroidLoggerTest {
     assertThat(record.getLogLevel(), is(LogLevel.WARN));
     assertThat(record.getMessage(), is(msg));
     assertThat(record.getThrown(), is(nullValue()));
-    assertThat(record.getMarker(), is(CoreMatchers.<Marker>instanceOf(NullMarker.class)));
+    assertThat(record.getMarker(), is(nullValue()));
     assertThat(record.getCallLocation(), is(notNullValue()));
   }
 
@@ -119,7 +119,7 @@ public class AndroidLoggerTest {
     assertThat(record.getLogLevel(), is(LogLevel.CRITICAL));
     assertThat(record.getMessage(), is(msg));
     assertThat(record.getThrown(), is(nullValue()));
-    assertThat(record.getMarker(), is(CoreMatchers.<Marker>instanceOf(NullMarker.class)));
+    assertThat(record.getMarker(), is(nullValue()));
     assertThat(record.getCallLocation(), is(notNullValue()));
   }
 

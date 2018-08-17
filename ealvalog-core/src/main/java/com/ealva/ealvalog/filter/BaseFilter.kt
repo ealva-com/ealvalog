@@ -19,9 +19,9 @@
 package com.ealva.ealvalog.filter
 
 import com.ealva.ealvalog.FilterResult
-import com.ealva.ealvalog.LogLevel
 import com.ealva.ealvalog.LoggerFilter
-import com.ealva.ealvalog.Marker
+import com.ealva.ealvalog.shouldBePublished
+import java.util.logging.LogRecord
 
 /**
  * Convenience base class for filters
@@ -29,19 +29,14 @@ import com.ealva.ealvalog.Marker
  * Created by Eric A. Snell on 3/13/17.
  */
 abstract class BaseFilter(
-  private val whenMatched: FilterResult = FilterResult.NEUTRAL,
-  private val whenDiffer: FilterResult = FilterResult.DENY,
-  private val includeLocation: Boolean = false
+  protected val whenMatched: FilterResult = FilterResult.NEUTRAL,
+  protected val whenDiffer: FilterResult = FilterResult.DENY
 ) : LoggerFilter {
-  protected fun result(matched: Boolean): FilterResult {
-    return if (matched) whenMatched else whenDiffer
+  override fun isLoggable(record: LogRecord?): Boolean {
+    return record?.shouldBePublished(this) == true
   }
 
-  override fun shouldIncludeLocation(
-    level: LogLevel,
-    marker: Marker?,
-    throwable: Throwable?
-  ): Boolean {
-    return includeLocation
+  protected inline fun result(block: () -> Boolean): FilterResult {
+    return if (block()) whenMatched else whenDiffer
   }
 }

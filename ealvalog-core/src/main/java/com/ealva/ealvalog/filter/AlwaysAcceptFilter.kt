@@ -20,9 +20,9 @@ package com.ealva.ealvalog.filter
 
 import com.ealva.ealvalog.FilterResult.ACCEPT
 import com.ealva.ealvalog.LogLevel
-import com.ealva.ealvalog.Logger
 import com.ealva.ealvalog.LoggerFilter
 import com.ealva.ealvalog.Marker
+import java.util.logging.LogRecord
 
 /**
  * A filter that always responds true. Helps avoid null.
@@ -30,13 +30,12 @@ import com.ealva.ealvalog.Marker
  * Created by Eric A. Snell on 3/8/17.
  */
 object AlwaysAcceptFilter : LoggerFilter {
-  override fun isLoggable(logger: Logger, level: LogLevel) = ACCEPT
-  override fun isLoggable(logger: Logger, logLevel: LogLevel, marker: Marker?, throwable: Throwable?) =
-    ACCEPT
+  override fun isLoggable(record: LogRecord?) = record != null
 
-  override fun shouldIncludeLocation(
-    level: LogLevel,
+  override fun isLoggable(
+    loggerName: String,
+    logLevel: LogLevel,
     marker: Marker?,
     throwable: Throwable?
-  ): Boolean = false
+  ) = ACCEPT
 }
