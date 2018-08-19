@@ -25,6 +25,7 @@ import com.ealva.ealvalog.Marker;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Formatter;
+import java.util.function.Supplier;
 
 /**
  * Created by Eric A. Snell on 8/13/18.
@@ -147,6 +148,46 @@ public interface JLogger extends Logger {
            @NotNull Object... remaining);
 
   /**
+   * Log the result of the supplier, ie supplier.get().toString()
+   * @param level level at which to log
+   * @param supplier supplies the object whose toString() method will be invoked and logged
+   */
+  void log(@NotNull LogLevel level, @NotNull Supplier<?> supplier);
+
+  /**
+   * Log the result of the supplier and use the Marker to see if it is loggable
+   *
+   * @param level level at which to log
+   * @param marker used to test if loggable
+   * @param supplier supplies the object whose toString() method will be invoked and logged
+   */
+  void log(@NotNull LogLevel level, @NotNull Marker marker, @NotNull Supplier<?> supplier);
+
+  /**
+   * Log the result of the supplier and use the Throwable to see if it is loggable
+   *
+   * @param level level at which to log
+   * @param throwable used to test if loggable
+   * @param supplier supplies the object whose toString() method will be invoked and logged
+   */
+  void log(@NotNull LogLevel level,
+           @NotNull Throwable throwable,
+           @NotNull Supplier<?> supplier);
+
+  /**
+   * Log the result of the supplier and use the Marker and Throwable to see if it is loggable
+   *
+   * @param level level at which to log
+   * @param marker used to test if loggable
+   * @param throwable used to test if loggable
+   * @param supplier supplies the object whose toString() method will be invoked and logged
+   */
+  void log(@NotNull LogLevel level,
+           @NotNull Marker marker,
+           @NotNull Throwable throwable,
+           @NotNull Supplier<?> supplier);
+
+  /**
    * Used to log an exception being caught where no message is needed. Logs:
    * "Caught: [throwable.getClass().toString()]"
    *
@@ -169,6 +210,7 @@ public interface JLogger extends Logger {
    *
    * @return returns the throwable for convenience
    */
+  @NotNull
   <T extends Throwable> T throwing(@NotNull LogLevel level, @NotNull T throwable);
 
 }

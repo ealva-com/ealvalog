@@ -21,6 +21,8 @@ package com.ealva.ealvalog.impl
 import com.ealva.ealvalog.LogLevel
 import com.ealva.ealvalog.Logger
 import com.ealva.ealvalog.Marker
+import com.ealva.ealvalog.logLevel
+import com.ealva.ealvalog.marker
 import com.ealva.ealvalog.util.LogUtil
 import java.util.concurrent.atomic.AtomicReference
 import java.util.logging.LogRecord
@@ -47,7 +49,7 @@ class AndroidLogger internal constructor(
     return logHandler.get().isLoggable(tag, level, marker, throwable)
   }
 
-  override fun resolveLocation(
+  override fun shouldIncludeLocation(
     logLevel: LogLevel,
     marker: Marker?,
     throwable: Throwable?
@@ -58,6 +60,12 @@ class AndroidLogger internal constructor(
       marker,
       throwable
     )
+  }
+
+  override fun log(record: LogRecord) {
+    if (isLoggable(record.logLevel, record.marker, record.thrown)) {
+      logImmediate(record)
+    }
   }
 
   override fun logImmediate(record: LogRecord) {

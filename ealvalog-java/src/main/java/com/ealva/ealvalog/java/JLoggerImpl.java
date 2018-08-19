@@ -20,6 +20,7 @@ package com.ealva.ealvalog.java;
 
 import com.ealva.ealvalog.ExtLogRecord;
 import com.ealva.ealvalog.LogLevel;
+import com.ealva.ealvalog.LogRecordExtKt;
 import com.ealva.ealvalog.Logger;
 import com.ealva.ealvalog.Marker;
 import com.ealva.ealvalog.NullMarker;
@@ -28,6 +29,7 @@ import com.ealva.ealvalog.util.LogUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.function.Supplier;
 import java.util.logging.LogRecord;
 
 /**
@@ -60,7 +62,7 @@ public class JLoggerImpl implements JLogger {
                                                   realLogger.getName(),
                                                   realLogger.getMarker(),
                                                   null)) {
-        if (realLogger.resolveLocation(level, realLogger.getMarker(), null)) {
+        if (realLogger.shouldIncludeLocation(level, realLogger.getMarker(), null)) {
           record.addLocation(STACK_DEPTH);
         }
         record.append(msg);
@@ -78,7 +80,7 @@ public class JLoggerImpl implements JLogger {
                                                   realLogger.getName(),
                                                   marker,
                                                   null)) {
-        if (realLogger.resolveLocation(level, marker, null)) {
+        if (realLogger.shouldIncludeLocation(level, marker, null)) {
           record.addLocation(STACK_DEPTH);
         }
         record.append(msg);
@@ -96,7 +98,7 @@ public class JLoggerImpl implements JLogger {
                                                   realLogger.getName(),
                                                   realLogger.getMarker(),
                                                   throwable)) {
-        if (realLogger.resolveLocation(level, realLogger.getMarker(), throwable)) {
+        if (realLogger.shouldIncludeLocation(level, realLogger.getMarker(), throwable)) {
           record.addLocation(STACK_DEPTH);
         }
         record.append(msg);
@@ -115,7 +117,7 @@ public class JLoggerImpl implements JLogger {
                                                   realLogger.getName(),
                                                   marker,
                                                   throwable)) {
-        if (realLogger.resolveLocation(level, marker, throwable)) {
+        if (realLogger.shouldIncludeLocation(level, marker, throwable)) {
           record.addLocation(STACK_DEPTH);
         }
         record.append(msg);
@@ -134,7 +136,7 @@ public class JLoggerImpl implements JLogger {
                                                   realLogger.getName(),
                                                   marker,
                                                   null)) {
-        if (realLogger.resolveLocation(level, marker, null)) {
+        if (realLogger.shouldIncludeLocation(level, marker, null)) {
           record.addLocation(STACK_DEPTH);
         }
         record.append(format, formatArgs);
@@ -153,7 +155,7 @@ public class JLoggerImpl implements JLogger {
                                                   realLogger.getName(),
                                                   realLogger.getMarker(),
                                                   throwable)) {
-        if (realLogger.resolveLocation(level, realLogger.getMarker(), throwable)) {
+        if (realLogger.shouldIncludeLocation(level, realLogger.getMarker(), throwable)) {
           record.addLocation(STACK_DEPTH);
         }
         record.append(format, formatArgs);
@@ -173,7 +175,7 @@ public class JLoggerImpl implements JLogger {
                                                   realLogger.getName(),
                                                   marker,
                                                   throwable)) {
-        if (realLogger.resolveLocation(level, marker, throwable)) {
+        if (realLogger.shouldIncludeLocation(level, marker, throwable)) {
           record.addLocation(STACK_DEPTH);
         }
         record.append(format, formatArgs);
@@ -191,7 +193,7 @@ public class JLoggerImpl implements JLogger {
                                                   realLogger.getName(),
                                                   realLogger.getMarker(),
                                                   null)) {
-        if (realLogger.resolveLocation(level, realLogger.getMarker(), null)) {
+        if (realLogger.shouldIncludeLocation(level, realLogger.getMarker(), null)) {
           record.addLocation(STACK_DEPTH);
         }
         record.append(format, arg1);
@@ -210,7 +212,7 @@ public class JLoggerImpl implements JLogger {
                                                   realLogger.getName(),
                                                   realLogger.getMarker(),
                                                   null)) {
-        if (realLogger.resolveLocation(level, realLogger.getMarker(), null)) {
+        if (realLogger.shouldIncludeLocation(level, realLogger.getMarker(), null)) {
           record.addLocation(STACK_DEPTH);
         }
         record.append(format, arg1, arg2);
@@ -230,7 +232,7 @@ public class JLoggerImpl implements JLogger {
                                                   realLogger.getName(),
                                                   realLogger.getMarker(),
                                                   null)) {
-        if (realLogger.resolveLocation(level, realLogger.getMarker(), null)) {
+        if (realLogger.shouldIncludeLocation(level, realLogger.getMarker(), null)) {
           record.addLocation(STACK_DEPTH);
         }
         record.append(format, arg1, arg2, arg3);
@@ -251,7 +253,7 @@ public class JLoggerImpl implements JLogger {
                                                   realLogger.getName(),
                                                   realLogger.getMarker(),
                                                   null)) {
-        if (realLogger.resolveLocation(level, realLogger.getMarker(), null)) {
+        if (realLogger.shouldIncludeLocation(level, realLogger.getMarker(), null)) {
           record.addLocation(STACK_DEPTH);
         }
         record.append(format, arg1, arg2, arg3, arg4);
@@ -273,7 +275,7 @@ public class JLoggerImpl implements JLogger {
                                                   realLogger.getName(),
                                                   realLogger.getMarker(),
                                                   null)) {
-        if (realLogger.resolveLocation(level, realLogger.getMarker(), null)) {
+        if (realLogger.shouldIncludeLocation(level, realLogger.getMarker(), null)) {
           record.addLocation(STACK_DEPTH);
         }
         // JLoggerImpl and ExtLogRecord are Java to avoid Kotlin's SpreadBuilder
@@ -286,13 +288,83 @@ public class JLoggerImpl implements JLogger {
     }
   }
 
+  public void log(@NotNull final LogLevel level, @NotNull final Supplier<?> supplier) {
+    if (isLoggable(level, null, null)) {
+      try (ExtLogRecord record = ExtLogRecord.get(level,
+                                                  realLogger.getName(),
+                                                  realLogger.getMarker(),
+                                                  null)) {
+        if (realLogger.shouldIncludeLocation(level, realLogger.getMarker(), null)) {
+          record.addLocation(STACK_DEPTH);
+        }
+        record.append(supplier.get().toString());
+        logImmediate(record);
+      }
+    }
+  }
+
+  @Override
+  public void log(@NotNull final LogLevel level,
+                  @NotNull final Marker marker,
+                  @NotNull final Supplier<?> supplier) {
+    if (isLoggable(level, marker, null)) {
+      try (ExtLogRecord record = ExtLogRecord.get(level,
+                                                  realLogger.getName(),
+                                                  marker,
+                                                  null)) {
+        if (realLogger.shouldIncludeLocation(level, marker, null)) {
+          record.addLocation(STACK_DEPTH);
+        }
+        record.append(supplier.get().toString());
+        logImmediate(record);
+      }
+    }
+  }
+
+  @Override
+  public void log(@NotNull final LogLevel level,
+                  @NotNull final Throwable throwable,
+                  @NotNull final Supplier<?> supplier) {
+    if (isLoggable(level, null, throwable)) {
+      try (ExtLogRecord record = ExtLogRecord.get(level,
+                                                  realLogger.getName(),
+                                                  realLogger.getMarker(),
+                                                  throwable)) {
+        if (realLogger.shouldIncludeLocation(level, realLogger.getMarker(), throwable)) {
+          record.addLocation(STACK_DEPTH);
+        }
+        record.append(supplier.get().toString());
+        logImmediate(record);
+      }
+    }
+  }
+
+  @Override
+  public void log(@NotNull final LogLevel level,
+                  @NotNull final Marker marker,
+                  @NotNull final Throwable throwable,
+                  @NotNull final Supplier<?> supplier) {
+    if (isLoggable(level, marker, throwable)) {
+      try (ExtLogRecord record = ExtLogRecord.get(level,
+                                                  realLogger.getName(),
+                                                  marker,
+                                                  throwable)) {
+        if (realLogger.shouldIncludeLocation(level, marker, throwable)) {
+          record.addLocation(STACK_DEPTH);
+        }
+        record.append(supplier.get().toString());
+        logImmediate(record);
+      }
+    }
+  }
+
   @Override public void caught(@NotNull final LogLevel level, @NotNull final Throwable throwable) {
     if (isLoggable(level, null, throwable)) {
       try (ExtLogRecord record = ExtLogRecord.get(level,
                                                   realLogger.getName(),
                                                   realLogger.getMarker(),
                                                   throwable)) {
-        if (realLogger.resolveLocation(level, realLogger.getMarker(), null)) {
+        if (realLogger.shouldIncludeLocation(level, realLogger.getMarker(), null)) {
           record.addLocation(STACK_DEPTH);
         }
         record.append("Caught: %s", throwable.getMessage());
@@ -301,7 +373,7 @@ public class JLoggerImpl implements JLogger {
     }
   }
 
-  @Override
+  @NotNull @Override
   public <T extends Throwable> T throwing(@NotNull final LogLevel level,
                                           @NotNull final T throwable) {
     if (isLoggable(level, null, throwable)) {
@@ -309,7 +381,7 @@ public class JLoggerImpl implements JLogger {
                                                   realLogger.getName(),
                                                   realLogger.getMarker(),
                                                   throwable)) {
-        if (realLogger.resolveLocation(level, realLogger.getMarker(), null)) {
+        if (realLogger.shouldIncludeLocation(level, realLogger.getMarker(), null)) {
           record.addLocation(STACK_DEPTH);
         }
         record.append("Throwing: %s", throwable.getMessage());
@@ -348,10 +420,10 @@ public class JLoggerImpl implements JLogger {
   }
 
   @Override
-  public boolean resolveLocation(@NotNull final LogLevel logLevel,
-                                 @Nullable final Marker marker,
-                                 @Nullable final Throwable throwable) {
-    return realLogger.resolveLocation(logLevel, marker, throwable);
+  public boolean shouldIncludeLocation(@NotNull final LogLevel logLevel,
+                                       @Nullable final Marker marker,
+                                       @Nullable final Throwable throwable) {
+    return realLogger.shouldIncludeLocation(logLevel, marker, throwable);
   }
 
   @Override public void setIncludeLocation(final boolean includeLocation) {
@@ -363,6 +435,14 @@ public class JLoggerImpl implements JLogger {
                             @Nullable final Marker marker,
                             @Nullable final Throwable throwable) {
     return realLogger.isLoggable(level, marker, throwable);
+  }
+
+  @Override public void log(@NotNull final LogRecord record) {
+    if (realLogger.isLoggable(LogRecordExtKt.getLogLevel(record),
+                              LogRecordExtKt.getMarker(record),
+                              record.getThrown())) {
+      realLogger.logImmediate(record);
+    }
   }
 
   @Override public void logImmediate(@NotNull final LogRecord record) {

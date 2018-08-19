@@ -49,7 +49,7 @@ class JdkLogger internal constructor(
     get() = bridge.includeLocation
     set(includeLocation) = config.setIncludeLocation(this, includeLocation)
 
-  override fun resolveLocation(
+  override fun shouldIncludeLocation(
     logLevel: LogLevel,
     marker: Marker?,
     throwable: Throwable?

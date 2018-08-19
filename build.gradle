@@ -18,6 +18,8 @@
 
 buildscript {
     ext.kotlin_version = '1.2.60'
+    ext.log4j_version = '2.11.1'
+
     ext {
         versions = [
                 'support_library': '27.1.1',

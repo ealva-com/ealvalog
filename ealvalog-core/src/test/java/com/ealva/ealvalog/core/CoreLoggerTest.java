@@ -98,9 +98,9 @@ public class CoreLoggerTest {
     }
 
     @Override
-    public boolean resolveLocation(@NotNull final LogLevel logLevel,
-                                   @Nullable final Marker marker,
-                                   @Nullable final Throwable throwable) {
+    public boolean shouldIncludeLocation(@NotNull final LogLevel logLevel,
+                                         @Nullable final Marker marker,
+                                         @Nullable final Throwable throwable) {
       return false;
     }
 

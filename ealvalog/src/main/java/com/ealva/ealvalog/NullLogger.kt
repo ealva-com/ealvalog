@@ -31,11 +31,12 @@ object NullLogger : Logger {
   override var logLevel: LogLevel? = null
   override val effectiveLogLevel: LogLevel = LogLevel.NONE
   override var includeLocation: Boolean = false
-  override fun resolveLocation(
+  override fun shouldIncludeLocation(
     logLevel: LogLevel,
     marker: Marker?,
     throwable: Throwable?
   ) = false
   override fun isLoggable(level: LogLevel, marker: Marker?, throwable: Throwable?) = false
+  override fun log(record: LogRecord) {}
   override fun logImmediate(record: LogRecord) {}
 }

@@ -22,8 +22,9 @@ import java.io.Serializable
 import java.util.Formattable
 
 /**
- * A Marker is extra data passed to the underlying logging system and it's up to that implementation on if/how a Marker is used. Examples
- * might be that the Marker is output along with the log message or the Marker might be used to route the log message.
+ * A Marker is extra data passed to the underlying logging system and it's up to that implementation
+ * on if/how a Marker is used. Examples might be that the Marker is output along with the log
+ * message or the Marker might be used to route the log message.
  *
  * Created by Eric A. Snell on 2/28/17.
  */

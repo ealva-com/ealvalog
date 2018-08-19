@@ -22,8 +22,7 @@ import java.util.logging.LogRecord
 
 /**
  * It's expected all logging occurs through concrete implementations of this interface which are
- * obtained via [Loggers]
- *
+ * obtained via logger factories and singletons
  *
  * Created by Eric A. Snell on 2/28/17.
  */
@@ -38,8 +37,8 @@ interface Logger {
   var marker: Marker?
 
   /**
-   * An optional LogLevel. If null the nearest ancestor LogLevel will be used as the level
-   * for this logger
+   * An optional LogLevel. If null and the Logger implementation is
+   * hierarchical, the nearest ancestor LogLevel will be used as the level for this logger
    *
    * If null is passed to the root logger, it sets the level to [LogLevel.NONE]
    */
@@ -54,7 +53,7 @@ interface Logger {
   /**
    * Set if this logger should include call site location information in the log information. This
    * is a relatively expensive operation and defaults to false. Even if this is false a lower level
-   * handler may request location be included. See [resolveLocation]
+   * handler may request location be included. See [shouldIncludeLocation]
    *
    * The information passed to lower layers of the logging framework include: caller class,
    * caller method, and caller file line number. This is obtained from the call stack. If calling
@@ -70,7 +69,7 @@ interface Logger {
    * lower level handler requests location information, it is obtained from the stack. Obtaining
    * the location is a relatively expensive operation.
    */
-  fun resolveLocation(logLevel: LogLevel, marker: Marker?, throwable: Throwable?): Boolean
+  fun shouldIncludeLocation(logLevel: LogLevel, marker: Marker?, throwable: Throwable?): Boolean
 
   /**
    * Determine if a log at this [LogLevel], with the given (optional) [Marker] and (optional)
@@ -83,11 +82,20 @@ interface Logger {
   ): Boolean
 
   /**
+   * First check if the [record] is loggable and, if so, then [logImmediate]
+   *
+   * Typically this is not necessary as the Kotlin functions already check if is loggable and the
+   * JLogger subclass also checks if is loggable before calling logImmediate. Use this only if
+   * you find the need to build your own [LogRecord] for some reason.
+   */
+  fun log(record: LogRecord)
+
+  /**
    * Log without checking the the level. This method's primary use is for this logging framework
-   * and it's not expected client's would typically use this method.
+   * and it's not expected client's would typically use this method. The Kotlin extension functions
+   * and the JLogger subclass use this function internally.
    *
    * @param record the full log information
    */
   fun logImmediate(record: LogRecord)
-
 }

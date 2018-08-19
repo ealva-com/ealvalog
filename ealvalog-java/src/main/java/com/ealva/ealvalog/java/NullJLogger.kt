@@ -20,7 +20,7 @@ package com.ealva.ealvalog.java
 
 import com.ealva.ealvalog.LogLevel
 import com.ealva.ealvalog.Marker
-import com.ealva.ealvalog.util.NullThrowable
+import java.util.function.Supplier
 import java.util.logging.LogRecord
 
 /**
@@ -36,7 +36,7 @@ object NullJLogger : JLogger {
   override fun caught(level: LogLevel, throwable: Throwable) {}
   override val effectiveLogLevel = LogLevel.NONE
   override var includeLocation = false
-  override fun resolveLocation(logLevel: LogLevel, marker: Marker?, throwable: Throwable?) = false
+  override fun shouldIncludeLocation(logLevel: LogLevel, marker: Marker?, throwable: Throwable?) = false
   override fun isLoggable(level: LogLevel, marker: Marker?, throwable: Throwable?) = false
   override fun log(level: LogLevel, marker: Marker, msg: String) {}
   override fun log(level: LogLevel, marker: Marker, throwable: Throwable, msg: String) {}
@@ -64,13 +64,25 @@ object NullJLogger : JLogger {
     vararg remaining: Any
   ) {
   }
+
+  override fun log(level: LogLevel, supplier: Supplier<*>) {}
+  override fun log(level: LogLevel, marker: Marker, supplier: Supplier<*>) {}
+  override fun log(level: LogLevel, throwable: Throwable, supplier: Supplier<*>) {}
+  override fun log(
+    level: LogLevel,
+    marker: Marker,
+    throwable: Throwable,
+    supplier: Supplier<*>
+  ) {
+  }
+
   override fun <T : Throwable> throwing(level: LogLevel, throwable: T): T {
     TODO()
   }
 
-
   override val name = "NullJLogger"
   override var marker: Marker? = null
   override var logLevel: LogLevel? = LogLevel.NONE
+  override fun log(record: LogRecord) {}
   override fun logImmediate(record: LogRecord) {}
 }

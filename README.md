@@ -196,7 +196,7 @@ to provide custom logging methods.
   result is pushing formatting down into the framework, providing very flexible formatting options. The framework uses a thread local
   formatter/string builder combination to greatly reduce object creation. All formatting is done into a reused, per-thread, StringBuilder.
   9. The resulting libraries are very small.
-  10. After a rewrite to directly support Kotlin style logging, the Logger interface was reduced to 6 properties and 3 functions. Kotlin
+  10. After a rewrite to directly support Kotlin style logging, the Logger interface was reduced to 5 properties and 4 functions. Kotlin
   clients use inline extension functions which push a very small amount of code into the client but provide even greater
   flexibility/control at the log site. For example, including log location information can be controlled per log statement and
   is done via the plus unary operator. A layer built on top of the Kotlin classes provides the standard Java style logging interface and
