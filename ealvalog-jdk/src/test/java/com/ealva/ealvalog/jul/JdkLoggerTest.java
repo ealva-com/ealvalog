@@ -16,10 +16,12 @@
  * limitations under the License.
  */
 
-package com.ealva.ealvalog.impl;
+package com.ealva.ealvalog.jul;
 
 import com.ealva.ealvalog.ExtLogRecord;
 import com.ealva.ealvalog.LogLevel;
+import com.ealva.ealvalog.jul.JdkLogger;
+import com.ealva.ealvalog.jul.JdkLoggerFactory;
 
 import static com.ealva.ealvalog.LogLevel.CRITICAL;
 import static com.ealva.ealvalog.LogLevel.ERROR;

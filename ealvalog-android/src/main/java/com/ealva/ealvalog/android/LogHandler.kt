@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.ealva.ealvalog.impl
+package com.ealva.ealvalog.android
 
 import com.ealva.ealvalog.Marker
 import com.ealva.ealvalog.util.LogMessageFormatter

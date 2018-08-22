@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.ealva.ealvalog.impl
+package com.ealva.ealvalog.jul
 
 import com.ealva.ealvalog.FilterResult
 import com.ealva.ealvalog.FilterResult.DENY

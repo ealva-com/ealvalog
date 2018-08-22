@@ -16,27 +16,27 @@
  * limitations under the License.
  */
 
-package com.ealva.ealvalog.util
+package com.ealva.ealvalog.jul
 
-import android.util.Log
 import com.ealva.ealvalog.LogLevel
+import com.ealva.ealvalog.Logger
+import com.ealva.ealvalog.LoggerFilter
+import java.util.logging.Handler
 
 /**
- * Map LogLevel to android.util.Log level
  *
- * Created by Eric A. Snell on 3/14/17.
+ * Created by Eric A. Snell on 3/7/17.
  */
-object Levels {
-  fun toAndroidLevel(level: LogLevel): Int {
-    return when (level) {
-      LogLevel.TRACE -> Log.VERBOSE
-      LogLevel.DEBUG -> Log.DEBUG
-      LogLevel.INFO -> Log.INFO
-      LogLevel.WARN -> Log.WARN
-      LogLevel.ERROR -> Log.ERROR
-      LogLevel.CRITICAL -> Log.ASSERT
-      LogLevel.ALL -> Log.VERBOSE
-      LogLevel.NONE -> Int.MAX_VALUE
-    }
-  }
+internal interface JdkLoggerConfiguration {
+  fun setLoggerFilter(logger: Logger, filter: LoggerFilter)
+
+  fun addLoggerHandler(logger: Logger, loggerHandler: Handler)
+
+  fun setLogLevel(logger: Logger, logLevel: LogLevel)
+
+  fun setLogToParent(logger: Logger, logToParent: Boolean)
+
+  fun setIncludeLocation(logger: Logger, includeLocation: Boolean)
+
+  fun getBridge(loggerClassName: String): JdkBridge
 }

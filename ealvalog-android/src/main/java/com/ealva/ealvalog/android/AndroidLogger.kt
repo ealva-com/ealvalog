@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.ealva.ealvalog.impl
+package com.ealva.ealvalog.android
 
 import com.ealva.ealvalog.LogLevel
 import com.ealva.ealvalog.Logger
@@ -73,7 +73,9 @@ class AndroidLogger internal constructor(
   }
 
   companion object {
-    private val logHandler: AtomicReference<LogHandler> = AtomicReference(NullLogHandler)
+    private val logHandler: AtomicReference<LogHandler> = AtomicReference(
+      NullLogHandler
+    )
 
     fun setHandler(handler: LogHandler) {
       logHandler.set(handler)

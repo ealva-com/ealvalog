@@ -22,7 +22,7 @@ import com.ealva.ealvalog.Loggers;
 import com.ealva.ealvalog.Marker;
 import com.ealva.ealvalog.NullLoggerFactory;
 import com.ealva.ealvalog.NullMarker;
-import com.ealva.ealvalog.impl.JdkLoggerFactory;
+import com.ealva.ealvalog.jul.JdkLoggerFactory;
 
 import org.junit.After;
 import org.junit.Before;

@@ -16,11 +16,12 @@
  * limitations under the License.
  */
 
-package com.ealva.ealvalog.impl
+package com.ealva.ealvalog.android
 
 import android.support.test.runner.AndroidJUnit4
 import com.ealva.ealvalog.Loggers
 import com.ealva.ealvalog.NullLoggerFactory
+import com.ealva.ealvalog.android.AndroidLoggerFactory
 import org.hamcrest.CoreMatchers.sameInstance
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.After

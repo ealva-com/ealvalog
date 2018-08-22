@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.ealva.ealvalog.impl
+package com.ealva.ealvalog.android
 
 import com.ealva.ealvalog.LoggerFactory
 import com.ealva.ealvalog.Marker
@@ -33,7 +33,13 @@ object AndroidLoggerFactory : LoggerFactory {
   private val loggerMap: ConcurrentMap<String, AndroidLogger> = ConcurrentHashMap()
 
   override fun get(name: String, marker: Marker?, includeLocation: Boolean): AndroidLogger {
-    return loggerMap.getOrPut(name) { AndroidLogger(name, marker, includeLocation) }
+    return loggerMap.getOrPut(name) {
+      AndroidLogger(
+        name,
+        marker,
+        includeLocation
+      )
+    }
   }
 
   override fun get(name: String): AndroidLogger {

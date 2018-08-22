@@ -21,8 +21,8 @@ package com.ealva.kotlinapp
 import android.app.Application
 import com.ealva.ealvalog.LogLevel
 import com.ealva.ealvalog.Loggers
-import com.ealva.ealvalog.impl.AndroidLoggerHandler
-import com.ealva.ealvalog.impl.JdkLoggerFactory
+import com.ealva.ealvalog.jdka.AndroidLoggerHandler
+import com.ealva.ealvalog.jul.JdkLoggerFactory
 
 /**
  * Created by Eric A. Snell on 8/15/18.

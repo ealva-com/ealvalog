@@ -16,17 +16,14 @@
  * limitations under the License.
  */
 
-package com.ealva.ealvalog.impl;
+package com.ealva.ealvalog.android;
 
 import com.ealva.ealvalog.ExtLogRecord;
 import com.ealva.ealvalog.LogLevel;
 import com.ealva.ealvalog.Loggers;
-import com.ealva.ealvalog.Marker;
-import com.ealva.ealvalog.NullMarker;
 import com.ealva.ealvalog.java.JLogger;
 import com.ealva.ealvalog.java.JLoggers;
 
-import org.hamcrest.CoreMatchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

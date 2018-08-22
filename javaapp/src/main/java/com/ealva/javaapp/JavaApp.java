@@ -20,9 +20,9 @@ package com.ealva.javaapp;
 
 import com.ealva.ealvalog.LogLevel;
 import com.ealva.ealvalog.Loggers;
-import com.ealva.ealvalog.impl.AndroidLoggerHandler;
-import com.ealva.ealvalog.impl.JdkLogger;
-import com.ealva.ealvalog.impl.JdkLoggerFactory;
+import com.ealva.ealvalog.jdka.AndroidLoggerHandler;
+import com.ealva.ealvalog.jul.JdkLogger;
+import com.ealva.ealvalog.jul.JdkLoggerFactory;
 
 import android.app.Application;
 

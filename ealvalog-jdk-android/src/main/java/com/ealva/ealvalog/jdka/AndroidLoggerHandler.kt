@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.ealva.ealvalog.impl
+package com.ealva.ealvalog.jdka
 
 import android.annotation.SuppressLint
 import android.util.Log

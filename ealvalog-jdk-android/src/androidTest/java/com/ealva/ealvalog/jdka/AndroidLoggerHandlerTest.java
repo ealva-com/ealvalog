@@ -16,13 +16,14 @@
  * limitations under the License.
  */
 
-package com.ealva.ealvalog.impl;
+package com.ealva.ealvalog.jdka;
 
 import com.ealva.ealvalog.ExtLogRecord;
 import com.ealva.ealvalog.LoggerFilter;
 import com.ealva.ealvalog.core.ExtRecordFormatter;
 import com.ealva.ealvalog.filter.AlwaysAcceptFilter;
 import com.ealva.ealvalog.filter.AlwaysNeutralFilter;
+import com.ealva.ealvalog.jdka.AndroidLoggerHandler;
 import com.ealva.ealvalog.util.LogUtil;
 
 import static com.ealva.ealvalog.LogLevel.CRITICAL;
