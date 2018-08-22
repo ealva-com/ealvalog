@@ -1,7 +1,7 @@
 eAlvaLog
 ========
 
-*eAlvaLog* is a Kotlin/Java logging facade and implementation initially inspired by various other logging frameworks
+*eAlvaLog* is a Kotlin/Java logging facade initially inspired by various other logging frameworks
 
 Libraries
 ---------
@@ -30,8 +30,6 @@ Libraries
 
 Quick Start
 ===========
-
-
 
 - Android Setup
 ```groovy
@@ -141,6 +139,18 @@ class ArtistTable {
 ```     
 Ensure you have the most recent version by checking [here](https://search.maven.org/search?q=ealvalog)
 
+Performance
+-----------
+
+Using the [Loggly Logging Framework Benchmark](https://www.loggly.com/blog/benchmarking-java-logging-frameworks/),
+[modified](https://github.com/pandasys/Java-Logging-Framework-Benchmark) to include this framework, shows an average performance gain of 
+40% using this facade over using java.util.logging directly. This is due to eAlvaLog using cached LogRecords, StringBuilders, and 
+Formatters. 
+
+The AndroidLogger uses the same framework but logs to the android.log.Log. eAlvaLog overhead compared to logging directly
+to android.log.Log is fundamentally String.format() over cached StringBuilders. This alleviates the need for the client to 
+do string building, so performance is comparable and can be better when the client code was previously doing extensive formatting. 
+
 Why?
 ----
 
@@ -187,7 +197,7 @@ to provide custom logging methods.
   styles using the eAlvaLog facade. For example, one part of the application can log straight to the Android logger and another part, 
   such as a library, can log to a rotating set of files. This is easily configured using some combination of Handlers, Filters, and/or 
   Markers.
-  6. Markers are provided in each facade implementation and are available to filtering and formatters to be presented in log output.
+  6. Markers are provided in each facade implementation and are available to filters and formatters to be presented in log output.
   7. One design goal of eAlvaLog is to keep as much configuration code out of the framework as possible. Instead it is expected 
   dependencies will be injected either by provided helper classes or client code. This area is still largely TBD, but separation of 
   concerns keeps the logging code much more simple.
@@ -201,5 +211,5 @@ to provide custom logging methods.
   flexibility/control at the log site. For example, including log location information can be controlled per log statement and
   is done via the plus unary operator. A layer built on top of the Kotlin classes provides the standard Java style logging interface and
   it is also easily extended to provide even tighter control over object creation, eg. keeping primitives unboxed until the logging
-  actually occurs. 
+  actually occurs.
  
