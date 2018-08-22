@@ -34,9 +34,9 @@ Quick Start
 - Android Setup
 ```groovy
 dependencies {
-    compile 'com.ealva:ealvalog:0.02.00-SNAPSHOT'
-    compile 'com.ealva:ealvalog-core:0.02.00-SNAPSHOT'
-    compile 'com.ealva:ealvalog-android:0.02.00-SNAPSHOT'
+    implementation 'com.ealva:ealvalog:0.02.00-SNAPSHOT'
+    implementation 'com.ealva:ealvalog-core:0.02.00-SNAPSHOT'
+    implementation 'com.ealva:ealvalog-android:0.02.00-SNAPSHOT'
 }
 ```
 ```java
@@ -51,11 +51,11 @@ public class MyApp extends Application {
 - Setup for facade over java.util.logging and also logs to Android log 
 ```groovy
 dependencies {
-    implementation project(path: ':ealvalog')
-    implementation project(path: ':ealvalog-java')
-    implementation project(path: ':ealvalog-core')
-    implementation project(path: ':ealvalog-jdk')
-    implementation project(path: ':ealvalog-jdk-android')
+    implementation 'com.ealva:ealvalog:0.02.00-SNAPSHOT'
+    implementation 'com.ealva:ealvalog-core:0.02.00-SNAPSHOT'
+    implementation 'com.ealva:ealvalog-java:0.02.00-SNAPSHOT'
+    implementation 'com.ealva:ealvalog-jdk:0.02.00-SNAPSHOT'
+    implementation 'com.ealva:ealvalog-jdk-android:0.02.00-SNAPSHOT'
 }
 ```
 ```java
@@ -82,39 +82,47 @@ public class JavaApp extends Application {
     }
   }
 }
-  
-class CrashlyticsLogHandler extends BaseLoggerHandler {
-  private ExtRecordFormatter formatter;
-
-  CrashlyticsLogHandler() {
-    formatter = new ExtRecordFormatter();
+```
+```kotlin
+private fun LogLevel.toAndroid(): Int {
+  return when (this) {
+    LogLevel.ALL -> Log.VERBOSE
+    LogLevel.TRACE -> Log.VERBOSE
+    LogLevel.DEBUG -> Log.DEBUG
+    LogLevel.INFO -> Log.INFO
+    LogLevel.WARN -> Log.WARN
+    LogLevel.ERROR -> Log.ERROR
+    LogLevel.CRITICAL -> Log.ASSERT
+    LogLevel.NONE -> Int.MAX_VALUE
+    else -> Log.ERROR // unexpected error level in the log should flag this issue
   }
+}
 
-  @Override
-  public FilterResult isLoggable(@NotNull final Logger logger,
-                                 @NotNull final LogLevel level,
-                                 @NotNull final Marker marker,
-                                 @NotNull final Throwable throwable) {
-    if (level.isAtLeast(LogLevel.ERROR)) {
-      return FilterResult.ACCEPT;
-    } else {
-      return FilterResult.DENY;
+internal class CrashlyticsLogHandler : Handler() {
+  private val formatter: ExtRecordFormatter = ExtRecordFormatter()
+
+  override fun publish(record: LogRecord?) {
+    if (record == null) {
+      return
     }
-  }
-
-  @Override public void publish(final LogRecord record) {
-    Crashlytics.log(Levels.toAndroidLevel(record.getLogLevel()),
-                    "MyApplicationTag",
-                    formatter.format(record));
-    final Throwable thrown = record.getThrown();
+    val logLevel = record.logLevel
+    if (logLevel.isAtLeast(LogLevel.ERROR) && EalvaTagLog.MARKER != record.marker)
+      Crashlytics.log(
+        logLevel.toAndroid(),
+        "AlvaPlayer",
+        formatter.format(record)
+      )
+    val thrown = record.thrown
     if (thrown != null) {
-      Crashlytics.logException(thrown);
+      Crashlytics.logException(thrown)
     }
   }
 
-  @Override public void flush() {}
+  override fun flush() {}
 
-  @Override public void close() throws SecurityException {}
+  @Throws(SecurityException::class)
+  override fun close() {
+  }
 }
 ```  
 - Logger use (canonical)
