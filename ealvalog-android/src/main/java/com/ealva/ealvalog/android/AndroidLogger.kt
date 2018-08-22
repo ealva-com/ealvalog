@@ -18,14 +18,13 @@
 
 package com.ealva.ealvalog.android
 
+import com.ealva.ealvalog.core.ExtLogRecord
+import com.ealva.ealvalog.LogEntry
 import com.ealva.ealvalog.LogLevel
 import com.ealva.ealvalog.Logger
 import com.ealva.ealvalog.Marker
-import com.ealva.ealvalog.logLevel
-import com.ealva.ealvalog.marker
 import com.ealva.ealvalog.util.LogUtil
 import java.util.concurrent.atomic.AtomicReference
-import java.util.logging.LogRecord
 
 /**
  * [com.ealva.ealvalog.Logger] implementation for Android
@@ -37,7 +36,6 @@ class AndroidLogger internal constructor(
   override var marker: Marker? = null,
   override var includeLocation: Boolean = false
 ) : Logger {
-
   private val tag: String = LogUtil.tagFromName(name)
 
   override var logLevel: LogLevel? = null
@@ -62,14 +60,14 @@ class AndroidLogger internal constructor(
     )
   }
 
-  override fun log(record: LogRecord) {
-    if (isLoggable(record.logLevel, record.marker, record.thrown)) {
-      logImmediate(record)
-    }
+  override fun getLogEntry(logLevel: LogLevel, marker: Marker?, throwable: Throwable?): LogEntry {
+    return ExtLogRecord.get(logLevel, name, marker, throwable)
   }
 
-  override fun logImmediate(record: LogRecord) {
-    logHandler.get().prepareLog(record)
+  override fun logImmediate(entry: LogEntry) {
+    ExtLogRecord.fromLogEntry(entry).use { record ->
+      logHandler.get().prepareLog(record)
+    }
   }
 
   companion object {

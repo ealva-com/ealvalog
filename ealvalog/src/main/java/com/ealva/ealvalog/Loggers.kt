@@ -69,7 +69,7 @@ inline fun Logger.t(
   block: (LogEntry) -> Unit
 ) {
   if (isLoggable(LogLevel.TRACE, marker, throwable)) {
-    ExtLogRecord.get(LogLevel.TRACE, name, marker, throwable).use { record ->
+    getLogEntry(LogLevel.TRACE, marker, throwable).use { record ->
       block(record)
       logImmediate(record)
     }
@@ -82,7 +82,7 @@ inline fun Logger.d(
   block: (LogEntry) -> Unit
 ) {
   if (isLoggable(LogLevel.DEBUG, marker, throwable)) {
-    ExtLogRecord.get(LogLevel.DEBUG, name, marker, throwable).use { record ->
+    getLogEntry(LogLevel.DEBUG, marker, throwable).use { record ->
       block(record)
       logImmediate(record)
     }
@@ -95,7 +95,7 @@ inline fun Logger.i(
   block: (LogEntry) -> Unit
 ) {
   if (isLoggable(LogLevel.INFO, marker, throwable)) {
-    ExtLogRecord.get(LogLevel.INFO, name, marker, throwable).use { record ->
+    getLogEntry(LogLevel.INFO, marker, throwable).use { record ->
       block(record)
       logImmediate(record)
     }
@@ -108,7 +108,7 @@ inline fun Logger.w(
   block: (LogEntry) -> Unit
 ) {
   if (isLoggable(LogLevel.WARN, marker, throwable)) {
-    ExtLogRecord.get(LogLevel.WARN, name, marker, throwable).use { record ->
+    getLogEntry(LogLevel.WARN, marker, throwable).use { record ->
       block(record)
       logImmediate(record)
     }
@@ -121,7 +121,7 @@ inline fun Logger.e(
   block: (LogEntry) -> Unit
 ) {
   if (isLoggable(LogLevel.ERROR, marker, throwable)) {
-    ExtLogRecord.get(LogLevel.ERROR, name, marker, throwable).use { record ->
+    getLogEntry(LogLevel.ERROR, marker, throwable).use { record ->
       block(record)
       logImmediate(record)
     }
@@ -134,7 +134,7 @@ inline fun Logger.wtf(
   block: (LogEntry) -> Unit
 ) {
   if (isLoggable(LogLevel.CRITICAL, marker, throwable)) {
-    ExtLogRecord.get(LogLevel.CRITICAL, name, marker, throwable).use { record ->
+    getLogEntry(LogLevel.CRITICAL, marker, throwable).use { record ->
       block(record)
       logImmediate(record)
     }

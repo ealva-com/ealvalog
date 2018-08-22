@@ -18,8 +18,10 @@
 
 package com.ealva.ealvalog.java;
 
-import com.ealva.ealvalog.ExtLogRecord;
+import com.ealva.ealvalog.core.ExtLogRecord;
+import com.ealva.ealvalog.LogLevel;
 import com.ealva.ealvalog.Logger;
+import com.ealva.ealvalog.Marker;
 import com.ealva.ealvalog.NullMarker;
 import com.ealva.ealvalog.util.NullThrowable;
 
@@ -50,12 +52,13 @@ import static org.mockito.Mockito.when;
  */
 public class JLoggerImplTest {
   private static final String MSG = "TheMessage";
-
+  private static final String LOGGER_NAME = "LoggerName";
   @Mock Logger realLogger;
 
   @Before
   public void setup() {
     MockitoAnnotations.initMocks(this);
+    when(realLogger.getName()).thenReturn(LOGGER_NAME);
   }
 
   @Test
@@ -115,57 +118,73 @@ public class JLoggerImplTest {
 
   @Test
   public void logMarkerMessage() {
-    when(realLogger.isLoggable(WARN, NullMarker.INSTANCE, null)).thenReturn(true);
+    LogLevel level = ERROR;
+    Marker marker = NullMarker.INSTANCE;
+    Throwable throwable = null;
+    when(realLogger.getLogEntry(level, marker, throwable)).thenReturn(ExtLogRecord.get(level, "", marker, throwable));
+    when(realLogger.isLoggable(level, marker, throwable)).thenReturn(true);
     JLoggerImpl logger = new JLoggerImpl(realLogger);
-    logger.log(WARN, NullMarker.INSTANCE, MSG);
+    logger.log(level, marker, MSG);
 
     ArgumentCaptor<ExtLogRecord> recordCaptor = ArgumentCaptor.forClass(ExtLogRecord.class);
     then(realLogger).should(times(1)).logImmediate(recordCaptor.capture());
     final ExtLogRecord record = recordCaptor.getValue();
     assertThat(record, is(notNullValue()));
-    assertThat(record.getLevel(), is(WARN.getJdkLevel()));
+    assertThat(record.getLevel(), is(level.getJdkLevel()));
     assertThat(record.getMessage(), is(equalTo(MSG)));
   }
 
   @Test
   public void logMarkerFormatMessage() {
-    when(realLogger.isLoggable(WARN, NullMarker.INSTANCE, null)).thenReturn(true);
+    LogLevel level = WARN;
+    Marker marker = NullMarker.INSTANCE;
+    Throwable throwable = null;
+    when(realLogger.getLogEntry(level, marker, throwable)).thenReturn(ExtLogRecord.get(level, "", marker, throwable));
+    when(realLogger.isLoggable(level, marker, throwable)).thenReturn(true);
     JLoggerImpl logger = new JLoggerImpl(realLogger);
-    logger.log(WARN, NullMarker.INSTANCE, "%s%d", "one", 2);
+    logger.log(level, marker, "%s%d", "one", 2);
 
     ArgumentCaptor<ExtLogRecord> recordCaptor = ArgumentCaptor.forClass(ExtLogRecord.class);
     then(realLogger).should(times(1)).logImmediate(recordCaptor.capture());
     final ExtLogRecord record = recordCaptor.getValue();
     assertThat(record, is(notNullValue()));
-    assertThat(record.getLevel(), is(WARN.getJdkLevel()));
+    assertThat(record.getLevel(), is(level.getJdkLevel()));
     assertThat(record.getMessage(), is(equalTo("one2")));
   }
 
   @Test
   public void logThrowableFormatMessage() {
-    when(realLogger.isLoggable(ERROR, null, NullThrowable.INSTANCE)).thenReturn(true);
+    LogLevel level = ERROR;
+    Marker marker = null;
+    Throwable throwable = NullThrowable.INSTANCE;
+    when(realLogger.getLogEntry(level, marker, throwable)).thenReturn(ExtLogRecord.get(level, "", marker, throwable));
+    when(realLogger.isLoggable(level, marker, throwable)).thenReturn(true);
     JLoggerImpl logger = new JLoggerImpl(realLogger);
-    logger.log(ERROR, NullThrowable.INSTANCE, "%d%s", 1, "two");
+    logger.log(level, throwable, "%d%s", 1, "two");
 
     ArgumentCaptor<ExtLogRecord> recordCaptor = ArgumentCaptor.forClass(ExtLogRecord.class);
     then(realLogger).should(times(1)).logImmediate(recordCaptor.capture());
     final ExtLogRecord record = recordCaptor.getValue();
     assertThat(record, is(notNullValue()));
-    assertThat(record.getLevel(), is(ERROR.getJdkLevel()));
+    assertThat(record.getLevel(), is(level.getJdkLevel()));
     assertThat(record.getMessage(), is(equalTo("1two")));
   }
 
   @Test
   public void logMarkerThrowableFormatMessage() {
-    when(realLogger.isLoggable(CRITICAL, NullMarker.INSTANCE, NullThrowable.INSTANCE)).thenReturn(true);
+    LogLevel level = CRITICAL;
+    Marker marker = NullMarker.INSTANCE;
+    Throwable throwable = NullThrowable.INSTANCE;
+    when(realLogger.getLogEntry(level, marker, throwable)).thenReturn(ExtLogRecord.get(level, "", marker, throwable));
+    when(realLogger.isLoggable(level, marker, throwable)).thenReturn(true);
     JLoggerImpl logger = new JLoggerImpl(realLogger);
-    logger.log(CRITICAL, NullMarker.INSTANCE, NullThrowable.INSTANCE, "%d%S", 1, "two");
+    logger.log(level, marker, throwable, "%d%S", 1, "two");
 
     ArgumentCaptor<ExtLogRecord> recordCaptor = ArgumentCaptor.forClass(ExtLogRecord.class);
     then(realLogger).should(times(1)).logImmediate(recordCaptor.capture());
     final ExtLogRecord record = recordCaptor.getValue();
     assertThat(record, is(notNullValue()));
-    assertThat(record.getLevel(), is(CRITICAL.getJdkLevel()));
+    assertThat(record.getLevel(), is(level.getJdkLevel()));
     assertThat(record.getMessage(), is(equalTo("1TWO")));
   }
 
@@ -178,104 +197,132 @@ public class JLoggerImplTest {
 
   @Test
   public void logOneArg() {
-    when(realLogger.isLoggable(INFO, null, null)).thenReturn(true);
+    LogLevel level = INFO;
+    Marker marker = null;
+    Throwable throwable = null;
+    when(realLogger.getLogEntry(level, marker, throwable)).thenReturn(ExtLogRecord.get(level, "", marker, throwable));
+    when(realLogger.isLoggable(level, marker, throwable)).thenReturn(true);
     JLoggerImpl logger = new JLoggerImpl(realLogger);
-    logger.log(INFO, "%s", one);
+    logger.log(level, "%s", one);
 
     ArgumentCaptor<ExtLogRecord> recordCaptor = ArgumentCaptor.forClass(ExtLogRecord.class);
     then(realLogger).should().logImmediate(recordCaptor.capture());
 
     final ExtLogRecord record = recordCaptor.getValue();
     assertThat(record, is(notNullValue()));
-    assertThat(record.getLevel(), is(INFO.getJdkLevel()));
+    assertThat(record.getLevel(), is(level.getJdkLevel()));
     assertThat(record.getMessage(), is(equalTo(one)));
   }
 
   @Test
   public void logTwoArgs() {
-    when(realLogger.isLoggable(INFO, null, null)).thenReturn(true);
+    LogLevel level = INFO;
+    Marker marker = null;
+    Throwable throwable = null;
+    when(realLogger.getLogEntry(level, marker, throwable)).thenReturn(ExtLogRecord.get(level, "", marker, throwable));
+    when(realLogger.isLoggable(level, marker, throwable)).thenReturn(true);
     JLoggerImpl logger = new JLoggerImpl(realLogger);
-    logger.log(INFO, "%s%s", one, two);
+    logger.log(level, "%s%s", one, two);
 
     ArgumentCaptor<ExtLogRecord> recordCaptor = ArgumentCaptor.forClass(ExtLogRecord.class);
     then(realLogger).should().logImmediate(recordCaptor.capture());
 
     final ExtLogRecord record = recordCaptor.getValue();
     assertThat(record, is(notNullValue()));
-    assertThat(record.getLevel(), is(INFO.getJdkLevel()));
+    assertThat(record.getLevel(), is(level.getJdkLevel()));
     assertThat(record.getMessage(), is(equalTo(one+two)));
   }
 
   @Test
   public void logThreeArgs() {
-    when(realLogger.isLoggable(INFO, null, null)).thenReturn(true);
+    LogLevel level = INFO;
+    Marker marker = null;
+    Throwable throwable = null;
+    when(realLogger.getLogEntry(level, marker, throwable)).thenReturn(ExtLogRecord.get(level, "", marker, throwable));
+    when(realLogger.isLoggable(level, marker, throwable)).thenReturn(true);
     JLoggerImpl logger = new JLoggerImpl(realLogger);
-    logger.log(INFO, "%s%s%s", one, two, three);
+    logger.log(level, "%s%s%s", one, two, three);
 
     ArgumentCaptor<ExtLogRecord> recordCaptor = ArgumentCaptor.forClass(ExtLogRecord.class);
     then(realLogger).should().logImmediate(recordCaptor.capture());
 
     final ExtLogRecord record = recordCaptor.getValue();
     assertThat(record, is(notNullValue()));
-    assertThat(record.getLevel(), is(INFO.getJdkLevel()));
+    assertThat(record.getLevel(), is(level.getJdkLevel()));
     assertThat(record.getMessage(), is(equalTo(one+two+three)));
   }
 
   @Test
   public void logFourArgs() {
-    when(realLogger.isLoggable(INFO, null, null)).thenReturn(true);
+    LogLevel level = INFO;
+    Marker marker = null;
+    Throwable throwable = null;
+    when(realLogger.getLogEntry(level, marker, throwable)).thenReturn(ExtLogRecord.get(level, "", marker, throwable));
+    when(realLogger.isLoggable(level, marker, throwable)).thenReturn(true);
     JLoggerImpl logger = new JLoggerImpl(realLogger);
-    logger.log(INFO, "%s%s%s%s", one, two, three, four);
+    logger.log(level, "%s%s%s%s", one, two, three, four);
 
     ArgumentCaptor<ExtLogRecord> recordCaptor = ArgumentCaptor.forClass(ExtLogRecord.class);
     then(realLogger).should().logImmediate(recordCaptor.capture());
 
     final ExtLogRecord record = recordCaptor.getValue();
     assertThat(record, is(notNullValue()));
-    assertThat(record.getLevel(), is(INFO.getJdkLevel()));
+    assertThat(record.getLevel(), is(level.getJdkLevel()));
     assertThat(record.getMessage(), is(equalTo(one+two+three+four)));
   }
 
   @Test
   public void logMoreThan4Args() {
-    when(realLogger.isLoggable(INFO, null, null)).thenReturn(true);
+    LogLevel level = INFO;
+    Marker marker = null;
+    Throwable throwable = null;
+    when(realLogger.getLogEntry(level, marker, throwable)).thenReturn(ExtLogRecord.get(level, "", marker, throwable));
+    when(realLogger.isLoggable(level, marker, throwable)).thenReturn(true);
     JLoggerImpl logger = new JLoggerImpl(realLogger);
-    logger.log(INFO, "%s%s%s%s%s%s", one, two, three, four, five, six);
+    logger.log(level, "%s%s%s%s%s%s", one, two, three, four, five, six);
 
     ArgumentCaptor<ExtLogRecord> recordCaptor = ArgumentCaptor.forClass(ExtLogRecord.class);
     then(realLogger).should().logImmediate(recordCaptor.capture());
 
     final ExtLogRecord record = recordCaptor.getValue();
     assertThat(record, is(notNullValue()));
-    assertThat(record.getLevel(), is(INFO.getJdkLevel()));
+    assertThat(record.getLevel(), is(level.getJdkLevel()));
     assertThat(record.getMessage(), is(equalTo(one + two + three + four + five + six)));
   }
 
   @Test
   public void logSupplier() {
-    when(realLogger.isLoggable(WARN, null, null)).thenReturn(true);
+    LogLevel level = WARN;
+    Marker marker = null;
+    Throwable throwable = null;
+    when(realLogger.getLogEntry(level, marker, throwable)).thenReturn(ExtLogRecord.get(level, "", marker, throwable));
+    when(realLogger.isLoggable(level, marker, throwable)).thenReturn(true);
     JLoggerImpl logger = new JLoggerImpl(realLogger);
-    logger.log(WARN, () -> MSG);
+    logger.log(level, () -> MSG);
 
     ArgumentCaptor<ExtLogRecord> recordCaptor = ArgumentCaptor.forClass(ExtLogRecord.class);
     then(realLogger).should(times(1)).logImmediate(recordCaptor.capture());
     final ExtLogRecord record = recordCaptor.getValue();
     assertThat(record, is(notNullValue()));
-    assertThat(record.getLevel(), is(WARN.getJdkLevel()));
+    assertThat(record.getLevel(), is(level.getJdkLevel()));
     assertThat(record.getMessage(), is(equalTo(MSG)));
   }
 
   @Test
   public void logMarkerSupplier() {
-    when(realLogger.isLoggable(WARN, NullMarker.INSTANCE, null)).thenReturn(true);
+    LogLevel level = WARN;
+    Marker marker = NullMarker.INSTANCE;
+    Throwable throwable = null;
+    when(realLogger.getLogEntry(level, marker, throwable)).thenReturn(ExtLogRecord.get(level, "", marker, throwable));
+    when(realLogger.isLoggable(level, marker, throwable)).thenReturn(true);
     JLoggerImpl logger = new JLoggerImpl(realLogger);
-    logger.log(WARN, NullMarker.INSTANCE, () -> new StringBuilder(MSG));
+    logger.log(level, NullMarker.INSTANCE, () -> new StringBuilder(MSG));
 
     ArgumentCaptor<ExtLogRecord> recordCaptor = ArgumentCaptor.forClass(ExtLogRecord.class);
     then(realLogger).should(times(1)).logImmediate(recordCaptor.capture());
     final ExtLogRecord record = recordCaptor.getValue();
     assertThat(record, is(notNullValue()));
-    assertThat(record.getLevel(), is(WARN.getJdkLevel()));
+    assertThat(record.getLevel(), is(level.getJdkLevel()));
     assertThat(record.getMessage(), is(equalTo(MSG)));
     assertThat(record.getMarker(), is(NullMarker.INSTANCE));
     assertThat(record.getThrown(), is(nullValue()));
@@ -283,67 +330,81 @@ public class JLoggerImplTest {
 
   @Test
   public void logThrowableSupplier() {
-    when(realLogger.isLoggable(WARN, null, NullThrowable.INSTANCE)).thenReturn(true);
+    LogLevel level = ERROR;
+    Marker marker = null;
+    Throwable throwable = NullThrowable.INSTANCE;
+    when(realLogger.getLogEntry(level, marker, throwable)).thenReturn(ExtLogRecord.get(level, "", marker, throwable));
+    when(realLogger.isLoggable(level, marker, throwable)).thenReturn(true);
     JLoggerImpl logger = new JLoggerImpl(realLogger);
-    logger.log(WARN, NullThrowable.INSTANCE, () -> MSG);
+    logger.log(level, throwable, () -> MSG);
 
     ArgumentCaptor<ExtLogRecord> recordCaptor = ArgumentCaptor.forClass(ExtLogRecord.class);
     then(realLogger).should(times(1)).logImmediate(recordCaptor.capture());
     final ExtLogRecord record = recordCaptor.getValue();
     assertThat(record, is(notNullValue()));
-    assertThat(record.getLevel(), is(WARN.getJdkLevel()));
+    assertThat(record.getLevel(), is(level.getJdkLevel()));
     assertThat(record.getMessage(), is(equalTo(MSG)));
     assertThat(record.getMarker(), is(nullValue()));
-    assertThat(record.getThrown(), is(NullThrowable.INSTANCE));
+    assertThat(record.getThrown(), is(throwable));
   }
 
   @Test
   public void logMarkerThrowableSupplier() {
-    when(realLogger.isLoggable(WARN, NullMarker.INSTANCE, NullThrowable.INSTANCE)).thenReturn(true);
+    LogLevel level = WARN;
+    Marker marker = NullMarker.INSTANCE;
+    Throwable throwable = new RuntimeException("Test");
+    when(realLogger.getLogEntry(level, marker, throwable)).thenReturn(ExtLogRecord.get(level, "", marker, throwable));
+    when(realLogger.isLoggable(level, marker, throwable)).thenReturn(true);
     JLoggerImpl logger = new JLoggerImpl(realLogger);
-    logger.log(WARN, NullMarker.INSTANCE, NullThrowable.INSTANCE, () -> new RuntimeException("Test"));
+    logger.log(level, marker, throwable, () -> new RuntimeException("Test"));
 
     ArgumentCaptor<ExtLogRecord> recordCaptor = ArgumentCaptor.forClass(ExtLogRecord.class);
     then(realLogger).should(times(1)).logImmediate(recordCaptor.capture());
     final ExtLogRecord record = recordCaptor.getValue();
     assertThat(record, is(notNullValue()));
-    assertThat(record.getLevel(), is(WARN.getJdkLevel()));
+    assertThat(record.getLevel(), is(level.getJdkLevel()));
     assertThat(record.getMessage(), is(equalTo("java.lang.RuntimeException: Test")));
     assertThat(record.getMarker(), is(NullMarker.INSTANCE));
-    assertThat(record.getThrown(), is(NullThrowable.INSTANCE));
+    assertThat(record.getThrown(), is(throwable));
   }
 
   @Test
   public void logCaught() {
-    RuntimeException ex = new RuntimeException("MeMeMe");
-    when(realLogger.isLoggable(INFO, null, ex)).thenReturn(true);
+    LogLevel level = ERROR;
+    Marker marker = null;
+    Throwable throwable = new RuntimeException("MeMeMe");
+    when(realLogger.getLogEntry(level, marker, throwable)).thenReturn(ExtLogRecord.get(level, "", marker, throwable));
+    when(realLogger.isLoggable(level, marker, throwable)).thenReturn(true);
     JLoggerImpl logger = new JLoggerImpl(realLogger);
-    logger.caught(INFO, ex);
+    logger.caught(level, throwable);
 
     ArgumentCaptor<ExtLogRecord> recordCaptor = ArgumentCaptor.forClass(ExtLogRecord.class);
     then(realLogger).should().logImmediate(recordCaptor.capture());
 
     final ExtLogRecord record = recordCaptor.getValue();
     assertThat(record, is(notNullValue()));
-    assertThat(record.getLevel(), is(INFO.getJdkLevel()));
-    assertThat(record.getThrown(), is(ex));
+    assertThat(record.getLevel(), is(level.getJdkLevel()));
+    assertThat(record.getThrown(), is(throwable));
   }
 
   @Test
   public void logThrowing() {
-    RuntimeException ex = new RuntimeException("MeMeMe");
-    when(realLogger.isLoggable(INFO, null, ex)).thenReturn(true);
+    LogLevel level = INFO;
+    Marker marker = null;
+    Throwable throwable = new RuntimeException("MeMeMe");
+    when(realLogger.getLogEntry(level, marker, throwable)).thenReturn(ExtLogRecord.get(level, "", marker, throwable));
+    when(realLogger.isLoggable(level, marker, throwable)).thenReturn(true);
     JLoggerImpl logger = new JLoggerImpl(realLogger);
-    Throwable returned = logger.throwing(INFO, ex);
+    Throwable returned = logger.throwing(level, throwable);
 
-    assertThat(returned, is(ex));
+    assertThat(returned, is(throwable));
     ArgumentCaptor<ExtLogRecord> recordCaptor = ArgumentCaptor.forClass(ExtLogRecord.class);
     then(realLogger).should().logImmediate(recordCaptor.capture());
 
     final ExtLogRecord record = recordCaptor.getValue();
     assertThat(record, is(notNullValue()));
-    assertThat(record.getLevel(), is(INFO.getJdkLevel()));
-    assertThat(record.getThrown(), is(ex));
+    assertThat(record.getLevel(), is(level.getJdkLevel()));
+    assertThat(record.getThrown(), is(throwable));
   }
 
 

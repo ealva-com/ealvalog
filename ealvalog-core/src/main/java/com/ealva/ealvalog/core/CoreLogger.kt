@@ -18,11 +18,9 @@
 
 package com.ealva.ealvalog.core
 
+import com.ealva.ealvalog.LogEntry
 import com.ealva.ealvalog.Logger
 import com.ealva.ealvalog.LoggerFilter
-import com.ealva.ealvalog.logLevel
-import com.ealva.ealvalog.marker
-import java.util.logging.LogRecord
 
 /**
  * This logger delegates to a [Bridge] for [.isLoggable] and
@@ -39,14 +37,10 @@ abstract class CoreLogger<T : Bridge> protected constructor(
 
   abstract fun shouldLogToParent(): Boolean
 
-  override fun log(record: LogRecord) {
-    if (isLoggable(record.logLevel, record.marker, record.thrown)) {
+  override fun logImmediate(entry: LogEntry) {
+    ExtLogRecord.fromLogEntry(entry).use { record ->
       bridge.log(record)
     }
-  }
-
-  override fun logImmediate(record: LogRecord) {
-    bridge.log(record)
   }
 
   abstract fun setFilter(filter: LoggerFilter)

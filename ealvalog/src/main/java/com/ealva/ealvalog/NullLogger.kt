@@ -37,6 +37,6 @@ object NullLogger : Logger {
     throwable: Throwable?
   ) = false
   override fun isLoggable(level: LogLevel, marker: Marker?, throwable: Throwable?) = false
-  override fun log(record: LogRecord) {}
-  override fun logImmediate(record: LogRecord) {}
+  override fun getLogEntry(logLevel: LogLevel, marker: Marker?, throwable: Throwable?) = NullLogEntry
+  override fun logImmediate(entry: LogEntry) {}
 }

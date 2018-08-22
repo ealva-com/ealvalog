@@ -16,15 +16,20 @@
  * limitations under the License.
  */
 
-package com.ealva.ealvalog
+package com.ealva.ealvalog.core
 
+import com.ealva.ealvalog.LogLevel
+import com.ealva.ealvalog.LoggerFilter
+import com.ealva.ealvalog.Marker
 import java.util.logging.LogRecord
 
 /**
  * Created by Eric A. Snell on 8/16/18.
  */
 val LogRecord.logLevel: LogLevel
-    get() = (this as? ExtLogRecord)?.logLevel ?: LogLevel.fromLevel(level)
+    get() = (this as? ExtLogRecord)?.logLevel ?: LogLevel.fromLevel(
+        level
+    )
 
 val LogRecord.marker: Marker?
     get() = (this as? ExtLogRecord)?.marker

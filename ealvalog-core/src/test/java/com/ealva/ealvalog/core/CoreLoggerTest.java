@@ -18,9 +18,11 @@
 
 package com.ealva.ealvalog.core;
 
+import com.ealva.ealvalog.LogEntry;
 import com.ealva.ealvalog.LogLevel;
 import com.ealva.ealvalog.LoggerFilter;
 import com.ealva.ealvalog.Marker;
+import com.ealva.ealvalog.NullLogEntry;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -32,9 +34,6 @@ import org.mockito.MockitoAnnotations;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.only;
-
-import java.util.logging.Level;
-import java.util.logging.LogRecord;
 
 /**
  * Test core functionality. Ensure it's calling the bridge correctly, including passing itself.
@@ -56,7 +55,8 @@ public class CoreLoggerTest {
   public void testPrintLog() {
     com.ealva.ealvalog.core.CoreLogger<com.ealva.ealvalog.core.Bridge>
         logger = new CoreLoggerForTest("LoggerName", bridge);
-    final LogRecord record = new LogRecord(Level.ALL, MESSAGE);
+    final ExtLogRecord record = ExtLogRecord.get(LogLevel.WARN, "", null, null);
+    record.append(MESSAGE);
     logger.logImmediate(record);
     then(bridge).should(only()).log(same(record));
   }
@@ -131,6 +131,13 @@ public class CoreLoggerTest {
 
     @Override public void setMarker(@Nullable final Marker marker) {
 
+    }
+
+    @NotNull @Override
+    public LogEntry getLogEntry(@NotNull final LogLevel logLevel,
+                                @Nullable final Marker marker,
+                                @Nullable final Throwable throwable) {
+      return NullLogEntry.INSTANCE;
     }
   }
 }

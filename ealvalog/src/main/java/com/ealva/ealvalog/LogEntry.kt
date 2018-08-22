@@ -41,11 +41,16 @@ operator fun LogEntry.unaryPlus() {
  */
 @Suppress("unused")
 interface LogEntry : Appendable, Closeable {
+  // specify close as not throwing
+  override fun close()
+
   val logLevel: LogLevel
 
   val threadName: String
 
   var marker: Marker?
+
+  val location: StackTraceElement?
 
   val sequenceNumber: Long
 
@@ -53,9 +58,13 @@ interface LogEntry : Appendable, Closeable {
 
   val sourceMethodName: String
 
+  val message: String
+
   val threadID: Int
 
   val millis: Long
+
+  val thrown: Throwable?
 
   val loggerName: String
 

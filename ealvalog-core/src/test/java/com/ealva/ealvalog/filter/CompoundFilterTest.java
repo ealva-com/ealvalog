@@ -18,7 +18,7 @@
 
 package com.ealva.ealvalog.filter;
 
-import com.ealva.ealvalog.ExtLogRecord;
+import com.ealva.ealvalog.core.ExtLogRecord;
 import com.ealva.ealvalog.FilterResult;
 import com.ealva.ealvalog.LogLevel;
 import com.ealva.ealvalog.LoggerFilter;

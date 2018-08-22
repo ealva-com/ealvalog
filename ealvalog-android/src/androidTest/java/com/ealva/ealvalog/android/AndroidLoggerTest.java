@@ -18,7 +18,7 @@
 
 package com.ealva.ealvalog.android;
 
-import com.ealva.ealvalog.ExtLogRecord;
+import com.ealva.ealvalog.core.ExtLogRecord;
 import com.ealva.ealvalog.LogLevel;
 import com.ealva.ealvalog.Loggers;
 import com.ealva.ealvalog.java.JLogger;
@@ -74,7 +74,7 @@ public class AndroidLoggerTest {
     assertThat(record.getMessage(), is(msg));
     assertThat(record.getThrown(), is(nullValue()));
     assertThat(record.getMarker(), is(nullValue()));
-    assertThat(record.getCallLocation(), is(isNull()));
+    assertThat(record.getLocation(), is(isNull()));
   }
 
   @Test
@@ -96,7 +96,7 @@ public class AndroidLoggerTest {
     assertThat(record.getMessage(), is(msg));
     assertThat(record.getThrown(), is(nullValue()));
     assertThat(record.getMarker(), is(nullValue()));
-    assertThat(record.getCallLocation(), is(notNullValue()));
+    assertThat(record.getLocation(), is(notNullValue()));
   }
 
   @Test
@@ -117,7 +117,7 @@ public class AndroidLoggerTest {
     assertThat(record.getMessage(), is(msg));
     assertThat(record.getThrown(), is(nullValue()));
     assertThat(record.getMarker(), is(nullValue()));
-    assertThat(record.getCallLocation(), is(notNullValue()));
+    assertThat(record.getLocation(), is(notNullValue()));
   }
 
 }

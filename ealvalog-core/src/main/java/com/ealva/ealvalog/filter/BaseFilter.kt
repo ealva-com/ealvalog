@@ -20,7 +20,7 @@ package com.ealva.ealvalog.filter
 
 import com.ealva.ealvalog.FilterResult
 import com.ealva.ealvalog.LoggerFilter
-import com.ealva.ealvalog.shouldBePublished
+import com.ealva.ealvalog.core.shouldBePublished
 import java.util.logging.LogRecord
 
 /**

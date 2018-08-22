@@ -18,6 +18,8 @@
 
 package com.ealva.ealvalog.jul
 
+import com.ealva.ealvalog.core.ExtLogRecord
+import com.ealva.ealvalog.LogEntry
 import com.ealva.ealvalog.LogLevel
 import com.ealva.ealvalog.LogLevel.NONE
 import com.ealva.ealvalog.LoggerFilter
@@ -37,7 +39,6 @@ class JdkLogger internal constructor(
   override var marker: Marker?,
   private var config: JdkLoggerConfiguration
 ) : CoreLogger<JdkBridge>(config.getBridge(name)) {
-
   override var logLevel: LogLevel?
     get() = bridge.getLevelForLogger(this)
     set(logLevel) = config.setLogLevel(this, logLevel ?: NONE)
@@ -76,6 +77,10 @@ class JdkLogger internal constructor(
     throwable: Throwable?
   ): Boolean {
     return bridge.isLoggable(name, level, marker, throwable).shouldProceed
+  }
+
+  override fun getLogEntry(logLevel: LogLevel, marker: Marker?, throwable: Throwable?): LogEntry {
+    return ExtLogRecord.get(logLevel, name, marker, throwable)
   }
 
   override fun shouldLogToParent(): Boolean {

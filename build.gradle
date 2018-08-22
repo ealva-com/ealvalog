@@ -17,13 +17,12 @@
  */
 
 buildscript {
-    ext.kotlin_version = '1.2.60'
+    ext.kotlin_version = '1.2.61'
     ext.log4j_version = '2.11.1'
 
     ext {
         versions = [
                 'support_library': '27.1.1',
-                'kotlin'         : '1.2.60',
         ]
         setup = [
                 'compile_sdk': 27,
@@ -42,7 +41,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.1.2'
+        classpath 'com.android.tools.build:gradle:3.1.4'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }

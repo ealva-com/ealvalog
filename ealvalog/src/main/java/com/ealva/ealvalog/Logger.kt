@@ -18,8 +18,6 @@
 
 package com.ealva.ealvalog
 
-import java.util.logging.LogRecord
-
 /**
  * It's expected all logging occurs through concrete implementations of this interface which are
  * obtained via logger factories and singletons
@@ -82,20 +80,19 @@ interface Logger {
   ): Boolean
 
   /**
-   * First check if the [record] is loggable and, if so, then [logImmediate]
-   *
-   * Typically this is not necessary as the Kotlin functions already check if is loggable and the
-   * JLogger subclass also checks if is loggable before calling logImmediate. Use this only if
-   * you find the need to build your own [LogRecord] for some reason.
+   * Obtain a [LogEntry] for use with this logger.
    */
-  fun log(record: LogRecord)
+  fun getLogEntry(logLevel: LogLevel, marker: Marker?, throwable: Throwable?): LogEntry
 
   /**
    * Log without checking the the level. This method's primary use is for this logging framework
    * and it's not expected client's would typically use this method. The Kotlin extension functions
    * and the JLogger subclass use this function internally.
    *
-   * @param record the full log information
+   * The [entry] is becomes "owned" by the Logger. Do not modify or reuse the [entry] after invoking
+   * this function. This function will close the entry before returning.
+   *
+   * @param entry the full log information
    */
-  fun logImmediate(record: LogRecord)
+  fun logImmediate(entry: LogEntry)
 }

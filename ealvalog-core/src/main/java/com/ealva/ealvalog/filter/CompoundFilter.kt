@@ -22,7 +22,7 @@ import com.ealva.ealvalog.FilterResult
 import com.ealva.ealvalog.LogLevel
 import com.ealva.ealvalog.LoggerFilter
 import com.ealva.ealvalog.Marker
-import com.ealva.ealvalog.shouldBePublished
+import com.ealva.ealvalog.core.shouldBePublished
 import java.util.concurrent.CopyOnWriteArraySet
 import java.util.logging.LogRecord
 

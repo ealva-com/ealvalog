@@ -16,8 +16,12 @@
  * limitations under the License.
  */
 
-package com.ealva.ealvalog;
+package com.ealva.ealvalog.core;
 
+import com.ealva.ealvalog.LogEntry;
+import com.ealva.ealvalog.LogLevel;
+import com.ealva.ealvalog.Marker;
+import com.ealva.ealvalog.NullMarker;
 import com.ealva.ealvalog.util.LogUtil;
 
 import org.jetbrains.annotations.NotNull;
@@ -50,7 +54,6 @@ import java.util.logging.LogRecord;
 public class ExtLogRecord extends LogRecord implements LogEntry {
   private static final long serialVersionUID = 936230097973648802L;
   private static final AtomicLong sequenceNumber = new AtomicLong(1);
-  private static final Object[] EMPTY_PARAMS = new Object[] {null, null, null, null};
   private static ThreadLocal<ExtLogRecord> threadLocalRecord = new ThreadLocal<>();
   /** The default, and minimum, size of cached string builders. This is a per thread cost */
   public static final int DEFAULT_STRING_BUILDER_SIZE = 1024;
@@ -118,6 +121,24 @@ public class ExtLogRecord extends LogRecord implements LogEntry {
     return result.isReserved() ? new ExtLogRecord().reserve() : result.reserve();
   }
 
+  /**
+   * If entry is an ExtLogRecord it is returned, otherwise a new ExtLogRecord will be created.
+   * Currently, new object creation is only necessary if someone sends a LogEntry into a Logger
+   * from which it did not originate.
+   *
+   * @param entry the LogEntry, which should already be an ExtLogRecord
+   *
+   * @return the entry if it is an ExtLogRecord or a new ExtLogRecord if entry must be converted
+   */
+  public static ExtLogRecord fromLogEntry(@NotNull final LogEntry entry) {
+    if (ExtLogRecord.class.isAssignableFrom(entry.getClass())) {
+      return (ExtLogRecord)entry;
+    } else {
+      entry.close();
+      return new ExtLogRecord(entry);
+    }
+  }
+
   @TestOnly
   public static void clearCachedRecord() {
     threadLocalRecord.set(null);
@@ -140,12 +161,38 @@ public class ExtLogRecord extends LogRecord implements LogEntry {
 
   private ExtLogRecord() {
     super(Level.OFF, "");
-    super.setParameters(EMPTY_PARAMS);
+    super.setParameters(new Object[]{null, null, null, null});
     parameterCount = 0;
     logLevel = LogLevel.NONE;
     threadName = Thread.currentThread().getName();
     builder = new StringBuilder(DEFAULT_STRING_BUILDER_SIZE);
     formatter = new Formatter(builder);
+  }
+
+  /**
+   * This ctor should only be called if the logging framework client logs a LogEntry not
+   * retrieved from the Logger which returns ExtLogRecord from getLogEntry()
+   * @param entry entry to convert to an ExtLogRecord
+   */
+  private ExtLogRecord(@NotNull final LogEntry entry) {
+    super(entry.getLogLevel().getJdkLevel(), entry.getMessage());
+    parameterCount = 0;
+    builder = new StringBuilder(DEFAULT_STRING_BUILDER_SIZE);
+    formatter = new Formatter(builder);
+    logLevel = entry.getLogLevel();
+    setSequenceNumber(entry.getSequenceNumber());
+    setSourceClassName(entry.getSourceClassName());
+    setSourceMethodName(entry.getSourceMethodName());
+    builder.append(entry.getMessage());
+    setThreadID(entry.getThreadID());
+    setMillis(entry.getMillis());
+    setThrown(entry.getThrown());
+    setLoggerName(entry.getLoggerName());
+    threadName = entry.getThreadName();
+    marker = entry.getMarker();
+    location = entry.getLocation();
+    threadPriority = entry.getThreadPriority();
+    nanoTime = entry.getNanoTime();
   }
 
   private boolean isReserved() {
@@ -176,7 +223,7 @@ public class ExtLogRecord extends LogRecord implements LogEntry {
   }
 
 
-  @Override public String getMessage() {
+  @NotNull @Override public String getMessage() {
     return builder.toString();
   }
 
@@ -245,7 +292,7 @@ public class ExtLogRecord extends LogRecord implements LogEntry {
     this.marker = marker;
   }
 
-  public @Nullable StackTraceElement getCallLocation() {
+  public @Nullable StackTraceElement getLocation() {
     return location;
   }
 
@@ -312,6 +359,8 @@ public class ExtLogRecord extends LogRecord implements LogEntry {
     copy.marker = marker;
     copy.location = location;
     copy.parameterCount = parameterCount;
+    copy.threadPriority = threadPriority;
+    copy.nanoTime = nanoTime;
     return copy;
   }
 
@@ -376,12 +425,12 @@ public class ExtLogRecord extends LogRecord implements LogEntry {
     return this;
   }
 
-  @Override public Appendable append(final CharSequence csq) {
+  @Override public LogEntry append(final CharSequence csq) {
     builder.append(csq);
     return this;
   }
 
-  @Override public Appendable append(final CharSequence csq, final int start, final int end) {
+  @Override public LogEntry append(final CharSequence csq, final int start, final int end) {
     builder.append(csq, start, end);
     return this;
   }

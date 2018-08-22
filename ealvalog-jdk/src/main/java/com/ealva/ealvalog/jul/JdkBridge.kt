@@ -26,7 +26,7 @@ import com.ealva.ealvalog.Marker
 import com.ealva.ealvalog.core.Bridge
 import com.ealva.ealvalog.core.CoreLogger
 import com.ealva.ealvalog.filter.AlwaysNeutralFilter
-import com.ealva.ealvalog.shouldBePublished
+import com.ealva.ealvalog.core.shouldBePublished
 import java.util.logging.Handler
 import java.util.logging.LogRecord
 
