@@ -18,45 +18,69 @@
 
 package com.ealva.ealvalog
 
+import java.io.Closeable
 import java.util.Formatter
 import java.util.Locale
 
-operator fun LogRecordBuilder.invoke(format: String): LogRecordBuilder {
+operator fun LogEntry.invoke(format: String): LogEntry {
   append(format)
   return this
 }
 
-operator fun LogRecordBuilder.invoke(format: String, vararg args: Any): LogRecordBuilder {
+operator fun LogEntry.invoke(format: String, vararg args: Any): LogEntry {
   append(format, *args)
   return this
 }
 
-operator fun LogRecordBuilder.unaryPlus() {
+operator fun LogEntry.unaryPlus() {
   addLocation(1)
 }
 
 /**
  * Created by Eric A. Snell on 6/29/18.
  */
-interface LogRecordBuilder : Appendable {
+@Suppress("unused")
+interface LogEntry : Appendable, Closeable {
+  val logLevel: LogLevel
+
+  val threadName: String
+
+  var marker: Marker?
+
+  val sequenceNumber: Long
+
+  val sourceClassName: String
+
+  val sourceMethodName: String
+
+  val threadID: Int
+
+  val millis: Long
+
+  val loggerName: String
+
+  val threadPriority: Int
+
+  val nanoTime: Long
+
   /**
    * Reset the message, ie. `setLength(0)`
    */
-  fun reset(): LogRecordBuilder
+  fun reset(): LogEntry
 
-  fun append(str: String): LogRecordBuilder
+  fun append(str: String): LogEntry
 
-  fun append(b: Boolean): LogRecordBuilder
+  fun append(b: Boolean): LogEntry
 
-  override fun append(c: Char): LogRecordBuilder
+  override fun append(c: Char): LogEntry
 
-  fun append(i: Int): LogRecordBuilder
+  fun append(i: Int): LogEntry
 
-  fun append(lng: Long): LogRecordBuilder
+  fun append(lng: Long): LogEntry
 
-  fun append(f: Float): LogRecordBuilder
+  fun append(f: Float): LogEntry
 
-  fun append(d: Double): LogRecordBuilder
+  fun append(d: Double): LogEntry
 
   /**
    * Format the `format` string with the given set of `args` into the contained [StringBuilder]
@@ -69,7 +93,7 @@ interface LogRecordBuilder : Appendable {
   fun append(
     format: String,
     vararg args: Any
-  ): LogRecordBuilder
+  ): LogEntry
 
   /**
    * Format the `format` string with the given set of `args` into the contained [StringBuilder]
@@ -84,7 +108,7 @@ interface LogRecordBuilder : Appendable {
     locale: Locale,
     format: String,
     vararg args: Any
-  ): LogRecordBuilder
+  ): LogEntry
 
   /**
    * Add the source location, determined by examining the call stack, to the log record. This is
@@ -92,8 +116,8 @@ interface LogRecordBuilder : Appendable {
    *
    * @param stackDepth should typically be 0 to add the current location
    *
-   * @return this LogRecordBuilder
+   * @return this LogEntry
    */
-  fun addLocation(stackDepth: Int): LogRecordBuilder
+  fun addLocation(stackDepth: Int): LogEntry
 
 }

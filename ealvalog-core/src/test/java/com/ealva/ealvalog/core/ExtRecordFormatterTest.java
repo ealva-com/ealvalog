@@ -74,7 +74,7 @@ public class ExtRecordFormatterTest {
 
   @After
   public void tearDown() {
-    ExtLogRecord.release(record);
+    record.close();
   }
 
   @Test(expected = IllegalFormatConversionException.class)

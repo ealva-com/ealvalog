@@ -57,7 +57,7 @@ public class ExtLogRecordTest {
     assertThat(first.getLoggerName(), is(loggerName));
     assertThat(first.getMarker(), is(marker));
     assertThat(first.getThrown(), is(throwable));
-    ExtLogRecord.release(first);
+    first.close();
     final LogLevel secondLevel = LogLevel.WARN;
     final String secondLoggerName = "Other";
     final Marker secondMarker = NullMarker.INSTANCE;
@@ -86,7 +86,7 @@ public class ExtLogRecordTest {
     Object[] firstParameters = first.getParameters();
     assertThat((String)firstParameters[0], is(firstParm));
     assertThat((String)firstParameters[1], is(secondParm));
-    ExtLogRecord.release(first);
+    first.close();
 
     final LogLevel secondLevel = LogLevel.WARN;
     final String secondLoggerName = "Other";
@@ -111,8 +111,8 @@ public class ExtLogRecordTest {
         second =
         ExtLogRecord.get(LogLevel.ERROR, "LoggerName", null, null);
     assertThat(first, not(sameInstance(second)));
-    ExtLogRecord.release(first);
-    ExtLogRecord.release(second);
+    first.close();
+    second.close();
     final LogLevel logLevel = LogLevel.WARN;
     final String loggerName = "Other";
     final ExtLogRecord third = ExtLogRecord.get(logLevel, loggerName, null, null);

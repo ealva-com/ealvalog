@@ -24,7 +24,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.TestOnly;
 
-import java.io.Closeable;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -39,7 +38,7 @@ import java.util.logging.LogRecord;
  * Subclass of LogRecord adding the extra info we need. Not thread safe.
  * <p>
  * Use {@link #getRecord()} to obtain an ExtLogRecord which is associated with a thread and needs
- * to be {@link #release()}ed to be properly reused. Lower layers of the logging framework
+ * to be {@link #close()}ed to be properly reused. Lower layers of the logging framework
  * need to copy this ExtLogRecord if it's to be passed to another thread.
  * <p>
  * Don't use the {@link #getParameters()} array length as the actual number of parameters. Use
@@ -48,12 +47,10 @@ import java.util.logging.LogRecord;
  * Created by Eric A. Snell on 3/4/17.
  */
 @SuppressWarnings({"WeakerAccess"})
-public class ExtLogRecord extends LogRecord
-    implements Closeable, // not AutoCloseable to be compatible with Android version < KitKat
-               LogRecordBuilder {
+public class ExtLogRecord extends LogRecord implements LogEntry {
   private static final long serialVersionUID = 936230097973648802L;
   private static final AtomicLong sequenceNumber = new AtomicLong(1);
-  private static final Object[] EMPTY_PARAMS = new Object[0];
+  private static final Object[] EMPTY_PARAMS = new Object[] {null, null, null, null};
   private static ThreadLocal<ExtLogRecord> threadLocalRecord = new ThreadLocal<>();
   /** The default, and minimum, size of cached string builders. This is a per thread cost */
   public static final int DEFAULT_STRING_BUILDER_SIZE = 1024;
@@ -67,6 +64,8 @@ public class ExtLogRecord extends LogRecord
   private transient @Nullable Marker marker;
   private transient @Nullable StackTraceElement location;
   private transient int parameterCount;   // actual number of parameters, array might be over-sized
+  private transient int threadPriority;
+  private transient long nanoTime;
   private transient boolean reserved;
   private transient @NotNull StringBuilder builder;
   private transient @NotNull Formatter formatter;
@@ -110,10 +109,6 @@ public class ExtLogRecord extends LogRecord
     return logRecord;
   }
 
-  public static void release(final @NotNull ExtLogRecord record) {
-    record.release();
-  }
-
   private static ExtLogRecord getRecord() {
     ExtLogRecord result = threadLocalRecord.get();
     if (result == null) {
@@ -128,16 +123,27 @@ public class ExtLogRecord extends LogRecord
     threadLocalRecord.set(null);
   }
 
+  @NotNull @Override public String getSourceClassName() {
+    final String name = super.getSourceClassName();
+    return name == null ? "" : name;
+  }
+
+  @NotNull @Override public String getSourceMethodName() {
+    final String name = super.getSourceMethodName();
+    return name == null ? "" : name;
+  }
+
+  @NotNull @Override public String getLoggerName() {
+    final String name = super.getLoggerName();
+    return name == null ? "Anonymous Logger" : name;
+  }
 
   private ExtLogRecord() {
     super(Level.OFF, "");
-    setParameters(EMPTY_PARAMS);
+    super.setParameters(EMPTY_PARAMS);
+    parameterCount = 0;
     logLevel = LogLevel.NONE;
     threadName = Thread.currentThread().getName();
-    marker = null;
-    location = null;
-    parameterCount = 0;
-    reserved = false;
     builder = new StringBuilder(DEFAULT_STRING_BUILDER_SIZE);
     formatter = new Formatter(builder);
   }
@@ -149,22 +155,20 @@ public class ExtLogRecord extends LogRecord
   private ExtLogRecord reserve() {
     reserved = true;
     super.setMessage(null);
+    setParameters(null);
     logLevel = LogLevel.NONE;
     marker = null;
     location = null;
-    setParameters(null);
     setMillis(System.currentTimeMillis());
     setSequenceNumber(sequenceNumber.getAndIncrement());
+    threadPriority = Thread.currentThread().getPriority();
+    nanoTime = System.nanoTime();
     if (builder.capacity() > maxBuilderSize) {
       builder.setLength(maxBuilderSize);
       builder.trimToSize();
     }
     builder.setLength(0);
     return this;
-  }
-
-  private void release() {
-    reserved = false;
   }
 
   public void setLocation(final @Nullable StackTraceElement location) {
@@ -204,7 +208,7 @@ public class ExtLogRecord extends LogRecord
     }
   }
 
-  public @NotNull LogLevel getLogLevel() {
+  @Override public @NotNull LogLevel getLogLevel() {
     return logLevel;
   }
 
@@ -220,7 +224,7 @@ public class ExtLogRecord extends LogRecord
    *
    * @return thread name
    */
-  @NotNull public String getThreadName() {
+  @Override @NotNull public String getThreadName() {
     return threadName;
   }
 
@@ -250,8 +254,17 @@ public class ExtLogRecord extends LogRecord
     return parameterCount;
   }
 
+
+  @Override public int getThreadPriority() {
+    return threadPriority;
+  }
+
+  @Override public long getNanoTime() {
+    return nanoTime;
+  }
+
   @Override public void close() {
-    release(this);
+    reserved = false;
   }
 
   private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
@@ -261,6 +274,8 @@ public class ExtLogRecord extends LogRecord
     marker = (Marker)in.readObject();
     location = (StackTraceElement)in.readObject();
     parameterCount = in.readInt();
+    threadPriority = in.readInt();
+    nanoTime = in.readLong();
     reserved = false;
     builder = new StringBuilder(DEFAULT_STRING_BUILDER_SIZE);
     formatter = new Formatter(builder);
@@ -273,6 +288,8 @@ public class ExtLogRecord extends LogRecord
     out.writeObject(marker);
     out.writeObject(location);
     out.writeInt(parameterCount);
+    out.writeInt(threadPriority);
+    out.writeLong(nanoTime);
   }
 
   @SuppressWarnings("unused")
@@ -298,54 +315,54 @@ public class ExtLogRecord extends LogRecord
     return copy;
   }
 
-  @NotNull @Override public LogRecordBuilder reset() {
+  @NotNull @Override public LogEntry reset() {
     builder.setLength(0);
     return this;
   }
 
-  @NotNull @Override public LogRecordBuilder append(@NotNull final String str) {
+  @NotNull @Override public LogEntry append(@NotNull final String str) {
     builder.append(str);
     return this;
   }
 
-  @NotNull @Override public LogRecordBuilder append(boolean b) {
+  @NotNull @Override public LogEntry append(boolean b) {
     builder.append(b);
     return this;
   }
 
-  @NotNull @Override public LogRecordBuilder append(final char c) {
+  @NotNull @Override public LogEntry append(final char c) {
     builder.append(c);
     return this;
   }
 
-  @NotNull @Override public LogRecordBuilder append(int i) {
+  @NotNull @Override public LogEntry append(int i) {
     builder.append(i);
     return this;
   }
 
-  @NotNull @Override public LogRecordBuilder append(long lng) {
+  @NotNull @Override public LogEntry append(long lng) {
     builder.append(lng);
     return this;
   }
 
-  @NotNull @Override public LogRecordBuilder append(float f) {
+  @NotNull @Override public LogEntry append(float f) {
     builder.append(f);
     return this;
   }
 
-  @NotNull @Override public LogRecordBuilder append(double d) {
+  @NotNull @Override public LogEntry append(double d) {
     builder.append(d);
     return this;
   }
 
-  @NotNull @Override public LogRecordBuilder append(@NotNull final String format,
-                                                    @NotNull final Object... args) {
+  @NotNull @Override public LogEntry append(@NotNull final String format,
+                                            @NotNull final Object... args) {
     return append(Locale.getDefault(), format, args);
   }
 
-  @NotNull @Override public LogRecordBuilder append(@NotNull Locale locale,
-                                                    @NotNull final String format,
-                                                    @NotNull final Object... args) {
+  @NotNull @Override public LogEntry append(@NotNull Locale locale,
+                                            @NotNull final String format,
+                                            @NotNull final Object... args) {
     if (args.length > 0) {
       formatter.format(locale, format, args);
     } else {
@@ -354,7 +371,7 @@ public class ExtLogRecord extends LogRecord
     return this;
   }
 
-  @NotNull @Override public LogRecordBuilder addLocation(final int stackDepth) {
+  @NotNull @Override public LogEntry addLocation(final int stackDepth) {
     location = LogUtil.getCallerLocation(stackDepth + 1);
     return this;
   }
@@ -368,5 +385,4 @@ public class ExtLogRecord extends LogRecord
     builder.append(csq, start, end);
     return this;
   }
-
 }

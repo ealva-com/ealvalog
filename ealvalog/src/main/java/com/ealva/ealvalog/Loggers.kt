@@ -66,7 +66,7 @@ fun <T : Any> T.lazyLogger(marker: Marker? = null, includeLocation: Boolean = fa
 inline fun Logger.t(
   throwable: Throwable? = null,
   marker: Marker? = null,
-  block: (LogRecordBuilder) -> Unit
+  block: (LogEntry) -> Unit
 ) {
   if (isLoggable(LogLevel.TRACE, marker, throwable)) {
     ExtLogRecord.get(LogLevel.TRACE, name, marker, throwable).use { record ->
@@ -79,7 +79,7 @@ inline fun Logger.t(
 inline fun Logger.d(
   throwable: Throwable? = null,
   marker: Marker? = null,
-  block: (LogRecordBuilder) -> Unit
+  block: (LogEntry) -> Unit
 ) {
   if (isLoggable(LogLevel.DEBUG, marker, throwable)) {
     ExtLogRecord.get(LogLevel.DEBUG, name, marker, throwable).use { record ->
@@ -92,7 +92,7 @@ inline fun Logger.d(
 inline fun Logger.i(
   throwable: Throwable? = null,
   marker: Marker? = null,
-  block: (LogRecordBuilder) -> Unit
+  block: (LogEntry) -> Unit
 ) {
   if (isLoggable(LogLevel.INFO, marker, throwable)) {
     ExtLogRecord.get(LogLevel.INFO, name, marker, throwable).use { record ->
@@ -105,7 +105,7 @@ inline fun Logger.i(
 inline fun Logger.w(
   throwable: Throwable? = null,
   marker: Marker? = null,
-  block: (LogRecordBuilder) -> Unit
+  block: (LogEntry) -> Unit
 ) {
   if (isLoggable(LogLevel.WARN, marker, throwable)) {
     ExtLogRecord.get(LogLevel.WARN, name, marker, throwable).use { record ->
@@ -118,7 +118,7 @@ inline fun Logger.w(
 inline fun Logger.e(
   throwable: Throwable? = null,
   marker: Marker? = null,
-  block: (LogRecordBuilder) -> Unit
+  block: (LogEntry) -> Unit
 ) {
   if (isLoggable(LogLevel.ERROR, marker, throwable)) {
     ExtLogRecord.get(LogLevel.ERROR, name, marker, throwable).use { record ->
@@ -131,7 +131,7 @@ inline fun Logger.e(
 inline fun Logger.wtf(
   throwable: Throwable? = null,
   marker: Marker? = null,
-  block: (LogRecordBuilder) -> Unit
+  block: (LogEntry) -> Unit
 ) {
   if (isLoggable(LogLevel.CRITICAL, marker, throwable)) {
     ExtLogRecord.get(LogLevel.CRITICAL, name, marker, throwable).use { record ->
