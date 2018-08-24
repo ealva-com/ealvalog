@@ -45,23 +45,23 @@ object JdkLoggerFactory : LoggerFactory {
   private val configuration: JdkLoggerConfiguration = object :
     JdkLoggerConfiguration {
     override fun setLoggerFilter(logger: Logger, filter: LoggerFilter) {
-      setFilter(logger, filter)
+      setFilter(logger.name, filter)
     }
 
     override fun addLoggerHandler(logger: Logger, loggerHandler: Handler) {
-      addHandler(logger, loggerHandler)
+      addHandler(logger.name, loggerHandler)
     }
 
     override fun setLogLevel(logger: Logger, logLevel: LogLevel) {
-      setLevel(logger, logLevel)
+      setLevel(logger.name, logLevel)
     }
 
     override fun setLogToParent(logger: Logger, logToParent: Boolean) {
-      setShouldLogToParent(logger, logToParent)
+      setShouldLogToParent(logger.name, logToParent)
     }
 
     override fun setIncludeLocation(logger: Logger, includeLocation: Boolean) {
-      setShouldIncludeLocation(logger, includeLocation)
+      setShouldIncludeLocation(logger.name, includeLocation)
     }
 
     override fun getBridge(loggerClassName: String): JdkBridge {
@@ -133,10 +133,9 @@ object JdkLoggerFactory : LoggerFactory {
     return get(name, null, false)
   }
 
-  private fun setFilter(logger: Logger, filter: LoggerFilter) {
+  private fun setFilter(loggerName: String, filter: LoggerFilter) {
     bridgeTreeLock.lock()
     try {
-      val loggerName = logger.name
       val bridge = getTheJdkBridge(loggerName)
       if (bridge.name == loggerName) {
         bridge.setFilter(filter)
@@ -154,10 +153,9 @@ object JdkLoggerFactory : LoggerFactory {
     }
   }
 
-  private fun addHandler(logger: Logger, loggerHandler: Handler) {
+  private fun addHandler(loggerName: String, loggerHandler: Handler) {
     bridgeTreeLock.lock()
     try {
-      val loggerName = logger.name
       val bridge = getTheJdkBridge(loggerName)
       if (bridge.name == loggerName) {
         bridge.addLoggerHandler(loggerHandler)
@@ -175,10 +173,9 @@ object JdkLoggerFactory : LoggerFactory {
     }
   }
 
-  private fun setLevel(logger: Logger, logLevel: LogLevel) {
+  private fun setLevel(loggerName: String, logLevel: LogLevel) {
     bridgeTreeLock.lock()
     try {
-      val loggerName = logger.name
       val bridge = getTheJdkBridge(loggerName)
       if (bridge.name == loggerName) {
         bridge.logLevel = logLevel
@@ -196,25 +193,23 @@ object JdkLoggerFactory : LoggerFactory {
     }
   }
 
-  private fun setShouldLogToParent(logger: Logger, logToParent: Boolean) {
+  private fun setShouldLogToParent(loggerName: String, logToParent: Boolean) {
     bridgeTreeLock.lock()
     try {
-      val loggerName = logger.name
       val bridge = getTheJdkBridge(loggerName)
       if (bridge.name == loggerName) {
-        bridge.setLogToParent(logToParent)
+        bridge.logToParent = logToParent
       } else {
-        makeNewBridge(bridge, loggerName, null, null, null).setLogToParent(logToParent)
+        makeNewBridge(bridge, loggerName, null, null, null).logToParent = logToParent
       }
     } finally {
       bridgeTreeLock.unlock()
     }
   }
 
-  private fun setShouldIncludeLocation(logger: Logger, includeLocation: Boolean) {
+  private fun setShouldIncludeLocation(loggerName: String, includeLocation: Boolean) {
     bridgeTreeLock.lock()
     try {
-      val loggerName = logger.name
       val bridge = getTheJdkBridge(loggerName)
       if (bridge.name == loggerName) {
         bridge.includeLocation = includeLocation

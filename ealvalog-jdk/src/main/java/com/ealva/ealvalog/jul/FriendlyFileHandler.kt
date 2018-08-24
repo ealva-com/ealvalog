@@ -47,7 +47,7 @@ class FriendlyFileHandler @Throws(IOException::class, SecurityException::class) 
 
   init {
     formatter = ExtRecordFormatter(formatterPattern, formatterLogErrors)
-    filter = loggerFilter
+    filter = JdkFilter(loggerFilter)
     manager?.let { mgr -> errorManager = mgr }
   }
 

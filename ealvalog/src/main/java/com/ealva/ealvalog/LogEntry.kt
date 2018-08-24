@@ -77,11 +77,15 @@ interface LogEntry : Appendable, Closeable {
    */
   fun reset(): LogEntry
 
+  override fun append(c: Char): LogEntry
+
+  override fun append(csq: CharSequence?): LogEntry
+
+  override fun append(csq: CharSequence?, start: Int, end: Int): LogEntry
+
   fun append(str: String): LogEntry
 
   fun append(b: Boolean): LogEntry
-
-  override fun append(c: Char): LogEntry
 
   fun append(i: Int): LogEntry
 

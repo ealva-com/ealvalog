@@ -22,7 +22,9 @@ import com.ealva.ealvalog.core.ExtLogRecord
 import com.ealva.ealvalog.LogEntry
 import com.ealva.ealvalog.LogLevel
 import com.ealva.ealvalog.Logger
+import com.ealva.ealvalog.LoggerFilter
 import com.ealva.ealvalog.Marker
+import com.ealva.ealvalog.filter.AlwaysNeutralFilter
 import com.ealva.ealvalog.util.LogUtil
 import java.util.concurrent.atomic.AtomicReference
 
@@ -36,6 +38,8 @@ class AndroidLogger internal constructor(
   override var marker: Marker? = null,
   override var includeLocation: Boolean = false
 ) : Logger {
+  override var filter: LoggerFilter = AlwaysNeutralFilter
+
   private val tag: String = LogUtil.tagFromName(name)
 
   override var logLevel: LogLevel? = null
@@ -44,7 +48,8 @@ class AndroidLogger internal constructor(
     get() = logLevel ?: LogLevel.NONE
 
   override fun isLoggable(level: LogLevel, marker: Marker?, throwable: Throwable?): Boolean {
-    return logHandler.get().isLoggable(tag, level, marker, throwable)
+    return filter.isLoggable(name, level, marker, throwable).shouldProceed &&
+        logHandler.get().isLoggable(tag, level, marker, throwable)
   }
 
   override fun shouldIncludeLocation(
@@ -71,9 +76,7 @@ class AndroidLogger internal constructor(
   }
 
   companion object {
-    private val logHandler: AtomicReference<LogHandler> = AtomicReference(
-      NullLogHandler
-    )
+    private val logHandler: AtomicReference<LogHandler> = AtomicReference(NullLogHandler)
 
     fun setHandler(handler: LogHandler) {
       logHandler.set(handler)

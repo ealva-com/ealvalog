@@ -117,7 +117,7 @@ public class JdkLoggerTest {
   @Test
   public void testChildLogsToHandlerAndRootHandler() {
     childLogger.addHandler(childHandler);
-    assertThat(childLogger.shouldLogToParent(), is(true));
+    assertThat(childLogger.willLogToParent(), is(true));
 
     try (ExtLogRecord extRecord = ExtLogRecord.get(WARN, CHILD_NAME, null, null)) {
       extRecord.append(MSG);

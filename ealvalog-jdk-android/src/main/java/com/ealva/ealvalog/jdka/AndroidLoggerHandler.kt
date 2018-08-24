@@ -21,11 +21,12 @@ package com.ealva.ealvalog.jdka
 import android.annotation.SuppressLint
 import android.util.Log
 import com.ealva.ealvalog.LogLevel
+import com.ealva.ealvalog.LoggerFilter
 import com.ealva.ealvalog.core.ExtRecordFormatter
 import com.ealva.ealvalog.filter.AlwaysNeutralFilter
+import com.ealva.ealvalog.jul.JdkFilter
 import com.ealva.ealvalog.util.LogUtil.tagFromName
 import java.util.logging.ErrorManager
-import java.util.logging.Filter
 import java.util.logging.Formatter
 import java.util.logging.Handler
 import java.util.logging.Level
@@ -60,13 +61,13 @@ private fun Level.toAndroid(): Int {
  */
 open class AndroidLoggerHandler(
   aFormatter: Formatter,
-  loggerFilter: Filter,
+  loggerFilter: LoggerFilter,
   anErrorMgr: ErrorManager
 ) : Handler() {
 
   init {
     formatter = aFormatter
-    filter = loggerFilter
+    filter = JdkFilter(loggerFilter)
     errorManager = anErrorMgr
   }
 
@@ -101,7 +102,7 @@ open class AndroidLoggerHandler(
     @JvmOverloads
     fun make(
       formatter: Formatter = ExtRecordFormatter(ExtRecordFormatter.TYPICAL_ANDROID_FORMAT, true),
-      filter: Filter = AlwaysNeutralFilter,
+      filter: LoggerFilter = AlwaysNeutralFilter,
       errorManager: ErrorManager = ErrorManager()
     ): AndroidLoggerHandler {
       return AndroidLoggerHandler(formatter, filter, errorManager)

@@ -37,16 +37,16 @@ object NullLogEntry : LogEntry {
     override val threadPriority = 0
     override val nanoTime = 0L
     override fun reset() = this
-    override fun append(str: String) = this
-    override fun append(b: Boolean) = this
     override fun append(c: Char) = this
+    override fun append(csq: CharSequence?) = this
+    override fun append(str: String) = this
+    override fun append(csq: CharSequence?, start: Int, end: Int) = this
+    override fun append(b: Boolean) = this
     override fun append(i: Int) = this
     override fun append(lng: Long) = this
     override fun append(f: Float) = this
     override fun append(d: Double) = this
     override fun append(format: String, vararg args: Any) = this
     override fun append(locale: Locale, format: String, vararg args: Any) = this
-    override fun append(csq: CharSequence?) = this
-    override fun append(csq: CharSequence?, start: Int, end: Int) = this
     override fun addLocation(stackDepth: Int) = this
 }

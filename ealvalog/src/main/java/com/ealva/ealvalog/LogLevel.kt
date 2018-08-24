@@ -47,8 +47,11 @@ enum class LogLevel(private val value: Int, val jdkLevel: Level) {
         LogLevel.values().forEach { logLevel -> this[logLevel.jdkLevel] = logLevel }
       }
 
-    fun fromLevel(level: Level): LogLevel {
-      return levelToLogLevelMap[level] ?: ALL
+    /**
+     * Maps [level] to LogLevel. If [level] is unknown, returns [defaultVal]
+     */
+    fun fromLevel(level: Level, defaultVal: LogLevel = NONE): LogLevel {
+      return levelToLogLevelMap[level] ?: defaultVal
     }
   }
 }

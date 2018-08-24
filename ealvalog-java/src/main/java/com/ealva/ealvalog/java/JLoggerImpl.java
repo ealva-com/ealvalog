@@ -18,6 +18,7 @@
 
 package com.ealva.ealvalog.java;
 
+import com.ealva.ealvalog.LoggerFilter;
 import com.ealva.ealvalog.core.ExtLogRecord;
 import com.ealva.ealvalog.LogEntry;
 import com.ealva.ealvalog.LogLevel;
@@ -427,5 +428,13 @@ public class JLoggerImpl implements JLogger {
                               @Nullable final Marker marker,
                               @Nullable final Throwable throwable) {
     return ExtLogRecord.get(logLevel, getName(), marker, throwable);
+  }
+
+  @NotNull @Override public LoggerFilter getFilter() {
+    return realLogger.getFilter();
+  }
+
+  @Override public void setFilter(@NotNull final LoggerFilter loggerFilter) {
+    realLogger.setFilter(loggerFilter);
   }
 }

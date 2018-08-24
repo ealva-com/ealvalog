@@ -20,15 +20,15 @@ package com.ealva.ealvalog.jul
 
 import com.ealva.ealvalog.FilterResult
 import com.ealva.ealvalog.FilterResult.DENY
+import com.ealva.ealvalog.LogEntry
 import com.ealva.ealvalog.LogLevel
 import com.ealva.ealvalog.LoggerFilter
 import com.ealva.ealvalog.Marker
 import com.ealva.ealvalog.core.Bridge
 import com.ealva.ealvalog.core.CoreLogger
+import com.ealva.ealvalog.core.ExtLogRecord
 import com.ealva.ealvalog.filter.AlwaysNeutralFilter
-import com.ealva.ealvalog.core.shouldBePublished
 import java.util.logging.Handler
-import java.util.logging.LogRecord
 
 /**
  * Bridge the [CoreLogger] to the underlying java.util.logging.Logger
@@ -57,17 +57,18 @@ class JdkBridge internal constructor(
 
   override var includeLocation: Boolean = false
 
+  override var logToParent: Boolean
+    get() = jdkLogger.useParentHandlers
+    set(value) { jdkLogger.useParentHandlers = value }
+
   override val name: String
     get() = jdkLogger.name
 
-  val logToParent: Boolean
-    get() = jdkLogger.useParentHandlers
-
-  fun getFilter(): LoggerFilter {
+  override fun getFilter(): LoggerFilter {
     return filter
   }
 
-  fun setFilter(filter: LoggerFilter?) {
+  override fun setFilter(filter: LoggerFilter?) {
     this.filter = filter ?: AlwaysNeutralFilter
   }
 
@@ -79,16 +80,8 @@ class JdkBridge internal constructor(
     return includeLocation || parent?.shouldIncludeLocation(level, marker, throwable) == true
   }
 
-  override fun shouldLogToParent(jdkLogger: com.ealva.ealvalog.Logger): Boolean {
-    return !bridgeIsLoggerPeer(jdkLogger) || this.jdkLogger.useParentHandlers
-  }
-
-  override fun setLogToParent(logToParent: Boolean) {
-    jdkLogger.useParentHandlers = logToParent
-  }
-
-  override fun isLoggable(record: LogRecord?): Boolean {
-    return record?.shouldBePublished(filter) == true
+  override fun willLogToParent(loggerName: String): Boolean {
+    return !bridgeIsLoggerPeer(loggerName) || jdkLogger.useParentHandlers
   }
 
   /**
@@ -109,18 +102,20 @@ class JdkBridge internal constructor(
     return filter.isLoggable(loggerName, logLevel, marker, throwable).acceptIfNeutral()
   }
 
-  override fun log(record: LogRecord) {
-    jdkLogger.log(record)
+  override fun log(entry: LogEntry) {
+    ExtLogRecord.fromLogEntry(entry).use { record ->
+      jdkLogger.log(record)
+    }
   }
 
   override fun getLevelForLogger(logger: com.ealva.ealvalog.Logger): LogLevel? {
-    return if (bridgeIsLoggerPeer(logger)) {
+    return if (bridgeIsLoggerPeer(logger.name)) {
       LogLevel.fromLevel(jdkLogger.level)
     } else null
   }
 
-  override fun bridgeIsLoggerPeer(logger: com.ealva.ealvalog.Logger): Boolean {
-    return name == logger.name
+  override fun bridgeIsLoggerPeer(loggerName: String): Boolean {
+    return name == loggerName
   }
 
   fun addLoggerHandler(loggerHandler: Handler) {

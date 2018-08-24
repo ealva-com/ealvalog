@@ -26,6 +26,10 @@ package com.ealva.ealvalog
  */
 interface Logger {
 
+  /**
+   * The name of the logger. If the underlying logger is anonymous (name is null), then
+   * [ANONYMOUS_NAME] is returned
+   */
   val name: String
 
   /**
@@ -33,6 +37,8 @@ interface Logger {
    * a logging call.
    */
   var marker: Marker?
+
+  var filter: LoggerFilter
 
   /**
    * An optional LogLevel. If null and the Logger implementation is
@@ -95,4 +101,8 @@ interface Logger {
    * @param entry the full log information
    */
   fun logImmediate(entry: LogEntry)
+
+  companion object {
+    const val ANONYMOUS_NAME = "Anonymous Logger"
+  }
 }

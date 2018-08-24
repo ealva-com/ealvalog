@@ -18,11 +18,11 @@
 
 package com.ealva.ealvalog.core
 
+import com.ealva.ealvalog.LogEntry
 import com.ealva.ealvalog.LogLevel
 import com.ealva.ealvalog.Logger
 import com.ealva.ealvalog.LoggerFilter
 import com.ealva.ealvalog.Marker
-import java.util.logging.LogRecord
 
 /**
  * Instance bridge the [CoreLogger] to the underlying logging implementation
@@ -48,13 +48,17 @@ interface Bridge : LoggerFilter {
    */
   val logLevel: LogLevel
 
+  fun getFilter(): LoggerFilter
+
+  fun setFilter(filter: LoggerFilter?)
+
   fun shouldIncludeLocation(level: LogLevel, marker: Marker?, throwable: Throwable?): Boolean
 
-  fun shouldLogToParent(jdkLogger: Logger): Boolean
+  fun willLogToParent(loggerName: String): Boolean
 
-  fun setLogToParent(logToParent: Boolean)
+  var logToParent: Boolean
 
-  fun log(record: LogRecord)
+  fun log(entry: LogEntry)
 
   /**
    * If this bridge is for `logger`, then return any set level. Otherwise, this bridge is for a
@@ -66,5 +70,5 @@ interface Bridge : LoggerFilter {
    */
   fun getLevelForLogger(logger: Logger): LogLevel?
 
-  fun bridgeIsLoggerPeer(logger: Logger): Boolean
+  fun bridgeIsLoggerPeer(loggerName: String): Boolean
 }

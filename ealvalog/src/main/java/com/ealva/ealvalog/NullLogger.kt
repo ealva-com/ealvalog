@@ -18,7 +18,7 @@
 
 package com.ealva.ealvalog
 
-import java.util.logging.LogRecord
+import com.ealva.ealvalog.filter.AlwaysDenyFilter
 
 /**
  * A no-op [com.ealva.ealvalog.Logger] implementation
@@ -26,6 +26,7 @@ import java.util.logging.LogRecord
  * Created by Eric A. Snell on 2/28/17.
  */
 object NullLogger : Logger {
+  override var filter: LoggerFilter = AlwaysDenyFilter
   override val name = "NullLogger"
   override var marker: Marker? = null
   override var logLevel: LogLevel? = null
@@ -36,7 +37,10 @@ object NullLogger : Logger {
     marker: Marker?,
     throwable: Throwable?
   ) = false
+
   override fun isLoggable(level: LogLevel, marker: Marker?, throwable: Throwable?) = false
-  override fun getLogEntry(logLevel: LogLevel, marker: Marker?, throwable: Throwable?) = NullLogEntry
+  override fun getLogEntry(logLevel: LogLevel, marker: Marker?, throwable: Throwable?) =
+    NullLogEntry
+
   override fun logImmediate(entry: LogEntry) {}
 }

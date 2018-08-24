@@ -24,13 +24,12 @@ import static java.util.FormattableFlags.ALTERNATE;
 import static java.util.FormattableFlags.LEFT_JUSTIFY;
 import static java.util.FormattableFlags.UPPERCASE;
 
-import java.util.Formattable;
 import java.util.Formatter;
 
 /**
  * Formats a contained {@link StackTraceElement} to "methodName:lineNumber". If alternate ("#") is
  * specified, it is prefixed with the class name. eg "ClassName.methodName:lineNumber"
- *
+ * <p>
  * Created by Eric A. Snell on 3/15/17.
  */
 public class FormattableStackTraceElement extends BaseFormattable {
@@ -59,7 +58,11 @@ public class FormattableStackTraceElement extends BaseFormattable {
     this.element = element;
   }
 
-  @Override public void formatTo(final Formatter formatter, final int flags, final int width, final int precision) {
+  @Override
+  public void formatTo(final Formatter formatter,
+                       final int flags,
+                       final int width,
+                       final int precision) {
     final boolean useAlternate = (flags & ALTERNATE) == ALTERNATE;
     final boolean leftJustify = (flags & LEFT_JUSTIFY) == LEFT_JUSTIFY;
     final boolean upperCase = (flags & UPPERCASE) == UPPERCASE;

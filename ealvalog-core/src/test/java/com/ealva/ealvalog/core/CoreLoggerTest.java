@@ -34,6 +34,7 @@ import org.mockito.MockitoAnnotations;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.only;
+import static org.mockito.Mockito.when;
 
 /**
  * Test core functionality. Ensure it's calling the bridge correctly, including passing itself.
@@ -42,19 +43,22 @@ import static org.mockito.Mockito.only;
  */
 public class CoreLoggerTest {
   private static final String MESSAGE = "Message";
+  private static final String LOGGER_NAME = "LoggerName";
 
-  @SuppressWarnings("WeakerAccess") @Mock com.ealva.ealvalog.core.Bridge bridge;
+  @Mock com.ealva.ealvalog.core.Bridge bridge;
+  @Mock LoggerConfiguration<Bridge> configuration;
 
   @Before
   public void setup() {
     MockitoAnnotations.initMocks(this);
+    when(configuration.getBridge(LOGGER_NAME)).thenReturn(bridge);
   }
 
   @SuppressWarnings("deprecation") // isNull()
   @Test
   public void testPrintLog() {
     com.ealva.ealvalog.core.CoreLogger<com.ealva.ealvalog.core.Bridge>
-        logger = new CoreLoggerForTest("LoggerName", bridge);
+        logger = new CoreLoggerForTest(LOGGER_NAME, configuration);
     final ExtLogRecord record = ExtLogRecord.get(LogLevel.WARN, "", null, null);
     record.append(MESSAGE);
     logger.logImmediate(record);
@@ -64,8 +68,9 @@ public class CoreLoggerTest {
   private static class CoreLoggerForTest extends CoreLogger<com.ealva.ealvalog.core.Bridge> {
     private final @NotNull String name;
 
-    CoreLoggerForTest(@NotNull final String name, @NotNull final Bridge bridge) {
-      super(bridge);
+    CoreLoggerForTest(@NotNull final String name,
+                      @NotNull final LoggerConfiguration<Bridge> configuration) {
+      super(name, configuration);
       this.name = name;
     }
 
@@ -73,24 +78,12 @@ public class CoreLoggerTest {
       return null;
     }
 
-    @Override public void setLogToParent(final boolean logToParent) {
-
-    }
-
     @Override public void setLogLevel(@Nullable final LogLevel logLevel) {
 
     }
 
-    @Override public boolean getLogToParent() {
-      return true;
-    }
-
     @NotNull @Override public LogLevel getEffectiveLogLevel() {
       return LogLevel.ALL;
-    }
-
-    @Override public boolean shouldLogToParent() {
-      return false;
     }
 
     @Override public boolean getIncludeLocation() {
@@ -138,6 +131,10 @@ public class CoreLoggerTest {
                                 @Nullable final Marker marker,
                                 @Nullable final Throwable throwable) {
       return NullLogEntry.INSTANCE;
+    }
+
+    @Override public void logImmediate(@NotNull final LogEntry entry) {
+      getBridge().log(entry);
     }
   }
 }

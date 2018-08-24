@@ -16,31 +16,31 @@
  * limitations under the License.
  */
 
-package com.ealva.ealvalog
+package com.ealva.ealvalog.jul
+
+import com.ealva.ealvalog.FilterResult
+import com.ealva.ealvalog.LogLevel
+import com.ealva.ealvalog.LoggerFilter
+import com.ealva.ealvalog.Marker
+import com.ealva.ealvalog.core.shouldBePublished
+import java.util.logging.Filter
+import java.util.logging.LogRecord
 
 /**
- * Used at top layer of logging to prevent unnecessary calls into lower layers, hence preventing
- * lots of unnecessary objects being created
- *
- * Created by Eric A. Snell on 3/6/17.
+ * Created by Eric A. Snell on 8/24/18.
  */
-interface LoggerFilter {
-
-  /**
-   * Will a log at this [LogLevel], with the given (optional) [Marker] and (optional) [Throwable],
-   * result in an actual log statement
-   *
-   * @param loggerName    the logger that is making the log call
-   * @param logLevel     the level to test
-   * @param marker    optional marker to test
-   * @param throwable optional throwable to test
-   *
-   * @return [FilterResult.ACCEPT] or [FilterResult.NEUTRAL] if logging will proceed
-   */
-  fun isLoggable(
+class JdkFilter(private val loggerFilter: LoggerFilter) : LoggerFilter, Filter {
+  override fun isLoggable(
     loggerName: String,
     logLevel: LogLevel,
     marker: Marker?,
     throwable: Throwable?
-  ): FilterResult
+  ): FilterResult {
+    return loggerFilter.isLoggable(loggerName, logLevel, marker, throwable)
+  }
+
+  override fun isLoggable(record: LogRecord?): Boolean {
+    return record?.shouldBePublished(loggerFilter) == true
+  }
+
 }

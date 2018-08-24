@@ -23,9 +23,6 @@ import com.ealva.ealvalog.LoggerFactory;
 import com.ealva.ealvalog.LoggerFilter;
 import com.ealva.ealvalog.Loggers;
 import com.ealva.ealvalog.filter.AlwaysAcceptFilter;
-import com.ealva.ealvalog.jul.JdkBridge;
-import com.ealva.ealvalog.jul.JdkLogger;
-import com.ealva.ealvalog.jul.JdkLoggerFactory;
 
 import static com.ealva.ealvalog.LoggerFactory.ROOT_LOGGER_NAME;
 

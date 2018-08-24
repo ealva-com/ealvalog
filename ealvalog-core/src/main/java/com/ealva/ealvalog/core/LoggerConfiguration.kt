@@ -16,20 +16,19 @@
  * limitations under the License.
  */
 
-package com.ealva.ealvalog.jul
+package com.ealva.ealvalog.core
 
+import com.ealva.ealvalog.LogLevel
 import com.ealva.ealvalog.Logger
-import com.ealva.ealvalog.core.LoggerConfiguration
-import java.util.logging.Handler
+import com.ealva.ealvalog.LoggerFilter
 
 /**
- *
- * Created by Eric A. Snell on 3/7/17.
+ * Created by Eric A. Snell on 8/24/18.
  */
-internal interface JdkLoggerConfiguration : LoggerConfiguration<JdkBridge> {
-
-  override fun getBridge(loggerClassName: String): JdkBridge
-
-  fun addLoggerHandler(logger: Logger, loggerHandler: Handler)
-
+interface LoggerConfiguration<T: Bridge> {
+  fun setLoggerFilter(logger: Logger, filter: LoggerFilter)
+  fun setLogLevel(logger: Logger, logLevel: LogLevel)
+  fun setLogToParent(logger: Logger, logToParent: Boolean)
+  fun setIncludeLocation(logger: Logger, includeLocation: Boolean)
+  fun getBridge(loggerClassName: String): T
 }

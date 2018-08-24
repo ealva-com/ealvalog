@@ -20,14 +20,17 @@ package com.ealva.ealvalog.java
 
 import com.ealva.ealvalog.LogEntry
 import com.ealva.ealvalog.LogLevel
+import com.ealva.ealvalog.LoggerFilter
 import com.ealva.ealvalog.Marker
 import com.ealva.ealvalog.NullLogEntry
+import com.ealva.ealvalog.filter.AlwaysNeutralFilter
 import java.util.function.Supplier
 
 /**
  * Created by Eric A. Snell on 8/10/18.
  */
 object NullJLogger : JLogger {
+  override var filter: LoggerFilter = AlwaysNeutralFilter
   override fun isLoggable(level: LogLevel) = false
   override fun isLoggable(level: LogLevel, marker: Marker): Boolean = false
   override fun isLoggable(level: LogLevel, throwable: Throwable): Boolean = false

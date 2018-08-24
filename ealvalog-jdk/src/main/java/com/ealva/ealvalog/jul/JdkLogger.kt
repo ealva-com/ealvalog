@@ -18,13 +18,11 @@
 
 package com.ealva.ealvalog.jul
 
-import com.ealva.ealvalog.core.ExtLogRecord
 import com.ealva.ealvalog.LogEntry
 import com.ealva.ealvalog.LogLevel
-import com.ealva.ealvalog.LogLevel.NONE
-import com.ealva.ealvalog.LoggerFilter
 import com.ealva.ealvalog.Marker
 import com.ealva.ealvalog.core.CoreLogger
+import com.ealva.ealvalog.core.ExtLogRecord
 import org.jetbrains.annotations.TestOnly
 import java.util.logging.Handler
 
@@ -38,29 +36,7 @@ class JdkLogger internal constructor(
   override val name: String,
   override var marker: Marker?,
   private var config: JdkLoggerConfiguration
-) : CoreLogger<JdkBridge>(config.getBridge(name)) {
-  override var logLevel: LogLevel?
-    get() = bridge.getLevelForLogger(this)
-    set(logLevel) = config.setLogLevel(this, logLevel ?: NONE)
-
-  override val effectiveLogLevel: LogLevel
-    get() = bridge.logLevel
-
-  override var includeLocation: Boolean
-    get() = bridge.includeLocation
-    set(includeLocation) = config.setIncludeLocation(this, includeLocation)
-
-  override fun shouldIncludeLocation(
-    logLevel: LogLevel,
-    marker: Marker?,
-    throwable: Throwable?
-  ): Boolean {
-    return bridge.shouldIncludeLocation(logLevel, marker, throwable)
-  }
-
-  override var logToParent: Boolean
-    get() = bridge.logToParent
-    set(logToParent) = config.setLogToParent(this, logToParent)
+) : CoreLogger<JdkBridge>(name, config) {
 
   internal fun update(configuration: JdkLoggerConfiguration) {
     this.config = configuration
@@ -71,24 +47,8 @@ class JdkLogger internal constructor(
     config.addLoggerHandler(this, handler)
   }
 
-  override fun isLoggable(
-    level: LogLevel,
-    marker: Marker?,
-    throwable: Throwable?
-  ): Boolean {
-    return bridge.isLoggable(name, level, marker, throwable).shouldProceed
-  }
-
   override fun getLogEntry(logLevel: LogLevel, marker: Marker?, throwable: Throwable?): LogEntry {
     return ExtLogRecord.get(logLevel, name, marker, throwable)
-  }
-
-  override fun shouldLogToParent(): Boolean {
-    return bridge.shouldLogToParent(this)
-  }
-
-  override fun setFilter(filter: LoggerFilter) {
-    config.setLoggerFilter(this, filter)
   }
 
   val bridgeForTest: JdkBridge

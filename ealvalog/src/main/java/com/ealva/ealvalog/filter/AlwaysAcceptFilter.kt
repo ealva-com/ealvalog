@@ -18,7 +18,7 @@
 
 package com.ealva.ealvalog.filter
 
-import com.ealva.ealvalog.FilterResult
+import com.ealva.ealvalog.FilterResult.ACCEPT
 import com.ealva.ealvalog.LogLevel
 import com.ealva.ealvalog.LoggerFilter
 import com.ealva.ealvalog.Marker
@@ -27,15 +27,13 @@ import java.util.logging.LogRecord
 /**
  * A filter that always responds true. Helps avoid null.
  *
- *
  * Created by Eric A. Snell on 3/8/17.
  */
-object AlwaysDenyFilter : LoggerFilter {
-  override fun isLoggable(record: LogRecord?) = false
+object AlwaysAcceptFilter : LoggerFilter {
   override fun isLoggable(
     loggerName: String,
     logLevel: LogLevel,
     marker: Marker?,
     throwable: Throwable?
-  ) = FilterResult.DENY
+  ) = ACCEPT
 }

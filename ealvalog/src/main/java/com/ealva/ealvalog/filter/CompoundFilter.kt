@@ -22,47 +22,41 @@ import com.ealva.ealvalog.FilterResult
 import com.ealva.ealvalog.LogLevel
 import com.ealva.ealvalog.LoggerFilter
 import com.ealva.ealvalog.Marker
-import com.ealva.ealvalog.core.shouldBePublished
 import java.util.concurrent.CopyOnWriteArraySet
-import java.util.logging.LogRecord
 
 /**
  * Created by Eric A. Snell on 8/17/18.
  */
 class CompoundFilter(vararg filters: LoggerFilter) : LoggerFilter {
-    private val filters = CopyOnWriteArraySet<LoggerFilter>().apply { addAll(filters) }
+  private val filters = CopyOnWriteArraySet<LoggerFilter>().apply { addAll(filters) }
 
-    fun add(filter: LoggerFilter): Boolean {
-        return filters.add(filter)
-    }
+  fun add(filter: LoggerFilter): Boolean {
+    return filters.add(filter)
+  }
 
-    fun remove(filter: LoggerFilter): Boolean {
-        return filters.remove(filter)
-    }
+  fun remove(filter: LoggerFilter): Boolean {
+    return filters.remove(filter)
+  }
 
-    fun clear() {
-        filters.clear()
-    }
+  fun clear() {
+    filters.clear()
+  }
 
-    fun addAll(vararg filters: LoggerFilter) {
-        this.filters.addAll(filters)
-    }
+  fun addAll(vararg filters: LoggerFilter) {
+    this.filters.addAll(filters)
+  }
 
-    override fun isLoggable(
-        loggerName: String,
-        logLevel: LogLevel,
-        marker: Marker?,
-        throwable: Throwable?
-    ): FilterResult {
-        filters.forEach {
-            val result = it.isLoggable(loggerName, logLevel, marker, throwable)
-            if (result !== FilterResult.NEUTRAL) return result
-        }
-        return FilterResult.NEUTRAL
+  override fun isLoggable(
+    loggerName: String,
+    logLevel: LogLevel,
+    marker: Marker?,
+    throwable: Throwable?
+  ): FilterResult {
+    filters.forEach {
+      val result = it.isLoggable(loggerName, logLevel, marker, throwable)
+      if (result !== FilterResult.NEUTRAL) return result
     }
-
-    override fun isLoggable(record: LogRecord?): Boolean {
-        return record?.shouldBePublished(this) == true
-    }
+    return FilterResult.NEUTRAL
+  }
 
 }

@@ -19,24 +19,22 @@
 package com.ealva.ealvalog.filter
 
 import com.ealva.ealvalog.FilterResult
+import com.ealva.ealvalog.LogLevel
 import com.ealva.ealvalog.LoggerFilter
-import com.ealva.ealvalog.core.shouldBePublished
+import com.ealva.ealvalog.Marker
 import java.util.logging.LogRecord
 
 /**
- * Convenience base class for filters
+ * A filter that always responds true. Helps avoid null.
  *
- * Created by Eric A. Snell on 3/13/17.
+ *
+ * Created by Eric A. Snell on 3/8/17.
  */
-abstract class BaseFilter(
-  protected val whenMatched: FilterResult = FilterResult.NEUTRAL,
-  protected val whenDiffer: FilterResult = FilterResult.DENY
-) : LoggerFilter {
-  override fun isLoggable(record: LogRecord?): Boolean {
-    return record?.shouldBePublished(this) == true
-  }
-
-  protected inline fun result(block: () -> Boolean): FilterResult {
-    return if (block()) whenMatched else whenDiffer
-  }
+object AlwaysNeutralFilter : LoggerFilter {
+  override fun isLoggable(
+    loggerName: String,
+    logLevel: LogLevel,
+    marker: Marker?,
+    throwable: Throwable?
+  ) = FilterResult.NEUTRAL
 }

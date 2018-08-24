@@ -128,7 +128,7 @@ public class ExtLogRecord extends LogRecord implements LogEntry {
    *
    * @param entry the LogEntry, which should already be an ExtLogRecord
    *
-   * @return the entry if it is an ExtLogRecord or a new ExtLogRecord if entry must be converted
+   * @return entry if it is an ExtLogRecord or a new ExtLogRecord if entry must be converted
    */
   public static ExtLogRecord fromLogEntry(@NotNull final LogEntry entry) {
     if (ExtLogRecord.class.isAssignableFrom(entry.getClass())) {
@@ -377,6 +377,21 @@ public class ExtLogRecord extends LogRecord implements LogEntry {
     return this;
   }
 
+  @NotNull @Override public LogEntry append(final char c) {
+    builder.append(c);
+    return this;
+  }
+
+  @NotNull @Override public LogEntry append(final CharSequence csq) {
+    builder.append(csq);
+    return this;
+  }
+
+  @NotNull @Override public LogEntry append(final CharSequence csq, final int start, final int end) {
+    builder.append(csq, start, end);
+    return this;
+  }
+
   @NotNull @Override public LogEntry append(@NotNull final String str) {
     builder.append(str);
     return this;
@@ -384,11 +399,6 @@ public class ExtLogRecord extends LogRecord implements LogEntry {
 
   @NotNull @Override public LogEntry append(boolean b) {
     builder.append(b);
-    return this;
-  }
-
-  @NotNull @Override public LogEntry append(final char c) {
-    builder.append(c);
     return this;
   }
 
@@ -430,16 +440,6 @@ public class ExtLogRecord extends LogRecord implements LogEntry {
 
   @NotNull @Override public LogEntry addLocation(final int stackDepth) {
     location = LogUtil.getCallerLocation(stackDepth + 1);
-    return this;
-  }
-
-  @Override public LogEntry append(final CharSequence csq) {
-    builder.append(csq);
-    return this;
-  }
-
-  @Override public LogEntry append(final CharSequence csq, final int start, final int end) {
-    builder.append(csq, start, end);
     return this;
   }
 }

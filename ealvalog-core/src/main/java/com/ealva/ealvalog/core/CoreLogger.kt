@@ -19,29 +19,68 @@
 package com.ealva.ealvalog.core
 
 import com.ealva.ealvalog.LogEntry
+import com.ealva.ealvalog.LogLevel
 import com.ealva.ealvalog.Logger
 import com.ealva.ealvalog.LoggerFilter
+import com.ealva.ealvalog.Marker
 
 /**
- * This logger delegates to a [Bridge] for [.isLoggable] and
- * [.printLog]
- *
+ * This logger delegates to a [Bridge] implementation to perform most operations. The
+ * [LoggerConfiguration] is so that the bridge hierarchy can be reconfigured on the fly.
+ * Typically a Factory implementation will be the LoggerConfiguration of of the particular
+ * Logger type.
  *
  * Created by Eric A. Snell on 3/7/17.
  */
 abstract class CoreLogger<T : Bridge> protected constructor(
-  @field:Volatile protected open var bridge: T
+  loggerName: String,
+  private val config: LoggerConfiguration<T>
 ) : Logger {
+  @field:Volatile protected open var bridge: T = config.getBridge(loggerName)
 
-  abstract var logToParent: Boolean
+  override var logLevel: LogLevel?
+    get() = bridge.getLevelForLogger(this)
+    set(logLevel) = config.setLogLevel(this, logLevel ?: LogLevel.NONE)
 
-  abstract fun shouldLogToParent(): Boolean
+  override val effectiveLogLevel: LogLevel
+    get() = bridge.logLevel
 
-  override fun logImmediate(entry: LogEntry) {
-    ExtLogRecord.fromLogEntry(entry).use { record ->
-      bridge.log(record)
-    }
+  override var includeLocation: Boolean
+    get() = bridge.includeLocation
+    set(includeLocation) = config.setIncludeLocation(this, includeLocation)
+
+  override fun shouldIncludeLocation(
+    logLevel: LogLevel,
+    marker: Marker?,
+    throwable: Throwable?
+  ): Boolean {
+    return bridge.shouldIncludeLocation(logLevel, marker, throwable)
   }
 
-  abstract fun setFilter(filter: LoggerFilter)
+  override fun isLoggable(
+    level: LogLevel,
+    marker: Marker?,
+    throwable: Throwable?
+  ): Boolean {
+    return bridge.isLoggable(name, level, marker, throwable).shouldProceed
+  }
+
+  var logToParent: Boolean
+    get() = bridge.logToParent
+    set(logToParent) = config.setLogToParent(this, logToParent)
+
+  override var filter: LoggerFilter
+    get() = bridge.getFilter()
+    set(value) {
+      config.setLoggerFilter(this, value)
+    }
+
+  fun willLogToParent(): Boolean {
+    return bridge.willLogToParent(name)
+  }
+
+  override fun logImmediate(entry: LogEntry) {
+    bridge.log(entry)
+  }
+
 }

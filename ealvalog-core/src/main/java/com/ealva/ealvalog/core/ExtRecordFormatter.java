@@ -303,7 +303,7 @@ public class ExtRecordFormatter extends Formatter {
     formatterArgs[MESSAGE_INDEX] = message;
     formatterArgs[THREAD_ID_INDEX] = Integer.valueOf(record.getThreadID());
     formatterArgs[LOGGER_NAME_INDEX] = record.getLoggerName();
-    formatterArgs[LOG_LEVEL_INDEX] = LogLevel.Companion.fromLevel(record.getLevel());
+    formatterArgs[LOG_LEVEL_INDEX] = LogLevel.Companion.fromLevel(record.getLevel(), LogLevel.NONE);
     formatterArgs[DATE_INDEX] = Long.valueOf(record.getMillis());
     ((FormattableThrowable)formatterArgs[THROWN_INDEX]).setRealThrowable(record.getThrown());
     formatterArgs[CLASS_NAME_INDEX] = record.getSourceClassName();
