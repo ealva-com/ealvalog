@@ -18,8 +18,6 @@
 
 package com.ealva.ealvalog.util;
 
-import com.ealva.ealvalog.util.FormattableStackTraceElement;
-
 import org.junit.Before;
 import org.junit.Test;
 
@@ -42,8 +40,12 @@ public class FormattableStackTraceElementTest {
   private static final String FILE_NAME_JAVA = "FileName.java";
   private static final int LINE_NUMBER = 100;
 
-  private static final String EXPECTED = String.format(Locale.getDefault(), "(%s:%d)", METHOD_NAME, LINE_NUMBER);
-  private static final String EXPECTED_ALT = String.format(Locale.getDefault(), "(%s.%s:%d)", DECLARING_CLASS, METHOD_NAME, LINE_NUMBER);
+  private static final String
+      EXPECTED =
+      String.format(Locale.getDefault(), "(%s:%d)", METHOD_NAME, LINE_NUMBER);
+  private static final String
+      EXPECTED_ALT =
+      String.format(Locale.getDefault(), "(%s.%s:%d)", DECLARING_CLASS, METHOD_NAME, LINE_NUMBER);
 
   private Formatter formatter;
   private StackTraceElement location;
@@ -63,7 +65,7 @@ public class FormattableStackTraceElementTest {
   }
 
   @Test
-  public void formatTo() throws Exception {
+  public void formatTo() {
     com.ealva.ealvalog.util.FormattableStackTraceElement
         formattable = com.ealva.ealvalog.util.FormattableStackTraceElement.make(location);
     formattable.formatTo(formatter, 0, -1, -1);
@@ -71,7 +73,7 @@ public class FormattableStackTraceElementTest {
   }
 
   @Test
-  public void formatToAlt() throws Exception {
+  public void formatToAlt() {
     com.ealva.ealvalog.util.FormattableStackTraceElement
         formattable = com.ealva.ealvalog.util.FormattableStackTraceElement.make(location);
     formattable.formatTo(formatter, FormattableFlags.ALTERNATE, -1, -1);
@@ -79,7 +81,7 @@ public class FormattableStackTraceElementTest {
   }
 
   @Test
-  public void formatToPrecision() throws Exception {
+  public void formatToPrecision() {
     com.ealva.ealvalog.util.FormattableStackTraceElement
         formattable = com.ealva.ealvalog.util.FormattableStackTraceElement.make(location);
     formattable.formatTo(formatter, 0, -1, 10);
@@ -87,7 +89,7 @@ public class FormattableStackTraceElementTest {
   }
 
   @Test
-  public void formatAltToPrecision() throws Exception {
+  public void formatAltToPrecision() {
     com.ealva.ealvalog.util.FormattableStackTraceElement
         formattable = com.ealva.ealvalog.util.FormattableStackTraceElement.make(location);
     formattable.formatTo(formatter, FormattableFlags.ALTERNATE, -1, 24);
@@ -95,15 +97,15 @@ public class FormattableStackTraceElementTest {
   }
 
   @Test
-  public void formatToWidth() throws Exception {
+  public void formatToWidth() {
     com.ealva.ealvalog.util.FormattableStackTraceElement
         formattable = com.ealva.ealvalog.util.FormattableStackTraceElement.make(location);
     formattable.formatTo(formatter, 0, EXPECTED.length() + 5, -1);
-    assertThat(formatter.toString(), is(equalTo("     " + EXPECTED )));
+    assertThat(formatter.toString(), is(equalTo("     " + EXPECTED)));
   }
 
   @Test
-  public void formatToWidthLeftJustified() throws Exception {
+  public void formatToWidthLeftJustified() {
     com.ealva.ealvalog.util.FormattableStackTraceElement
         formattable = com.ealva.ealvalog.util.FormattableStackTraceElement.make(location);
     formattable.formatTo(formatter, FormattableFlags.LEFT_JUSTIFY, EXPECTED.length() + 5, -1);
@@ -111,7 +113,7 @@ public class FormattableStackTraceElementTest {
   }
 
   @Test
-  public void formatToPrecisionLargerWidth() throws Exception {
+  public void formatToPrecisionLargerWidth() {
     com.ealva.ealvalog.util.FormattableStackTraceElement
         formattable = com.ealva.ealvalog.util.FormattableStackTraceElement.make(location);
     formattable.formatTo(formatter, 0, 12, 10);
@@ -119,7 +121,7 @@ public class FormattableStackTraceElementTest {
   }
 
   @Test
-  public void formatAltToPrecisionLargerWidth() throws Exception {
+  public void formatAltToPrecisionLargerWidth() {
     com.ealva.ealvalog.util.FormattableStackTraceElement
         formattable = com.ealva.ealvalog.util.FormattableStackTraceElement.make(location);
     formattable.formatTo(formatter, FormattableFlags.ALTERNATE, 26, 24);
@@ -127,7 +129,7 @@ public class FormattableStackTraceElementTest {
   }
 
   @Test
-  public void formatToPrecisionLargerWidthLeftJustifited() throws Exception {
+  public void formatToPrecisionLargerWidthLeftJustifited() {
     com.ealva.ealvalog.util.FormattableStackTraceElement
         formattable = com.ealva.ealvalog.util.FormattableStackTraceElement.make(location);
     formattable.formatTo(formatter, FormattableFlags.LEFT_JUSTIFY, 12, 10);
@@ -135,10 +137,13 @@ public class FormattableStackTraceElementTest {
   }
 
   @Test
-  public void formatAltToPrecisionLargerWidthLeftJustifited() throws Exception {
+  public void formatAltToPrecisionLargerWidthLeftJustifited() {
     com.ealva.ealvalog.util.FormattableStackTraceElement
         formattable = FormattableStackTraceElement.make(location);
-    formattable.formatTo(formatter, FormattableFlags.LEFT_JUSTIFY | FormattableFlags.ALTERNATE, 26, 24);
+    formattable.formatTo(formatter,
+                         FormattableFlags.LEFT_JUSTIFY | FormattableFlags.ALTERNATE,
+                         26,
+                         24);
     assertThat(formatter.toString(), is(equalTo("(…gClass.MethodName:100)  ")));
   }
 

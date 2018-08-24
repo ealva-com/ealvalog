@@ -70,7 +70,7 @@ import java.util.logging.LogRecord;
  * <td align="center" valign="top">6$
  * <td align="center" valign="top">"%6$s" or "%6$#s"
  * <td align="center" valign="top">FormattableThrowable
- * <td align="center" valign="top">Thrown <sup>1</sup>
+ * <td align="center" valign="top">Thrown<sup>1</sup>
  * <p><tr>
  * <td align="center" valign="top">7$
  * <td align="center" valign="top">"%7$s"
@@ -83,8 +83,8 @@ import java.util.logging.LogRecord;
  * <td align="center" valign="top">Method Name <sup>2</sup>
  * <p><tr>
  * <td align="center" valign="top">9$
- * <td align="center" valign="top">"%9$s"
- * <td align="center" valign="top">FormattableStackTraceElement
+ * <td align="center" valign="top">"%9$s" or "%9$#s"
+ * <td align="center" valign="top">FormattableStackTraceElement<sup>3</sup>
  * <td align="center" valign="top">Location <sup>2</sup>
  * <p><tr>
  * <td align="center" valign="top">10$
@@ -96,56 +96,80 @@ import java.util.logging.LogRecord;
  * <td align="center" valign="top">"%11$s"
  * <td align="center" valign="top">Marker
  * <td align="center" valign="top">Marker
+ * <p><tr>
+ * <td align="center" valign="top">12$
+ * <td align="center" valign="top">"%12$d"
+ * <td align="center" valign="top">Integer
+ * <td align="center" valign="top">Thread Priority
+ * <p><tr>
+ * <td align="center" valign="top">13$
+ * <td align="center" valign="top">"%13$d"
+ * <td align="center" valign="top">Long
+ * <td align="center" valign="top">Nano Time
  * <p>
  * </table>
  * <p><sup>1</sup> # flag for stack trace
  * <p><sup>2</sup> Log call site
+ * <p><sup>3</sup> # flag includes class name in location
  * <p>
  * Created by Eric A. Snell on 3/4/17.
  */
 @SuppressWarnings({"WeakerAccess", "unused", "UnnecessaryBoxing"})
 public class ExtRecordFormatter extends Formatter {
-  /** Of the form: "2017-03-05 14:33:15.098" */
-  public static final String DATE_TIME_FORMAT = "%5$tF %5$tT.%5$tL";
-  /** Of the form: "Sun 2017-03-05 14:33:15.098" */
-  public static final String DAY_DATE_TIME_FORMAT = "%5$ta " + DATE_TIME_FORMAT;
-
+  // Index into array is 0 based (duh) but formatter args are 1 based
   private static final int MESSAGE_INDEX = 0;
-  public static final String MESSAGE_POSITION = "%" + Integer.toString(MESSAGE_INDEX + 1);
-  private static final int THREAD_ID_INDEX = 1;
-  public static final String THREAD_ID_POSITION = "%" + Integer.toString(THREAD_ID_INDEX + 1);
-  private static final int LOGGER_NAME_INDEX = 2;
-  public static final String LOGGER_NAME_POSITION = "%" + Integer.toString(LOGGER_NAME_INDEX + 1);
-  private static final int LOG_LEVEL_INDEX = 3;
-  public static final String LOG_LEVEL_POSITION = "%" + Integer.toString(LOG_LEVEL_INDEX + 1);
-  private static final int DATE_INDEX = 4;
-  public static final String DATE_POSITION = "%" + Integer.toString(DATE_INDEX + 1);
-  private static final int THROWN_INDEX = 5;
-  public static final String THROWN_POSITION = "%" + Integer.toString(THROWN_INDEX + 1);
-  private static final int CLASS_NAME_INDEX = 6;
-  public static final String CLASS_NAME_POSITION = "%" + Integer.toString(CLASS_NAME_INDEX + 1);
-  private static final int METHOD_NAME_INDEX = 7;
-  public static final String METHOD_NAME_POSITION = "%" + Integer.toString(METHOD_NAME_INDEX + 1);
-  private static final int LOCATION_INDEX = 8;
-  public static final String LOCATION_POSITION = "%" + Integer.toString(LOCATION_INDEX + 1);
-  private static final int THREAD_NAME_INDEX = 9;
-  public static final String THREAD_NAME_POSITION = "%" + Integer.toString(THREAD_NAME_INDEX + 1);
-  private static final int MARKER_INDEX = 10;
-  public static final String MARKER_POSITION = "%" + Integer.toString(MARKER_INDEX + 1);
+  public static final int MESSAGE_POSITION = MESSAGE_INDEX + 1;
+  private static final int THREAD_ID_INDEX = MESSAGE_INDEX + 1;
+  public static final int THREAD_ID_POSITION = THREAD_ID_INDEX + 1;
+  private static final int LOGGER_NAME_INDEX = THREAD_ID_INDEX + 1;
+  public static final int LOGGER_NAME_POSITION = LOGGER_NAME_INDEX + 1;
+  private static final int LOG_LEVEL_INDEX = LOGGER_NAME_INDEX + 1;
+  public static final int LOG_LEVEL_POSITION = LOG_LEVEL_INDEX + 1;
+  private static final int DATE_INDEX = LOG_LEVEL_INDEX + 1;
+  public static final int DATE_POSITION = DATE_INDEX + 1;
+  private static final int THROWN_INDEX = DATE_INDEX + 1;
+  public static final int THROWN_POSITION = THROWN_INDEX + 1;
+  private static final int CLASS_NAME_INDEX = THROWN_INDEX + 1;
+  public static final int CLASS_NAME_POSITION = CLASS_NAME_INDEX + 1;
+  private static final int METHOD_NAME_INDEX = CLASS_NAME_INDEX + 1;
+  public static final int METHOD_NAME_POSITION = METHOD_NAME_INDEX + 1;
+  private static final int LOCATION_INDEX = METHOD_NAME_INDEX + 1;
+  public static final int LOCATION_POSITION = LOCATION_INDEX + 1;
+  private static final int THREAD_NAME_INDEX = LOCATION_INDEX + 1;
+  public static final int THREAD_NAME_POSITION = THREAD_NAME_INDEX + 1;
+  private static final int MARKER_INDEX = THREAD_NAME_INDEX + 1;
+  public static final int MARKER_POSITION = MARKER_INDEX + 1;
+  private static final int THREAD_PRIORITY_INDEX = MARKER_INDEX + 1;
+  public static final int THREAD_PRIORITY_POSITION = THREAD_PRIORITY_INDEX + 1;
+  private static final int NANO_INDEX = THREAD_PRIORITY_INDEX + 1;
+  public static final int NANO_POSITION = NANO_INDEX + 1;
+  public static final int LAST_POSITION = NANO_POSITION; // update if adding more formatter arguments
+  
+  private static final int ARG_COUNT = LAST_POSITION; 
 
-  public static final String MESSAGE_ARG = MESSAGE_POSITION + "$s";
-  public static final String THREAD_ID_ARG = THREAD_ID_POSITION + "$d";
-  public static final String LOGGER_NAME_ARG = LOGGER_NAME_POSITION + "$s";
-  public static final String LOG_LEVEL_ARG = LOG_LEVEL_POSITION + "$s";
-  public static final String DATE_ARG = DATE_TIME_FORMAT;
-  public static final String THROWN_ARG = THROWN_POSITION + "$s";
-  public static final String CLASS_NAME_ARG = CLASS_NAME_POSITION + "$s";
-  public static final String METHOD_NAME_ARG = METHOD_NAME_POSITION + "$s";
-  public static final String LOCATION_ARG = LOCATION_POSITION + "$s";
-  public static final String THREAD_NAME_ARG = THREAD_NAME_POSITION + "$s";
-  public static final String MARKER_ARG = MARKER_POSITION + "$s";
-  public static final String THROWN_STACKTRACE_ARG = THROWN_POSITION + "$#s";
-  public static final String LOCATION_WITH_CLASS_NAME_ARG = LOCATION_POSITION + "$#s";
+  private static final String DATE_ARG = "%" + Integer.toString(DATE_POSITION);
+
+  /** Of the form: "2017-03-05 14:33:15.098" */
+  public static final String DATE_TIME_FORMAT = DATE_ARG + "$tF " + DATE_ARG + "$tT." + DATE_ARG + "$tL";
+  /** Of the form: "Sun 2017-03-05 14:33:15.098" */
+  public static final String DAY_DATE_TIME_FORMAT = DATE_ARG + "$ta " + DATE_TIME_FORMAT;
+
+  public static final String MESSAGE_ARG_TYPE = "s";
+  public static final String THREAD_ID_ARG_TYPE = "d";
+  public static final String LOGGER_NAME_ARG_TYPE = "s";
+  public static final String LOG_LEVEL_ARG_TYPE = "s";
+  public static final String DATE_ARG_TYPE = "t";
+  public static final String THROWN_ARG_TYPE = "s";
+  public static final String THROWN_STACKTRACE_ARG_TYPE = "#s";
+  public static final String CLASS_NAME_ARG_TYPE = "s";
+  public static final String LOCATION_WITH_CLASS_NAME_ARG_TYPE = "#s";
+  public static final String METHOD_NAME_ARG_TYPE = "s";
+  public static final String LOCATION_ARG_TYPE = "s";
+  public static final String THREAD_NAME_ARG_TYPE = "s";
+  public static final String MARKER_ARG_TYPE = "s";
+  public static final String THREAD_PRIORITY_ARG_TYPE = "d";
+  public static final String NANO_TIME_ARG_TYPE = "d";
+  
   public static final String TYPICAL_FORMAT =
       DATE_TIME_FORMAT + " %4$s [%10$s] %3$s - %1$s %6$#s%n";
   public static final String TYPICAL_ANDROID_FORMAT = "[%10$s]%9$s %1$s";
@@ -163,7 +187,6 @@ public class ExtRecordFormatter extends Formatter {
           return lmf;
         }
       };
-  private static final int ARG_COUNT = 11;
 
   private @NotNull String format;
   private boolean logErrors;
@@ -270,6 +293,8 @@ public class ExtRecordFormatter extends Formatter {
     formatterArgs[THREAD_NAME_INDEX] = record.getThreadName();
     final Marker marker = record.getMarker();
     formatterArgs[MARKER_INDEX] = marker == null ? NullMarker.INSTANCE : marker;
+    formatterArgs[THREAD_PRIORITY_INDEX] = record.getThreadPriority();
+    formatterArgs[NANO_INDEX] = record.getNanoTime();
   }
 
   private void setBaseArgs(@NotNull final LogRecord record,

@@ -28,11 +28,12 @@ import java.util.Formattable;
 import java.util.Formatter;
 
 /**
- * Formats a contained {@link StackTraceElement}
+ * Formats a contained {@link StackTraceElement} to "methodName:lineNumber". If alternate ("#") is
+ * specified, it is prefixed with the class name. eg "ClassName.methodName:lineNumber"
  *
  * Created by Eric A. Snell on 3/15/17.
  */
-public class FormattableStackTraceElement implements Formattable {
+public class FormattableStackTraceElement extends BaseFormattable {
   private static final ThreadLocal<StringBuilder> threadLocalStringBuilder =
       new ThreadLocal<StringBuilder>() {
         @Override
@@ -54,20 +55,17 @@ public class FormattableStackTraceElement implements Formattable {
     this.element = element;
   }
 
-  @Nullable public StackTraceElement getElement() {
-    return element;
-  }
-
   public void setElement(@Nullable final StackTraceElement element) {
     this.element = element;
   }
 
   @Override public void formatTo(final Formatter formatter, final int flags, final int width, final int precision) {
+    final boolean useAlternate = (flags & ALTERNATE) == ALTERNATE;
+    final boolean leftJustify = (flags & LEFT_JUSTIFY) == LEFT_JUSTIFY;
+    final boolean upperCase = (flags & UPPERCASE) == UPPERCASE;
+
+    final StringBuilder builder = threadLocalStringBuilder.get();
     if (element != null) {
-      final boolean useAlternate = (flags & ALTERNATE) == ALTERNATE;
-      final boolean leftJustify = (flags & LEFT_JUSTIFY) == LEFT_JUSTIFY;
-      final boolean upperCase = (flags & UPPERCASE) == UPPERCASE;
-      final StringBuilder builder = threadLocalStringBuilder.get();
       if (useAlternate) {
         builder.append(element.getClassName())
                .append('.');
@@ -82,24 +80,11 @@ public class FormattableStackTraceElement implements Formattable {
       }
       builder.insert(0, '(');
       builder.append(')');
-      if (width != -1 && width > builder.length()) {
-        builder.ensureCapacity(width);
-        final int padAmount = width - builder.length();
-        if (leftJustify) {
-          for (int i = 0; i < padAmount; i++) {
-            builder.append(' ');
-          }
-        } else {
-          for (int i = 0; i < padAmount; i++) {
-            builder.insert(0, ' ');
-          }
-        }
-      }
-      formatter.format(upperCase ? builder.toString().toUpperCase() : builder.toString());
     } else {
       formatter.format("");
     }
-
+    maybePadAndJustify(width, leftJustify, builder);
+    formatter.format(upperCase ? builder.toString().toUpperCase() : builder.toString());
   }
 
   @SuppressWarnings("SameParameterValue")

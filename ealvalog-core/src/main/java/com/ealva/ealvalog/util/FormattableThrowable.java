@@ -27,7 +27,6 @@ import static java.util.FormattableFlags.UPPERCASE;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.Formattable;
 import java.util.FormattableFlags;
 import java.util.Formatter;
 
@@ -38,7 +37,7 @@ import java.util.Formatter;
  * Created by Eric A. Snell on 3/8/17.
  */
 @SuppressWarnings("unused")
-public class FormattableThrowable implements Formattable {
+public class FormattableThrowable extends BaseFormattable {
   private static final ThreadLocal<StringBuilder> threadLocalStringBuilder =
       new ThreadLocal<StringBuilder>() {
         @Override
@@ -65,12 +64,17 @@ public class FormattableThrowable implements Formattable {
     realThrowable = throwable;
   }
 
-  @Override public void formatTo(final Formatter formatter, final int flags, final int width, final int precision) {
+  @Override
+  public void formatTo(final Formatter formatter,
+                       final int flags,
+                       final int width,
+                       final int precision) {
+    final boolean useAlternate = (flags & ALTERNATE) == ALTERNATE;
+    final boolean leftJustify = (flags & LEFT_JUSTIFY) == LEFT_JUSTIFY;
+    final boolean upperCase = (flags & UPPERCASE) == UPPERCASE;
+    final StringBuilder builder = threadLocalStringBuilder.get();
+
     if (realThrowable != null) {
-      final boolean useAlternate = (flags & ALTERNATE) == ALTERNATE;
-      final boolean leftJustify = (flags & LEFT_JUSTIFY) == LEFT_JUSTIFY;
-      final boolean upperCase = (flags & UPPERCASE) == UPPERCASE;
-      final StringBuilder builder = threadLocalStringBuilder.get();
       if (useAlternate) {
         getStackTraceAsString(builder, realThrowable);
       } else {
@@ -80,32 +84,19 @@ public class FormattableThrowable implements Formattable {
         builder.setLength(precision - 1);
         builder.append('…');
       }
-      if (width != -1 && width > builder.length()) {
-        builder.ensureCapacity(width);
-        final int padAmount = width - builder.length();
-        if (leftJustify) {
-          for (int i = 0; i < padAmount; i++) {
-            builder.append(' ');
-          }
-        } else {
-          for (int i = 0; i < padAmount; i++) {
-            builder.insert(0, ' ');  // could possibly be more efficient to insert from long string of spaces, but Knuth would not approve
-          }
-        }
-      }
-      formatter.format(upperCase ? builder.toString().toUpperCase() : builder.toString());
     } else {
       formatter.format("");
     }
+    maybePadAndJustify(width, leftJustify, builder);
+    formatter.format(upperCase ? builder.toString().toUpperCase() : builder.toString());
   }
 
   public @Nullable Throwable getRealThrowable() {
     return realThrowable;
   }
 
-  public FormattableThrowable setRealThrowable(final @Nullable Throwable realThrowable) {
+  public void setRealThrowable(final @Nullable Throwable realThrowable) {
     this.realThrowable = realThrowable;
-    return this;
   }
 
   /**

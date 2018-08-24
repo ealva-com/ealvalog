@@ -18,8 +18,6 @@
 
 package com.ealva.ealvalog.util;
 
-import com.ealva.ealvalog.util.FormattableThrowable;
-
 import org.junit.Before;
 import org.junit.Test;
 
@@ -58,7 +56,8 @@ public class FormattableThrowableTest {
   @Test
   public void testFormat() {
     com.ealva.ealvalog.util.FormattableThrowable
-        formattableThrowable = com.ealva.ealvalog.util.FormattableThrowable.make(new IllegalArgumentException("Blah"));
+        formattableThrowable =
+        com.ealva.ealvalog.util.FormattableThrowable.make(new IllegalArgumentException("Blah"));
     formattableThrowable.formatTo(formatter, 0, -1, -1);
     assertThat(formatter.toString(), is(equalTo("java.lang.IllegalArgumentException: Blah")));
   }
@@ -66,15 +65,18 @@ public class FormattableThrowableTest {
   @Test
   public void testFormatUppercase() {
     com.ealva.ealvalog.util.FormattableThrowable
-        formattableThrowable = com.ealva.ealvalog.util.FormattableThrowable.make(new IllegalArgumentException("Blah"));
+        formattableThrowable =
+        com.ealva.ealvalog.util.FormattableThrowable.make(new IllegalArgumentException("Blah"));
     formattableThrowable.formatTo(formatter, FormattableFlags.UPPERCASE, -1, -1);
-    assertThat(formatter.toString(), is(equalTo("java.lang.IllegalArgumentException: Blah".toUpperCase())));
+    assertThat(formatter.toString(),
+               is(equalTo("java.lang.IllegalArgumentException: Blah".toUpperCase())));
   }
 
   @Test
   public void testSmallPrecision() {
     com.ealva.ealvalog.util.FormattableThrowable
-        formattableThrowable = com.ealva.ealvalog.util.FormattableThrowable.make(new IllegalArgumentException("Blah"));
+        formattableThrowable =
+        com.ealva.ealvalog.util.FormattableThrowable.make(new IllegalArgumentException("Blah"));
     formattableThrowable.formatTo(formatter, 0, -1, 18);
     assertThat(formatter.toString(), is(equalTo("java.lang.Illegal…")));
   }
@@ -82,7 +84,8 @@ public class FormattableThrowableTest {
   @Test
   public void testLargePrecision() {
     com.ealva.ealvalog.util.FormattableThrowable
-        formattableThrowable = com.ealva.ealvalog.util.FormattableThrowable.make(new IllegalArgumentException("Blah"));
+        formattableThrowable =
+        com.ealva.ealvalog.util.FormattableThrowable.make(new IllegalArgumentException("Blah"));
     formattableThrowable.formatTo(formatter, 0, -1, 500);
     assertThat(formatter.toString(), is(equalTo("java.lang.IllegalArgumentException: Blah")));
   }
@@ -90,23 +93,28 @@ public class FormattableThrowableTest {
   @Test
   public void testWitdth() {
     com.ealva.ealvalog.util.FormattableThrowable
-        formattableThrowable = com.ealva.ealvalog.util.FormattableThrowable.make(new IllegalArgumentException("Blah"));
+        formattableThrowable =
+        com.ealva.ealvalog.util.FormattableThrowable.make(new IllegalArgumentException("Blah"));
     formattableThrowable.formatTo(formatter, 0, 50, -1);
-    assertThat(formatter.toString(), is(equalTo("          java.lang.IllegalArgumentException: Blah")));
+    assertThat(formatter.toString(),
+               is(equalTo("          java.lang.IllegalArgumentException: Blah")));
   }
 
   @Test
   public void testWitdthLeftJustified() {
     com.ealva.ealvalog.util.FormattableThrowable
-        formattableThrowable = com.ealva.ealvalog.util.FormattableThrowable.make(new IllegalArgumentException("Blah"));
+        formattableThrowable =
+        com.ealva.ealvalog.util.FormattableThrowable.make(new IllegalArgumentException("Blah"));
     formattableThrowable.formatTo(formatter, FormattableFlags.LEFT_JUSTIFY, 50, -1);
-    assertThat(formatter.toString(), is(equalTo("java.lang.IllegalArgumentException: Blah          ")));
+    assertThat(formatter.toString(),
+               is(equalTo("java.lang.IllegalArgumentException: Blah          ")));
   }
 
   @Test
   public void testSmallPrecisionWithWidthLeftJustified() {
     com.ealva.ealvalog.util.FormattableThrowable
-        formattableThrowable = com.ealva.ealvalog.util.FormattableThrowable.make(new IllegalArgumentException("Blah"));
+        formattableThrowable =
+        com.ealva.ealvalog.util.FormattableThrowable.make(new IllegalArgumentException("Blah"));
     formattableThrowable.formatTo(formatter, FormattableFlags.LEFT_JUSTIFY, 20, 18);
     assertThat(formatter.toString(), is(equalTo("java.lang.Illegal…  ")));
   }
@@ -114,7 +122,8 @@ public class FormattableThrowableTest {
   @Test
   public void testSmallPrecisionWithWidthUpperCase() {
     com.ealva.ealvalog.util.FormattableThrowable
-        formattableThrowable = com.ealva.ealvalog.util.FormattableThrowable.make(new IllegalArgumentException("Blah"));
+        formattableThrowable =
+        com.ealva.ealvalog.util.FormattableThrowable.make(new IllegalArgumentException("Blah"));
     formattableThrowable.formatTo(formatter, FormattableFlags.UPPERCASE, 20, 18);
     assertThat(formatter.toString(), is(equalTo("  java.lang.Illegal…".toUpperCase())));
   }
@@ -128,7 +137,8 @@ public class FormattableThrowableTest {
     assertThat(result, is(startsWith("java.lang.IllegalArgumentException: Blah")));
 
     // ensure larger than non-alternative
-    assertThat(result.length(), is(greaterThan("java.lang.IllegalArgumentException: Blah".length() + 20)));
+    assertThat(result.length(),
+               is(greaterThan("java.lang.IllegalArgumentException: Blah".length() + 20)));
   }
 
 }

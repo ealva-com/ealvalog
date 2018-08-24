@@ -18,9 +18,6 @@
 
 package com.ealva.ealvalog.util;
 
-import com.ealva.ealvalog.util.LogMessageFormatter;
-import com.ealva.ealvalog.util.LogMessageFormatterImpl;
-
 import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;

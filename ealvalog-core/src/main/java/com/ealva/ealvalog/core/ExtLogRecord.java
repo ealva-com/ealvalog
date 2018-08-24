@@ -306,8 +306,16 @@ public class ExtLogRecord extends LogRecord implements LogEntry {
     return threadPriority;
   }
 
+  void setThreadPriority(int priority) {
+    threadPriority = priority;
+  }
+
   @Override public long getNanoTime() {
     return nanoTime;
+  }
+
+  void setNanoTime(long time) {
+    nanoTime = time;
   }
 
   @Override public void close() {
