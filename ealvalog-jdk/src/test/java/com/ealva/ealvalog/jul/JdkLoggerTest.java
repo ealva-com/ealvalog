@@ -71,7 +71,7 @@ public class JdkLoggerTest {
     MockitoAnnotations.initMocks(this);
 
     final JdkLoggerFactory loggerFactory = JdkLoggerFactory.INSTANCE;
-    loggerFactory.reset();
+    loggerFactory.reset(true);
 
     rootLogger = loggerFactory.getRoot();
 //    parentLogger = loggerFactory.get(PARENT_NAME);

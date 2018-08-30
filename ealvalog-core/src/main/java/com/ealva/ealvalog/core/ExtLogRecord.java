@@ -115,10 +115,10 @@ public class ExtLogRecord extends LogRecord implements LogEntry {
   private static ExtLogRecord getRecord() {
     ExtLogRecord result = threadLocalRecord.get();
     if (result == null) {
-      result = new ExtLogRecord();
+      result = new ExtLogRecord(null);
       threadLocalRecord.set(result);
     }
-    return result.isReserved() ? new ExtLogRecord().reserve() : result.reserve();
+    return result.isReserved() ? new ExtLogRecord(null).reserve() : result.reserve();
   }
 
   /**
@@ -159,47 +159,48 @@ public class ExtLogRecord extends LogRecord implements LogEntry {
     return name == null ? "Anonymous Logger" : name;
   }
 
-  private ExtLogRecord() {
-    super(Level.OFF, "");
-    super.setParameters(new Object[]{null, null, null, null});
-    parameterCount = 0;
-    logLevel = LogLevel.NONE;
-    threadName = Thread.currentThread().getName();
-    builder = new StringBuilder(DEFAULT_STRING_BUILDER_SIZE);
-    formatter = new Formatter(builder);
-  }
+//  protected ExtLogRecord() {
+//    super(Level.OFF, "");
+//    super.setParameters(new Object[]{null, null, null, null});
+//    parameterCount = 0;
+//    builder = new StringBuilder(DEFAULT_STRING_BUILDER_SIZE);
+//    formatter = new Formatter(builder);
+//    logLevel = LogLevel.NONE;
+//    threadName = Thread.currentThread().getName();
+//  }
 
-  /**
-   * This ctor should only be called if the logging framework client logs a LogEntry not
-   * retrieved from the Logger which returns ExtLogRecord from getLogEntry()
-   * @param entry entry to convert to an ExtLogRecord
-   */
-  private ExtLogRecord(@NotNull final LogEntry entry) {
-    super(entry.getLogLevel().getJdkLevel(), entry.getMessage());
+  protected ExtLogRecord(@Nullable final LogEntry entry) {
+    super(entry == null ? Level.SEVERE : entry.getLogLevel().getJdkLevel(),
+          entry == null ? "" : entry.getMessage());
     parameterCount = 0;
     builder = new StringBuilder(DEFAULT_STRING_BUILDER_SIZE);
     formatter = new Formatter(builder);
-    logLevel = entry.getLogLevel();
-    setSequenceNumber(entry.getSequenceNumber());
-    setSourceClassName(entry.getSourceClassName());
-    setSourceMethodName(entry.getSourceMethodName());
-    builder.append(entry.getMessage());
-    setThreadID(entry.getThreadID());
-    setMillis(entry.getMillis());
-    setThrown(entry.getThrown());
-    setLoggerName(entry.getLoggerName());
-    threadName = entry.getThreadName();
-    marker = entry.getMarker();
-    location = entry.getLocation();
-    threadPriority = entry.getThreadPriority();
-    nanoTime = entry.getNanoTime();
+    if (entry != null) {
+      logLevel = entry.getLogLevel();
+      setSequenceNumber(entry.getSequenceNumber());
+      setSourceClassName(entry.getSourceClassName());
+      setSourceMethodName(entry.getSourceMethodName());
+      builder.append(entry.getMessage());
+      setThreadID(entry.getThreadID());
+      setMillis(entry.getMillis());
+      setThrown(entry.getThrown());
+      setLoggerName(entry.getLoggerName());
+      threadName = entry.getThreadName();
+      marker = entry.getMarker();
+      location = entry.getLocation();
+      threadPriority = entry.getThreadPriority();
+      nanoTime = entry.getNanoTime();
+    } else {
+      logLevel = LogLevel.ERROR;
+      threadName = Thread.currentThread().getName();
+    }
   }
 
-  private boolean isReserved() {
+  public boolean isReserved() {
     return reserved;
   }
 
-  private ExtLogRecord reserve() {
+  protected ExtLogRecord reserve() {
     reserved = true;
     super.setMessage(null);
     setParameters(null);
@@ -349,27 +350,27 @@ public class ExtLogRecord extends LogRecord implements LogEntry {
 
   @SuppressWarnings("unused")
   public ExtLogRecord copyOf() {
-    ExtLogRecord copy = new ExtLogRecord();
-    copy.setLogLevel(logLevel);  // handles Level and LogLevel
-    copy.setSequenceNumber(getSequenceNumber());
-    copy.setSourceClassName(getSourceClassName());
-    copy.setSourceMethodName(getSourceMethodName());
-    copy.builder.append(builder.toString());
-    copy.setThreadID(getThreadID());
-    copy.setMillis(getMillis());
-    copy.setThrown(getThrown());
-    copy.setLoggerName(getLoggerName());
-    copy.setParameters(getParameters());
-    copy.setResourceBundle(getResourceBundle());
-    copy.setResourceBundleName(getResourceBundleName());
-
-    copy.threadName = threadName;
-    copy.marker = marker;
-    copy.location = location;
-    copy.parameterCount = parameterCount;
-    copy.threadPriority = threadPriority;
-    copy.nanoTime = nanoTime;
-    return copy;
+    return new ExtLogRecord(this);
+//    copy.setLogLevel(logLevel);  // handles Level and LogLevel
+//    copy.setSequenceNumber(getSequenceNumber());
+//    copy.setSourceClassName(getSourceClassName());
+//    copy.setSourceMethodName(getSourceMethodName());
+//    copy.builder.append(builder.toString());
+//    copy.setThreadID(getThreadID());
+//    copy.setMillis(getMillis());
+//    copy.setThrown(getThrown());
+//    copy.setLoggerName(getLoggerName());
+//    copy.setParameters(getParameters());
+//    copy.setResourceBundle(getResourceBundle());
+//    copy.setResourceBundleName(getResourceBundleName());
+//
+//    copy.threadName = threadName;
+//    copy.marker = marker;
+//    copy.location = location;
+//    copy.parameterCount = parameterCount;
+//    copy.threadPriority = threadPriority;
+//    copy.nanoTime = nanoTime;
+//    return copy;
   }
 
   @NotNull @Override public LogEntry reset() {

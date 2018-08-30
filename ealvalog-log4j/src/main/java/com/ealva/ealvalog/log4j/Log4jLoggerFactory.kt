@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.ealva.ealvalog.jul
+package com.ealva.ealvalog.log4j
 
 import com.ealva.ealvalog.LogLevel
 import com.ealva.ealvalog.Logger
@@ -27,29 +27,20 @@ import com.ealva.ealvalog.filter.AlwaysNeutralFilter
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentMap
 import java.util.concurrent.locks.ReentrantLock
-import java.util.logging.Handler
-import java.util.logging.LogManager
 
 /**
- * Factory for [JdkLogger] instances
- *
- *
- * Created by Eric A. Snell on 3/4/17.
+ * Created by Eric A. Snell on 8/29/18.
  */
-object JdkLoggerFactory : LoggerFactory {
-  private val bridgeMap: ConcurrentHashMap<String, JdkBridge> = ConcurrentHashMap()
-  private val loggerMap: ConcurrentMap<String, JdkLogger> = ConcurrentHashMap()
+object Log4jLoggerFactory : LoggerFactory {
+  private val bridgeMap: ConcurrentHashMap<String, Log4jBridge> = ConcurrentHashMap()
+  private val loggerMap: ConcurrentMap<String, Log4jLoggerAdapter> = ConcurrentHashMap()
   private val bridgeTreeLock = ReentrantLock()
-  private val bridgeRoot = JdkBridge(LoggerFactory.ROOT_LOGGER_NAME)
+  private val bridgeRoot = Log4jBridge(LoggerFactory.ROOT_LOGGER_NAME)
 
-  private val configuration: JdkLoggerConfiguration = object :
-    JdkLoggerConfiguration {
+  private val configuration: Log4jLoggerConfiguration = object :
+    Log4jLoggerConfiguration {
     override fun setLoggerFilter(logger: Logger, filter: LoggerFilter) {
       setFilter(logger.name, filter)
-    }
-
-    override fun addLoggerHandler(logger: Logger, loggerHandler: Handler) {
-      addHandler(logger.name, loggerHandler)
     }
 
     override fun setLogLevel(logger: Logger, logLevel: LogLevel) {
@@ -64,39 +55,33 @@ object JdkLoggerFactory : LoggerFactory {
       setShouldIncludeLocation(logger.name, includeLocation)
     }
 
-    override fun getBridge(loggerClassName: String): JdkBridge {
-      return getTheJdkBridge(loggerClassName)
+    override fun getBridge(loggerClassName: String): Log4jBridge {
+      return getTheLog4jBridge(loggerClassName)
     }
   }
 
   init {
-    reset(false)
+    reset()
   }
 
-  val root = JdkLogger(
-    LoggerFactory.ROOT_LOGGER_NAME,
-    null,
-    configuration
-  )
+  val root = Log4jLoggerAdapter(LoggerFactory.ROOT_LOGGER_NAME, null, configuration)
 
   /**
    * Typically not necessary for clients to call this as it's done on init. Resets all loggers,
    * removing filters and underlying handlers from the java.util.logging Loggers
    */
-  fun reset(fullReset: Boolean = false) {
-    if (fullReset) {
-      LogManager.getLogManager().reset()
-      val root = LogManager.getLogManager().getLogger("")
-      val handlers = root.handlers
-      for (handler in handlers) {
-        root.removeHandler(handler)
-        handler.close()
-      }
-
-      for (bridge in bridgeMap.values) {
-        bridge.setToDefault()
-      }
-    }
+  fun reset() {
+//    LogManager.getLogManager().reset()
+//    val root = LogManager.getLogManager().getLogger("")
+//    val handlers = root.handlers
+//    for (handler in handlers) {
+//      root.removeHandler(handler)
+//      handler.close()
+//    }
+//
+//    for (bridge in bridgeMap.values) {
+//      bridge.setToDefault()
+//    }
 
     bridgeMap.clear()
     loggerMap.clear()
@@ -104,7 +89,7 @@ object JdkLoggerFactory : LoggerFactory {
     updateLoggers()
   }
 
-  override fun get(name: String, marker: Marker?, includeLocation: Boolean): JdkLogger {
+  override fun get(name: String, marker: Marker?, includeLocation: Boolean): Log4jLoggerAdapter {
     if (LoggerFactory.ROOT_LOGGER_NAME == name) {
       return root
     }
@@ -113,7 +98,7 @@ object JdkLoggerFactory : LoggerFactory {
       var created = false
       val logger = loggerMap.getOrPut(name) {
         created = true // if we create a new one we need to ensure the parent hierarchy is correct
-        JdkLogger(
+        Log4jLoggerAdapter(
           name,
           marker,
           configuration
@@ -131,14 +116,14 @@ object JdkLoggerFactory : LoggerFactory {
     }
   }
 
-  override fun get(name: String): JdkLogger {
+  override fun get(name: String): Log4jLoggerAdapter {
     return get(name, null, false)
   }
 
   private fun setFilter(loggerName: String, filter: LoggerFilter) {
     bridgeTreeLock.lock()
     try {
-      val bridge = getTheJdkBridge(loggerName)
+      val bridge = getTheLog4jBridge(loggerName)
       if (bridge.name == loggerName) {
         bridge.setFilter(filter)
       } else {
@@ -146,27 +131,6 @@ object JdkLoggerFactory : LoggerFactory {
           bridge,
           loggerName,
           filter,
-          null,
-          null
-        )
-      }
-    } finally {
-      bridgeTreeLock.unlock()
-    }
-  }
-
-  private fun addHandler(loggerName: String, loggerHandler: Handler) {
-    bridgeTreeLock.lock()
-    try {
-      val bridge = getTheJdkBridge(loggerName)
-      if (bridge.name == loggerName) {
-        bridge.addLoggerHandler(loggerHandler)
-      } else {
-        makeNewBridge(
-          bridge,
-          loggerName,
-          null,
-          loggerHandler,
           null
         )
       }
@@ -178,14 +142,13 @@ object JdkLoggerFactory : LoggerFactory {
   private fun setLevel(loggerName: String, logLevel: LogLevel) {
     bridgeTreeLock.lock()
     try {
-      val bridge = getTheJdkBridge(loggerName)
+      val bridge = getTheLog4jBridge(loggerName)
       if (bridge.name == loggerName) {
         bridge.logLevel = logLevel
       } else {
         makeNewBridge(
           bridge,
           loggerName,
-          null,
           null,
           logLevel
         )
@@ -198,11 +161,11 @@ object JdkLoggerFactory : LoggerFactory {
   private fun setShouldLogToParent(loggerName: String, logToParent: Boolean) {
     bridgeTreeLock.lock()
     try {
-      val bridge = getTheJdkBridge(loggerName)
+      val bridge = getTheLog4jBridge(loggerName)
       if (bridge.name == loggerName) {
         bridge.logToParent = logToParent
       } else {
-        makeNewBridge(bridge, loggerName, null, null, null).logToParent = logToParent
+        makeNewBridge(bridge, loggerName, null, null).logToParent = logToParent
       }
     } finally {
       bridgeTreeLock.unlock()
@@ -212,11 +175,11 @@ object JdkLoggerFactory : LoggerFactory {
   private fun setShouldIncludeLocation(loggerName: String, includeLocation: Boolean) {
     bridgeTreeLock.lock()
     try {
-      val bridge = getTheJdkBridge(loggerName)
+      val bridge = getTheLog4jBridge(loggerName)
       if (bridge.name == loggerName) {
         bridge.includeLocation = includeLocation
       } else {
-        makeNewBridge(bridge, loggerName, null, null, null).includeLocation = includeLocation
+        makeNewBridge(bridge, loggerName, null, null).includeLocation = includeLocation
       }
     } finally {
       bridgeTreeLock.unlock()
@@ -224,14 +187,13 @@ object JdkLoggerFactory : LoggerFactory {
   }
 
   private fun makeNewBridge(
-    parent: JdkBridge,
+    parent: Log4jBridge,
     loggerName: String,
     filter: LoggerFilter?,
-    handler: Handler?,
     logLevel: LogLevel?
-  ): JdkBridge {
+  ): Log4jBridge {
     val newBridge =
-      JdkBridge(loggerName, filter ?: AlwaysNeutralFilter, handler, logLevel)
+      Log4jBridge(loggerName, filter ?: AlwaysNeutralFilter, logLevel)
     newBridge.parent = parent
     bridgeMap.putIfAbsent(loggerName, newBridge)
     setParents()
@@ -245,8 +207,8 @@ object JdkLoggerFactory : LoggerFactory {
     }
   }
 
-  private fun getTheJdkBridge(loggerClassName: String): JdkBridge {
-    var bridge: JdkBridge? = bridgeMap[loggerClassName]
+  private fun getTheLog4jBridge(loggerClassName: String): Log4jBridge {
+    var bridge: Log4jBridge? = bridgeMap[loggerClassName]
     if (bridge != null) {
       return bridge
     }
@@ -269,8 +231,8 @@ object JdkLoggerFactory : LoggerFactory {
         val i = key.lastIndexOf('.')
         if (i > 0) {
           key = key.substring(0, i)
-          var parent: JdkBridge? =
-            getTheJdkBridge(key)
+          var parent: Log4jBridge? =
+            getTheLog4jBridge(key)
           if (parent == null) {
             parent = bridgeRoot
           }
@@ -289,4 +251,5 @@ object JdkLoggerFactory : LoggerFactory {
     val i = name.lastIndexOf('.')
     return if (i > 0) name.substring(0, i) else ""
   }
+
 }

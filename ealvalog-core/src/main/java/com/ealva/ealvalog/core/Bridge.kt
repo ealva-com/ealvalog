@@ -58,7 +58,7 @@ interface Bridge : LoggerFilter {
 
   var logToParent: Boolean
 
-  fun log(entry: LogEntry)
+  fun log(logEntry: LogEntry)
 
   /**
    * If this bridge is for `logger`, then return any set level. Otherwise, this bridge is for a

@@ -42,7 +42,7 @@ enum class LogLevel(private val value: Int, val jdkLevel: Level) {
   }
 
   companion object {
-    private val levelToLogLevelMap: MutableMap<Level, LogLevel> =
+    private val levelToLogLevelMap: Map<Level, LogLevel> =
       HashMap<Level, LogLevel>(8).apply {
         LogLevel.values().forEach { logLevel -> this[logLevel.jdkLevel] = logLevel }
       }

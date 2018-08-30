@@ -102,8 +102,8 @@ class JdkBridge internal constructor(
     return filter.isLoggable(loggerName, logLevel, marker, throwable).acceptIfNeutral()
   }
 
-  override fun log(entry: LogEntry) {
-    ExtLogRecord.fromLogEntry(entry).use { record ->
+  override fun log(logEntry: LogEntry) {
+    ExtLogRecord.fromLogEntry(logEntry).use { record ->
       jdkLogger.log(record)
     }
   }

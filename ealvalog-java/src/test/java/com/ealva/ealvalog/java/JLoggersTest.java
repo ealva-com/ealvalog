@@ -41,7 +41,7 @@ public class JLoggersTest {
 
   @Before
   public void setup() {
-    JdkLoggerFactory.INSTANCE.reset();
+    JdkLoggerFactory.INSTANCE.reset(true);
     Loggers.INSTANCE.setFactory(JdkLoggerFactory.INSTANCE);
   }
 

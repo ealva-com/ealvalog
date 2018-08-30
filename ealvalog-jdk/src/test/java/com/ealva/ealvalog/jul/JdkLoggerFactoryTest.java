@@ -130,7 +130,7 @@ public class JdkLoggerFactoryTest {
     assertThat(bridge.getFilter(), is(dummy));
     assertThat(bridge.getParent(), is(theRootBridge));
 
-    JdkLoggerFactory.INSTANCE.reset();
+    JdkLoggerFactory.INSTANCE.reset(true);
     jdkLogger = JdkLoggerFactory.INSTANCE.get(this.getClass().getName());
     bridge = jdkLogger.getBridgeForTest();
     assertThat(bridge, is(theRootBridge));  // no filter set so will be the root
