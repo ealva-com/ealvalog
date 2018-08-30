@@ -76,4 +76,4 @@ tasks.withType(Javadoc) {
     options.addStringOption('charSet', 'UTF-8')
 }
 
-//apply from: rootProject.file('gradle/gradle-mvn-push-jar.gradle')
+apply from: rootProject.file('gradle/gradle-mvn-push-jar.gradle')
