@@ -29,14 +29,13 @@ import com.ealva.ealvalog.filter.AlwaysNeutralFilter
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.core.LoggerContext
 import org.apache.logging.log4j.core.config.Configurator
-import org.apache.logging.log4j.core.config.LoggerConfig
 import org.apache.logging.log4j.spi.ExtendedLogger
 
 /**
  * Created by Eric A. Snell on 8/24/18.
  */
 class Log4jBridge(
-  name: String,
+  override val name: String,
   private var filter: LoggerFilter = AlwaysNeutralFilter,
   logLevel: LogLevel? = null
 ) : Bridge {
@@ -47,12 +46,11 @@ class Log4jBridge(
       }
     }
 
+  private val loggerConfig = (LogManager.getContext(false) as LoggerContext).configuration.getLoggerConfig(name)
+
   @Volatile var parent: Log4jBridge? = null  // root bridge will have a null parent
 
   override var includeLocation: Boolean = false
-
-  override val name: String
-    get() = log4jLogger.name
 
   override var logLevel: LogLevel
     get() = log4jLogger.level.logLevel
@@ -73,22 +71,22 @@ class Log4jBridge(
     marker: Marker?,
     throwable: Throwable?
   ): Boolean {
-    return includeLocation || getLoggerConfig().isIncludeLocation
+    return includeLocation || loggerConfig.isIncludeLocation
   }
 
   override fun willLogToParent(loggerName: String): Boolean {
-    return loggerName == name && getLoggerConfig().isAdditive
+    return loggerName == name && loggerConfig.isAdditive
   }
 
   override var logToParent: Boolean
-    get() = getLoggerConfig().isAdditive
+    get() = loggerConfig.isAdditive
     set(value) {
-      getLoggerConfig().isAdditive = value
+      loggerConfig.isAdditive = value
     }
 
   override fun log(logEntry: LogEntry) {
     LogRecordEvent.fromLogEntry(logEntry).use { record ->
-      getLoggerConfig().log(record.logEvent)
+      loggerConfig.log(record.logEvent)
     }
   }
 
@@ -114,9 +112,4 @@ class Log4jBridge(
     else FilterResult.DENY
   }
 
-  private fun getLoggerConfig(): LoggerConfig {
-    val logContext: LoggerContext = LogManager.getContext(false) as LoggerContext
-    val configuration = logContext.configuration
-    return configuration.getLoggerConfig(name)
-  }
 }

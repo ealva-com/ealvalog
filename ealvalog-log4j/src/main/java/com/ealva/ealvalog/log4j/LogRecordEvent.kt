@@ -126,8 +126,10 @@ class LogRecordEvent(logEntry: LogEntry?) : ExtLogRecord(logEntry) {
       return ThreadContext.EMPTY_STACK
     }
 
-    override fun getThrownProxy(): ThrowableProxy {
-      return ThrowableProxy(this@LogRecordEvent.thrown)
+    override fun getThrownProxy(): ThrowableProxy? {
+      this@LogRecordEvent.thrown?.let { thrown ->
+        return ThrowableProxy(thrown)
+      } ?: return null
     }
 
     override fun getThreadId(): Long {
