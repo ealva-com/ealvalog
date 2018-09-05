@@ -19,19 +19,36 @@
 package com.ealva.ealvalog
 
 import java.io.Closeable
-import java.util.Formatter
 import java.util.Locale
 
-operator fun LogEntry.invoke(format: String): LogEntry {
-  append(format)
+/**
+ * Appends the [msg] to the the [LogEntry]
+ */
+operator fun LogEntry.invoke(msg: String): LogEntry {
+  append(msg)
   return this
 }
 
+/**
+ * Add the [format] string and [args] to the [LogEntry] so the information is available to
+ * the underlying logging framework. The [format] string style depends on the logging framework,
+ * but is typically similar to the style required by [java.text.MessageFormat]. This framework
+ * prefers the printf style of [String.format], which uses [java.util.Formatter], though there is
+ * is a small performance penalty (12.5% on our test machine)
+ *
+ * See [LogEntry.log]
+ */
 operator fun LogEntry.invoke(format: String, vararg args: Any): LogEntry {
-  append(format, *args)
+  log(format, *args)
   return this
 }
 
+/**
+ * Add the source location, determined by examining the call stack, to the log record. This is
+ * an expensive operation as the JVM has to fill out the entire stack frame.
+ *
+ * See [LogEntry.addLocation]
+ */
 operator fun LogEntry.unaryPlus() {
   addLocation(1)
 }
@@ -96,38 +113,45 @@ interface LogEntry : Appendable, Closeable {
   fun append(d: Double): LogEntry
 
   /**
-   * Format the `format` string with the given set of `args` into the contained [StringBuilder]
+   * Use [format] and [args] to format the LogEntry using String.format() type formatting. The
+   * resulting String is set into this LogEntry. The underlying logging system sees only a
+   * simple string with no parameter substitution
    *
-   * @param format the format string as defined in [Formatter]
-   * @param args   arguments pass for [Formatter.format]
-   *
-   * @return self
+   * If the underlying logging is asynchronous, prefer [log] over this method, which will delay
+   * string formatting until the last possible moment (typically on a background thread)
    */
-  fun append(
-    format: String,
-    vararg args: Any
-  ): LogEntry
+  fun format(format: String, vararg args: Any): LogEntry
 
   /**
-   * Format the `format` string with the given set of `args` into the contained [StringBuilder]
+   * Use [locale], [format], and [args] to format the LogEntry using String.format() type
+   * formatting. The resulting String is set into this LogEntry. The underlying logging system sees
+   * only a simple string with no parameter substitution arguments
    *
-   * @param locale the [Locale] to use during formatting
-   * @param format the format string as defined in [Formatter]
-   * @param args   arguments pass for [Formatter.format]
-   *
-   * @return self
+   * If the underlying logging is asynchronous, prefer [log] over this method, which will delay
+   * string formatting until the last possible moment (typically on a background thread)
    */
-  fun append(
-    locale: Locale,
-    format: String,
-    vararg args: Any
-  ): LogEntry
+  fun format(locale: Locale, format: String, vararg args: Any): LogEntry
+
+  /**
+   * Set the [format] and parameter substitution [args] into the this LogEntry for the
+   * underlying logging system to format. This is typically done in the [java.text.MessageFormat]
+   * style parameter substitution. The [format] strings is retained as-is and the [args] are set
+   * into this LogEntry, making both available to the underlying logging system.
+   *
+   * If the underlying logging is asynchronous, prefer this method over [format], which will delay
+   * string formatting until the last possible moment (typically on a background thread)
+   */
+  fun log(format: String, vararg args: Any): LogEntry
 
   /**
    * Add the source location, determined by examining the call stack, to the log record. This is
    * an expensive operation as the JVM has to fill out the entire stack frame.
    *
-   * @param stackDepth should typically be 0 to add the current location
+   * @param stackDepth should typically be 0 to add the current location. If layering a
+   * facade/adapter over this LogEntry, add 1 to the [stackDepth] for every layer. Searching for
+   * class/method names in the [StackTraceElement] list is error prone when extending this
+   * framework as the names are unknown to this framework and we do not want to restrict client
+   * naming. [stackDepth] is simply an index into the stack trace.
    *
    * @return this LogEntry
    */

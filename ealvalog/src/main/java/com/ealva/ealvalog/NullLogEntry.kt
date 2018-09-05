@@ -21,32 +21,33 @@ package com.ealva.ealvalog
 import java.util.Locale
 
 object NullLogEntry : LogEntry {
-    override fun close() {}
-    override val logLevel = LogLevel.NONE
-    override val threadName = ""
-    override var marker: Marker? = null
-    override val location: StackTraceElement? = null
-    override val sequenceNumber = 0L
-    override val sourceClassName = ""
-    override val sourceMethodName = ""
-    override val message = ""
-    override val threadID = 0
-    override val millis = 0L
-    override val thrown: Throwable? = null
-    override val loggerName = ""
-    override val threadPriority = 0
-    override val nanoTime = 0L
-    override fun reset() = this
-    override fun append(c: Char) = this
-    override fun append(csq: CharSequence?) = this
-    override fun append(str: String) = this
-    override fun append(csq: CharSequence?, start: Int, end: Int) = this
-    override fun append(b: Boolean) = this
-    override fun append(i: Int) = this
-    override fun append(lng: Long) = this
-    override fun append(f: Float) = this
-    override fun append(d: Double) = this
-    override fun append(format: String, vararg args: Any) = this
-    override fun append(locale: Locale, format: String, vararg args: Any) = this
-    override fun addLocation(stackDepth: Int) = this
+  override fun close() {}
+  override val logLevel = LogLevel.NONE
+  override val threadName = ""
+  override var marker: Marker? = null
+  override val location: StackTraceElement? = null
+  override val sequenceNumber = 0L
+  override val sourceClassName = ""
+  override val sourceMethodName = ""
+  override val message = ""
+  override val threadID = 0
+  override val millis = 0L
+  override val thrown: Throwable? = null
+  override val loggerName = ""
+  override val threadPriority = 0
+  override val nanoTime = 0L
+  override fun reset() = this
+  override fun append(c: Char) = this
+  override fun append(csq: CharSequence?) = this
+  override fun append(str: String) = this
+  override fun append(csq: CharSequence?, start: Int, end: Int) = this
+  override fun append(b: Boolean) = this
+  override fun append(i: Int) = this
+  override fun append(lng: Long) = this
+  override fun append(f: Float) = this
+  override fun append(d: Double) = this
+  override fun format(format: String, vararg args: Any) = this
+  override fun format(locale: Locale, format: String, vararg args: Any) = this
+  override fun log(format: String, vararg args: Any) = this
+  override fun addLocation(stackDepth: Int) = this
 }

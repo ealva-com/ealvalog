@@ -39,7 +39,7 @@ class Log4jLoggerAdapter internal constructor(
   }
 
   override fun getLogEntry(logLevel: LogLevel, marker: Marker?, throwable: Throwable?): LogEntry {
-    return LogRecordEvent.getRecordEvent()
+    return LogRecordEvent.getRecordEvent(logLevel, name, marker, throwable)
   }
 
   val bridgeForTest: Log4jBridge

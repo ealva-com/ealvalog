@@ -84,7 +84,7 @@ public class ExtRecordFormatterTest {
     ExtLogRecord.clearCachedRecord();
     record = ExtLogRecord.get(LOG_LEVEL, LOGGER_NAME, MARKER, THROWABLE);
     record.addLocation(0);
-    record.append(MESSAGE_FORMAT, MESSAGE_ARG);
+    record.format(MESSAGE_FORMAT, MESSAGE_ARG);
     record.setThreadPriority(THREAD_PRIORITY);
     record.setNanoTime(NANO_TIME);
   }

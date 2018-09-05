@@ -423,12 +423,12 @@ public class ExtLogRecord extends LogRecord implements LogEntry {
     return this;
   }
 
-  @NotNull @Override public LogEntry append(@NotNull final String format,
+  @NotNull @Override public LogEntry format(@NotNull final String format,
                                             @NotNull final Object... args) {
-    return append(Locale.getDefault(), format, args);
+    return format(Locale.getDefault(), format, args);
   }
 
-  @NotNull @Override public LogEntry append(@NotNull Locale locale,
+  @NotNull @Override public LogEntry format(@NotNull Locale locale,
                                             @NotNull final String format,
                                             @NotNull final Object... args) {
     if (args.length > 0) {
@@ -441,6 +441,15 @@ public class ExtLogRecord extends LogRecord implements LogEntry {
 
   @NotNull @Override public LogEntry addLocation(final int stackDepth) {
     location = LogUtil.getCallerLocation(stackDepth + 1);
+    return this;
+  }
+
+  @NotNull @Override
+  public LogEntry log(@NotNull final String format, @NotNull final Object... args) {
+    if (args.length > 0) {
+      setParameters(args);
+    }
+    builder.append(format);
     return this;
   }
 }

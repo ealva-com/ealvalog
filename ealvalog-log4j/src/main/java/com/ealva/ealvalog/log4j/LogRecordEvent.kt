@@ -19,6 +19,8 @@
 package com.ealva.ealvalog.log4j
 
 import com.ealva.ealvalog.LogEntry
+import com.ealva.ealvalog.LogLevel
+import com.ealva.ealvalog.Marker
 import com.ealva.ealvalog.core.ExtLogRecord
 import com.ealva.ealvalog.e
 import com.ealva.ealvalog.invoke
@@ -46,12 +48,16 @@ class LogRecordEvent(logEntry: LogEntry?) : ExtLogRecord(logEntry) {
     }
 
     /**
-     * We are obtaining a thread local [org.apache.logging.log4j.message.ReusableSimpleMessage]
-     * from the factory, so any client should not use the returned [Message] past the lifetime
-     * of the LogRecordEvent.
+     * We are obtaining a thread local [org.apache.logging.log4j.message.ReusableSimpleMessage] or
+     * [org.apache.logging.log4j.message.ParameterizedMessage] from the factory, so any client
+     * should not use the returned [Message] past the lifetime of the LogRecordEvent.
      */
     override fun getMessage(): Message {
-      return messageFactory.newMessage(this@LogRecordEvent.message)
+      return if (parameterCount == 0) {
+        messageFactory.newMessage(this@LogRecordEvent.message)
+      } else {
+        messageFactory.newMessage(this@LogRecordEvent.message, *parameters)
+      }
     }
 
     override fun getThreadName(): String {
@@ -163,13 +169,23 @@ class LogRecordEvent(logEntry: LogEntry?) : ExtLogRecord(logEntry) {
 
     private val threadLocalRecord = ThreadLocal<LogRecordEvent>()
 
-    fun getRecordEvent(): LogRecordEvent {
+    fun getRecordEvent(
+      logLevel: LogLevel,
+      name: String,
+      marker: Marker?,
+      throwable: Throwable?
+    ): LogRecordEvent {
       var result: LogRecordEvent? = threadLocalRecord.get()
       if (result == null) {
         result = LogRecordEvent(null)
         threadLocalRecord.set(result)
       }
-      return if (result.isReserved) makeNewAndReserve() else result.reserve()
+      return (if (result.isReserved) makeNewAndReserve() else result.reserve()).apply {
+        setLogLevel(logLevel)
+        setLoggerName(name)
+        this.marker = marker
+        setThrown(throwable)
+      }
     }
 
     private fun makeNewAndReserve(): LogRecordEvent {

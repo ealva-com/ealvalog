@@ -61,7 +61,7 @@ class FriendlyFileHandler @Throws(IOException::class, SecurityException::class) 
    * @return A File of the current log file, or null on error.
    */
   val currentLogFile: File?
-    @Synchronized get() = synchronized(flushLock) {
+    @Synchronized get() = synchronized(FriendlyFileHandler) {
       // so the file has the most recent date on it.
       flush()
 
@@ -103,20 +103,17 @@ class FriendlyFileHandler @Throws(IOException::class, SecurityException::class) 
 
   @Synchronized override fun flush() {
     // only let one Handler flush at a time.
-    synchronized(flushLock) {
+    synchronized(FriendlyFileHandler) {
       super.flush()
     }
   }
 
-  companion object {
-    /***
-     * In order to ensure the most recent log file is the file this one owns,
-     * we flush before checking the directory for most recent file.
-     *
-     * But we must keep other log handlers from flushing in between and making
-     * a NEW recent file.
-     */
-    private val flushLock = arrayOfNulls<Any>(0)
-  }
-
+  /***
+   * In order to ensure the most recent log file is the file this one owns,
+   * we flush before checking the directory for most recent file.
+   *
+   * But we must keep other log handlers from flushing in between and making
+   * a NEW recent file. We'll synchronize on a companion singleton object
+   */
+  companion object
 }

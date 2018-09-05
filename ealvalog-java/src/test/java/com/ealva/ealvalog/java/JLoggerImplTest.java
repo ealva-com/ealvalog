@@ -149,7 +149,6 @@ public class JLoggerImplTest {
     final ExtLogRecord record = recordCaptor.getValue();
     assertThat(record, is(notNullValue()));
     assertThat(record.getLevel(), is(level.getJdkLevel()));
-    assertThat(record.getMessage(), is(equalTo("one2")));
   }
 
   @Test
@@ -167,7 +166,6 @@ public class JLoggerImplTest {
     final ExtLogRecord record = recordCaptor.getValue();
     assertThat(record, is(notNullValue()));
     assertThat(record.getLevel(), is(level.getJdkLevel()));
-    assertThat(record.getMessage(), is(equalTo("1two")));
   }
 
   @Test
@@ -185,7 +183,6 @@ public class JLoggerImplTest {
     final ExtLogRecord record = recordCaptor.getValue();
     assertThat(record, is(notNullValue()));
     assertThat(record.getLevel(), is(level.getJdkLevel()));
-    assertThat(record.getMessage(), is(equalTo("1TWO")));
   }
 
   private final static String one = "one";
@@ -211,7 +208,6 @@ public class JLoggerImplTest {
     final ExtLogRecord record = recordCaptor.getValue();
     assertThat(record, is(notNullValue()));
     assertThat(record.getLevel(), is(level.getJdkLevel()));
-    assertThat(record.getMessage(), is(equalTo(one)));
   }
 
   @Test
@@ -230,7 +226,6 @@ public class JLoggerImplTest {
     final ExtLogRecord record = recordCaptor.getValue();
     assertThat(record, is(notNullValue()));
     assertThat(record.getLevel(), is(level.getJdkLevel()));
-    assertThat(record.getMessage(), is(equalTo(one+two)));
   }
 
   @Test
@@ -249,7 +244,6 @@ public class JLoggerImplTest {
     final ExtLogRecord record = recordCaptor.getValue();
     assertThat(record, is(notNullValue()));
     assertThat(record.getLevel(), is(level.getJdkLevel()));
-    assertThat(record.getMessage(), is(equalTo(one+two+three)));
   }
 
   @Test
@@ -268,7 +262,6 @@ public class JLoggerImplTest {
     final ExtLogRecord record = recordCaptor.getValue();
     assertThat(record, is(notNullValue()));
     assertThat(record.getLevel(), is(level.getJdkLevel()));
-    assertThat(record.getMessage(), is(equalTo(one+two+three+four)));
   }
 
   @Test
@@ -287,7 +280,6 @@ public class JLoggerImplTest {
     final ExtLogRecord record = recordCaptor.getValue();
     assertThat(record, is(notNullValue()));
     assertThat(record.getLevel(), is(level.getJdkLevel()));
-    assertThat(record.getMessage(), is(equalTo(one + two + three + four + five + six)));
   }
 
   @Test

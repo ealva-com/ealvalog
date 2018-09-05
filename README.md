@@ -7,11 +7,12 @@ Libraries
 ---------
 
   - elavalog             - the API and some framework functionality
-  - ealvalog-java        - provides JLogger for java clients (fat interface, extensible). Requires ealvalog lib
-  - ealvalog-core        - adds CoreLogger as base for bridging to other frameworks and Marker implementation. Requires ealvalog lib
-  - ealvalog-android     - very thin facade over the Android logger. Requires ealvalog and ealvalog-core libs
-  - ealvalog-jdk         - facade implementation using java.util.logging. Requires ealvalog and ealvalog-core libs
+  - ealvalog-java        - provides JLogger for java clients (fat interface, extensible). Requires ealvalog
+  - ealvalog-core        - adds CoreLogger as base for bridging to other frameworks and Marker implementation. Requires ealvalog
+  - ealvalog-android     - very thin facade over the Android logger. Requires ealvalog and ealvalog-core
+  - ealvalog-jdk         - adapts to java.util.logging. Requires ealvalog and ealvalog-core
   - ealvalog-jdk-android - adds an Android handler to be used with ealvalog-jdk. Used with ealvalog-jdk when more functionality is required over ealvalog-android
+  - ealvalog-log4j       - adapts to log4j2. Requires ealvalog and ealvalog-core 
   
   If you wish to create another facade implementation, it's recommended you start at the ealvalog-core level. We also hope you'd 
   contribute it back to this library.
@@ -152,12 +153,15 @@ Performance
 
 Using the [Loggly Logging Framework Benchmark](https://www.loggly.com/blog/benchmarking-java-logging-frameworks/),
 [modified](https://github.com/pandasys/Java-Logging-Framework-Benchmark) to include this framework, shows an average performance gain of 
-40% using this facade over using java.util.logging directly. This is due to eAlvaLog using cached LogRecords, StringBuilders, and 
+approximately 37-40% using this facade over using java.util.logging directly. This is due to eAlvaLog using cached LogRecords, StringBuilders, and 
 Formatters. 
 
 The AndroidLogger uses the same framework but logs to the android.log.Log. eAlvaLog overhead compared to logging directly
 to android.log.Log is fundamentally String.format() over cached StringBuilders. This alleviates the need for the client to 
 do string building, so performance is comparable and can be better when the client code was previously doing extensive formatting. 
+
+Using this framework over Log4j2 results in basically the same performance as logging directly to Log4j. eAlvaLog adapts its 
+ExtLogRecord to Log4J LogEvent, which helps to avoid any performance penalty.
 
 Why?
 ----
@@ -214,7 +218,7 @@ to provide custom logging methods.
   result is pushing formatting down into the framework, providing very flexible formatting options. The framework uses a thread local
   formatter/string builder combination to greatly reduce object creation. All formatting is done into a reused, per-thread, StringBuilder.
   9. The resulting libraries are very small.
-  10. After a rewrite to directly support Kotlin style logging, the Logger interface was reduced to 5 properties and 4 functions. Kotlin
+  10. After a rewrite to directly support Kotlin style logging, the Logger interface was reduced to 6 properties and 4 functions. Kotlin
   clients use inline extension functions which push a very small amount of code into the client but provide even greater
   flexibility/control at the log site. For example, including log location information can be controlled per log statement and
   is done via the plus unary operator. A layer built on top of the Kotlin classes provides the standard Java style logging interface and

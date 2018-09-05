@@ -29,7 +29,6 @@ import java.util.logging.Handler
 /**
  * Implementation that uses [java.util.logging.Logger]
  *
- *
  * Created by Eric A. Snell on 2/28/17.
  */
 class JdkLogger internal constructor(

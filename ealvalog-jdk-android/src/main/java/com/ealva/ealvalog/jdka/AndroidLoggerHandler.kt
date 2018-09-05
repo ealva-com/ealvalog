@@ -56,7 +56,6 @@ private fun Level.toAndroid(): Int {
 /**
  * Handler for the jdk facade implementation which logs to the Android Log
  *
- *
  * Created by Eric A. Snell on 3/10/17.
  */
 open class AndroidLoggerHandler(
