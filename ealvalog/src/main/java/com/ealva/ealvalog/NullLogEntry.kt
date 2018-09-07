@@ -36,6 +36,7 @@ object NullLogEntry : LogEntry {
   override val loggerName = ""
   override val threadPriority = 0
   override val nanoTime = 0L
+  override val loggerFQCN: String = javaClass.name
   override fun reset() = this
   override fun append(c: Char) = this
   override fun append(csq: CharSequence?) = this

@@ -34,7 +34,7 @@ operator fun LogEntry.invoke(msg: String): LogEntry {
  * the underlying logging framework. The [format] string style depends on the logging framework,
  * but is typically similar to the style required by [java.text.MessageFormat]. This framework
  * prefers the printf style of [String.format], which uses [java.util.Formatter], though there is
- * is a small performance penalty (12.5% on our test machine)
+ * is a small performance penalty for String.format() over java.util.Formatter
  *
  * See [LogEntry.log]
  */
@@ -54,9 +54,34 @@ operator fun LogEntry.unaryPlus() {
 }
 
 /**
+ * A LogEntry is obtained from a [Logger] and logging information is added to it before it is sent
+ * back to the [Logger]. This is typically via extension functions in Kotlin or the JLogger
+ * interface in Java code.
+ *
+ * - Logger use (canonical)
+ * ```java
+ * public class MainActivity extends Activity  {
+ *   private static final JLogger LOG = JLoggers.get(MainActivity.class);
+ *
+ *   public void someMethod() {
+ *     LOG.log(LogLevel.ERROR, "Widget %s too large, height=%d", widget, heightCentimeters);
+ *   }
+ * }
+ * ```
+ * - Kotlin client
+ * ```kotlin
+ * private val LOG by lazyLogger(ArtistTable::class) // don't get the logger unless we actually use it
+ *
+ * class ArtistTable {
+ *   fun someMethod(artistId: Long) {
+ *     LOG.e { +it("No record for artist _id=%d", artistId) }  // + operator adds call site information
+ *   }
+ * }
+ * ```
+ *
+ *
  * Created by Eric A. Snell on 6/29/18.
  */
-@Suppress("unused")
 interface LogEntry : Appendable, Closeable {
   // specify close as not throwing
   override fun close()
@@ -88,6 +113,8 @@ interface LogEntry : Appendable, Closeable {
   val threadPriority: Int
 
   val nanoTime: Long
+
+  val loggerFQCN: String
 
   /**
    * Reset the message, ie. `setLength(0)`

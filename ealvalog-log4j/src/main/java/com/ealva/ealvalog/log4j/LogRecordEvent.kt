@@ -60,13 +60,12 @@ class LogRecordEvent(logEntry: LogEntry?) : ExtLogRecord(logEntry) {
       }
     }
 
-    override fun getThreadName(): String {
+    override fun getThreadName(): String? {
       return this@LogRecordEvent.threadName
     }
 
-    override fun getMarker(): org.apache.logging.log4j.Marker {
-      TODO()
-//    return record.marker
+    override fun getMarker(): org.apache.logging.log4j.Marker? {
+      return Log4jMarkerFactory.asLog4jMarker(this@LogRecordEvent.marker)
     }
 
     override fun getInstant(): Instant {
@@ -98,7 +97,7 @@ class LogRecordEvent(logEntry: LogEntry?) : ExtLogRecord(logEntry) {
       return contextData.toMap()
     }
 
-    override fun getLoggerName(): String {
+    override fun getLoggerName(): String? {
       return this@LogRecordEvent.loggerName
     }
 
@@ -121,7 +120,7 @@ class LogRecordEvent(logEntry: LogEntry?) : ExtLogRecord(logEntry) {
     }
 
     override fun getLoggerFqcn(): String {
-      return loggerName
+      return this@LogRecordEvent.loggerFQCN
     }
 
     override fun getContextData(): ReadOnlyStringMap {
@@ -170,6 +169,7 @@ class LogRecordEvent(logEntry: LogEntry?) : ExtLogRecord(logEntry) {
     private val threadLocalRecord = ThreadLocal<LogRecordEvent>()
 
     fun getRecordEvent(
+      loggerFQCN: String,
       logLevel: LogLevel,
       name: String,
       marker: Marker?,
@@ -180,22 +180,21 @@ class LogRecordEvent(logEntry: LogEntry?) : ExtLogRecord(logEntry) {
         result = LogRecordEvent(null)
         threadLocalRecord.set(result)
       }
-      return (if (result.isReserved) makeNewAndReserve() else result.reserve()).apply {
+      return (if (result.isReserved) {
+        LOG.e {
+              it(
+                "Had to make a new LogRecordEvent because the thread local is already in use. In use=%s",
+                threadLocalRecord.get() ?: "Null?"
+              )
+            }
+        LogRecordEvent(null).reserve()
+      } else result.reserve()).apply {
+        setLoggerFQCN(loggerFQCN)
         setLogLevel(logLevel)
         setLoggerName(name)
         this.marker = marker
         setThrown(throwable)
       }
-    }
-
-    private fun makeNewAndReserve(): LogRecordEvent {
-      LOG.e {
-        it(
-          "Had to make a new LogRecordEvent because the thread local is already in use. In use=%s",
-          threadLocalRecord.get() ?: "Null?"
-        )
-      }
-      return LogRecordEvent(null).reserve()
     }
 
   }

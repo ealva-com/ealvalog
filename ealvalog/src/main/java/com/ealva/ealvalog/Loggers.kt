@@ -174,7 +174,7 @@ inline fun Logger.wtf(
  */
 object Loggers {
   private const val STACK_DEPTH = 1
-  @Volatile private var loggerFactory: LoggerFactory = NullLoggerFactory
+  @field:Volatile private var loggerFactory: LoggerFactory = NullLoggerFactory
 
   /**
    * Get the root logger. Logger with name [LoggerFactory.ROOT_LOGGER_NAME]
@@ -206,3 +206,57 @@ object Loggers {
     )
   }
 }
+
+/*
+Example Android extension functions for Debug mode. Use these when you only want the particular
+log statement in when BuildConfig.DEBUG is true.
+
+inline fun Logger._t(
+  throwable: Throwable? = null,
+  marker: Marker? = null,
+  block: (LogEntry) -> Unit
+) {
+  if (BuildConfig.DEBUG) t(throwable, marker, block)
+}
+
+inline fun Logger._d(
+  throwable: Throwable? = null,
+  marker: Marker? = null,
+  block: (LogEntry) -> Unit
+) {
+  if (BuildConfig.DEBUG) d(throwable, marker, block)
+}
+
+inline fun Logger._i(
+  throwable: Throwable? = null,
+  marker: Marker? = null,
+  block: (LogEntry) -> Unit
+) {
+  if (BuildConfig.DEBUG) i(throwable, marker, block)
+}
+
+inline fun Logger._w(
+  throwable: Throwable? = null,
+  marker: Marker? = null,
+  block: (LogEntry) -> Unit
+) {
+  if (BuildConfig.DEBUG) w(throwable, marker, block)
+}
+
+inline fun Logger._e(
+  throwable: Throwable? = null,
+  marker: Marker? = null,
+  block: (LogEntry) -> Unit
+) {
+  if (BuildConfig.DEBUG) e(throwable, marker, block)
+}
+
+inline fun Logger._wtf(
+  throwable: Throwable? = null,
+  marker: Marker? = null,
+  block: (LogEntry) -> Unit
+) {
+  if (BuildConfig.DEBUG) wtf(throwable, marker, block)
+}
+
+ */

@@ -18,11 +18,10 @@
 
 package com.ealva.javaapp;
 
+import com.ealva.ealvalog.Configuration;
 import com.ealva.ealvalog.LogLevel;
-import com.ealva.ealvalog.Loggers;
 import com.ealva.ealvalog.jdka.AndroidLoggerHandler;
-import com.ealva.ealvalog.jul.JdkLogger;
-import com.ealva.ealvalog.jul.JdkLoggerFactory;
+import com.ealva.ealvalog.jul.JulConfiguration;
 
 import android.app.Application;
 
@@ -33,22 +32,18 @@ public class JavaApp extends Application {
   @Override public void onCreate() {
     super.onCreate();
 
+    Configuration config;
     // Configure the Loggers singleton
-    JdkLoggerFactory factory = JdkLoggerFactory.INSTANCE;
-    Loggers.INSTANCE.setFactory(factory);
-
-    // Configure the underlying root java.util.logging.Logger
-    JdkLogger rootLogger = JdkLoggerFactory.INSTANCE.getRoot();
-    rootLogger.setIncludeLocation(true); // makes logging more expensive
-
     if (BuildConfig.DEBUG) {
-//      Fabric.with(this, CrashlyticsCore.Builder().disabled(BuildConfig.DEBUG).build())
-      rootLogger.addHandler(AndroidLoggerHandler.Companion.make());
-      rootLogger.setLogLevel(LogLevel.WARN);
+      config =
+          new JulConfiguration(true, true, AndroidLoggerHandler.Companion.make(), LogLevel.WARN);
     } else {
 //      Fabric.with(this, CrashlyticsCore(), Answers(), Crashlytics());
-//      rootLogger.addHandler(CrashlyticsLogHandler());
-//      rootLogger.logLevel(LogLevel.ERROR);
+//      config = new JulConfiguration(false, CrashlyticsLogHandler(), LogLevel.ERROR);
+      config =
+          new JulConfiguration(true, true, AndroidLoggerHandler.Companion.make(), LogLevel.ERROR);
     }
+
+    config.configure();
   }
 }

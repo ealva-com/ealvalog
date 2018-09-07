@@ -34,6 +34,7 @@ import com.ealva.ealvalog.Marker
  */
 abstract class CoreLogger<T : Bridge> protected constructor(
   loggerName: String,
+  override var marker: Marker?,
   private val config: LoggerConfiguration<T>
 ) : Logger {
   @field:Volatile protected open var bridge: T = config.getBridge(loggerName)
@@ -54,7 +55,7 @@ abstract class CoreLogger<T : Bridge> protected constructor(
     marker: Marker?,
     throwable: Throwable?
   ): Boolean {
-    return bridge.shouldIncludeLocation(logLevel, marker, throwable)
+    return bridge.shouldIncludeLocation(logLevel, resolveMarker(marker), throwable)
   }
 
   override fun isLoggable(
@@ -62,7 +63,7 @@ abstract class CoreLogger<T : Bridge> protected constructor(
     marker: Marker?,
     throwable: Throwable?
   ): Boolean {
-    return bridge.isLoggable(name, level, marker, throwable).shouldProceed
+    return bridge.isLoggable(name, level, resolveMarker(marker), throwable).shouldProceed
   }
 
   var logToParent: Boolean
@@ -81,6 +82,10 @@ abstract class CoreLogger<T : Bridge> protected constructor(
 
   override fun logImmediate(entry: LogEntry) {
     bridge.log(entry)
+  }
+
+  protected fun resolveMarker(marker: Marker?): Marker? {
+    return marker ?: this.marker
   }
 
 }

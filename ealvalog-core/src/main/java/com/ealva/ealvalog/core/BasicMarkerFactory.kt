@@ -28,13 +28,13 @@ import java.util.concurrent.ConcurrentMap
  *
  * Created by Eric A. Snell on 2/28/17.
  */
-class MarkerFactoryImpl : MarkerFactory {
+class BasicMarkerFactory : MarkerFactory {
   private val nameMarkerMap: ConcurrentMap<String, Marker> = ConcurrentHashMap()
 
   override fun get(name: String): Marker {
     var marker: Marker? = nameMarkerMap[name]
     if (marker == null) {
-      marker = MarkerImpl(name, this)
+      marker = BasicMarker(name)
       val oldMarker = nameMarkerMap.putIfAbsent(name, marker)
       if (oldMarker != null) {
         marker = oldMarker
@@ -52,6 +52,6 @@ class MarkerFactoryImpl : MarkerFactory {
   }
 
   override fun makeOrphan(name: String): Marker {
-    return MarkerImpl(name, this)
+    return BasicMarker(name)
   }
 }

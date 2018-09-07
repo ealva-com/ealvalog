@@ -26,6 +26,8 @@ import com.ealva.ealvalog.core.ExtLogRecord
 import org.jetbrains.annotations.TestOnly
 import java.util.logging.Handler
 
+private val loggerFQCN: String = JdkLogger::class.java.name
+
 /**
  * Implementation that uses [java.util.logging.Logger]
  *
@@ -33,9 +35,9 @@ import java.util.logging.Handler
  */
 class JdkLogger internal constructor(
   override val name: String,
-  override var marker: Marker?,
+  marker: Marker?,
   private var config: JdkLoggerConfiguration
-) : CoreLogger<JdkBridge>(name, config) {
+) : CoreLogger<JdkBridge>(name, marker, config) {
 
   internal fun update(configuration: JdkLoggerConfiguration) {
     this.config = configuration
@@ -47,7 +49,7 @@ class JdkLogger internal constructor(
   }
 
   override fun getLogEntry(logLevel: LogLevel, marker: Marker?, throwable: Throwable?): LogEntry {
-    return ExtLogRecord.get(logLevel, name, marker, throwable)
+    return ExtLogRecord.get(loggerFQCN, logLevel, name, resolveMarker(marker), throwable)
   }
 
   val bridgeForTest: JdkBridge

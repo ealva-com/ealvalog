@@ -69,19 +69,12 @@ object JdkLoggerFactory : LoggerFactory {
     }
   }
 
-  init {
-    reset(false)
-  }
-
-  val root = JdkLogger(
-    LoggerFactory.ROOT_LOGGER_NAME,
-    null,
-    configuration
-  )
+  val root = JdkLogger(LoggerFactory.ROOT_LOGGER_NAME, null, configuration)
 
   /**
-   * Typically not necessary for clients to call this as it's done on init. Resets all loggers,
-   * removing filters and underlying handlers from the java.util.logging Loggers
+   * Typically this would be called during initialization. If [fullReset] is true, removes and
+   * closes all root handlers. Resets the factory mappings to Jul loggers and the JdkLoggerFactory
+   * mappings.
    */
   fun reset(fullReset: Boolean = false) {
     if (fullReset) {

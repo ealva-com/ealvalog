@@ -44,9 +44,11 @@ import static org.mockito.Mockito.when;
 public class CoreLoggerTest {
   private static final String MESSAGE = "Message";
   private static final String LOGGER_NAME = "LoggerName";
+  private static final String LOGGER_FQCN = "com.acme.loggers.TheLogger";
 
   @Mock com.ealva.ealvalog.core.Bridge bridge;
   @Mock LoggerConfiguration<Bridge> configuration;
+  @Mock Marker marker;
 
   @Before
   public void setup() {
@@ -54,12 +56,11 @@ public class CoreLoggerTest {
     when(configuration.getBridge(LOGGER_NAME)).thenReturn(bridge);
   }
 
-  @SuppressWarnings("deprecation") // isNull()
   @Test
   public void testPrintLog() {
     com.ealva.ealvalog.core.CoreLogger<com.ealva.ealvalog.core.Bridge>
-        logger = new CoreLoggerForTest(LOGGER_NAME, configuration);
-    final ExtLogRecord record = ExtLogRecord.get(LogLevel.WARN, "", null, null);
+        logger = new CoreLoggerForTest(LOGGER_NAME, marker, configuration);
+    final ExtLogRecord record = ExtLogRecord.get(LOGGER_FQCN, LogLevel.WARN, "", marker, null);
     record.append(MESSAGE);
     logger.logImmediate(record);
     then(bridge).should(only()).log(same(record));
@@ -69,8 +70,9 @@ public class CoreLoggerTest {
     private final @NotNull String name;
 
     CoreLoggerForTest(@NotNull final String name,
+                      @NotNull final Marker marker,
                       @NotNull final LoggerConfiguration<Bridge> configuration) {
-      super(name, configuration);
+      super(name, marker, configuration);
       this.name = name;
     }
 

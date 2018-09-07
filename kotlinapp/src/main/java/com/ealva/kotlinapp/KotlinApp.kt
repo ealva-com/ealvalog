@@ -20,9 +20,8 @@ package com.ealva.kotlinapp
 
 import android.app.Application
 import com.ealva.ealvalog.LogLevel
-import com.ealva.ealvalog.Loggers
 import com.ealva.ealvalog.jdka.AndroidLoggerHandler
-import com.ealva.ealvalog.jul.JdkLoggerFactory
+import com.ealva.ealvalog.jul.JulConfiguration
 
 /**
  * Created by Eric A. Snell on 8/15/18.
@@ -30,22 +29,12 @@ import com.ealva.ealvalog.jul.JdkLoggerFactory
 class KotlinApp : Application() {
   override fun onCreate() {
     super.onCreate()
-    // Configure the Loggers singleton
-    val factory = JdkLoggerFactory
-    Loggers.setFactory(factory)
-
-    // Configure the underlying root java.util.logging.Logger
-    val rootLogger = factory.root
-    // rootLogger.setIncludeLocation(true); // unnecessary, can control at log site with + operator
-
     if (BuildConfig.DEBUG) {
-      //      Fabric.with(this, CrashlyticsCore.Builder().disabled(BuildConfig.DEBUG).build())
-      rootLogger.addHandler(AndroidLoggerHandler.make())
-      rootLogger.logLevel = LogLevel.WARN
+      JulConfiguration(true, true, AndroidLoggerHandler.make(), LogLevel.WARN)
     } else {
       //      Fabric.with(this, CrashlyticsCore(), Answers(), Crashlytics());
-      //      rootLogger.addHandler(CrashlyticsLogHandler());
-      //      rootLogger.logLevel(LogLevel.ERROR);
-    }
+      //      config = new JulConfiguration(false, CrashlyticsLogHandler(), LogLevel.ERROR);
+      JulConfiguration(true, true, AndroidLoggerHandler.make(), LogLevel.ERROR)
+    }.configure()
   }
 }

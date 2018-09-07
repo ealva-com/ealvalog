@@ -53,6 +53,7 @@ import static org.mockito.Mockito.when;
 public class JLoggerImplTest {
   private static final String MSG = "TheMessage";
   private static final String LOGGER_NAME = "LoggerName";
+  private static final String LOGGER_FQCN = "com.acme.loggers.TheLogger";
   @Mock Logger realLogger;
 
   @Before
@@ -121,7 +122,7 @@ public class JLoggerImplTest {
     LogLevel level = ERROR;
     Marker marker = NullMarker.INSTANCE;
     Throwable throwable = null;
-    when(realLogger.getLogEntry(level, marker, throwable)).thenReturn(ExtLogRecord.get(level, "", marker, throwable));
+    when(realLogger.getLogEntry(level, marker, throwable)).thenReturn(ExtLogRecord.get(LOGGER_FQCN, level, "", marker, throwable));
     when(realLogger.isLoggable(level, marker, throwable)).thenReturn(true);
     JLoggerImpl logger = new JLoggerImpl(realLogger);
     logger.log(level, marker, MSG);
@@ -139,7 +140,7 @@ public class JLoggerImplTest {
     LogLevel level = WARN;
     Marker marker = NullMarker.INSTANCE;
     Throwable throwable = null;
-    when(realLogger.getLogEntry(level, marker, throwable)).thenReturn(ExtLogRecord.get(level, "", marker, throwable));
+    when(realLogger.getLogEntry(level, marker, throwable)).thenReturn(ExtLogRecord.get(LOGGER_FQCN, level, "", marker, throwable));
     when(realLogger.isLoggable(level, marker, throwable)).thenReturn(true);
     JLoggerImpl logger = new JLoggerImpl(realLogger);
     logger.log(level, marker, "%s%d", "one", 2);
@@ -156,7 +157,7 @@ public class JLoggerImplTest {
     LogLevel level = ERROR;
     Marker marker = null;
     Throwable throwable = NullThrowable.INSTANCE;
-    when(realLogger.getLogEntry(level, marker, throwable)).thenReturn(ExtLogRecord.get(level, "", marker, throwable));
+    when(realLogger.getLogEntry(level, marker, throwable)).thenReturn(ExtLogRecord.get(LOGGER_FQCN, level, "", marker, throwable));
     when(realLogger.isLoggable(level, marker, throwable)).thenReturn(true);
     JLoggerImpl logger = new JLoggerImpl(realLogger);
     logger.log(level, throwable, "%d%s", 1, "two");
@@ -173,7 +174,7 @@ public class JLoggerImplTest {
     LogLevel level = CRITICAL;
     Marker marker = NullMarker.INSTANCE;
     Throwable throwable = NullThrowable.INSTANCE;
-    when(realLogger.getLogEntry(level, marker, throwable)).thenReturn(ExtLogRecord.get(level, "", marker, throwable));
+    when(realLogger.getLogEntry(level, marker, throwable)).thenReturn(ExtLogRecord.get(LOGGER_FQCN, level, "", marker, throwable));
     when(realLogger.isLoggable(level, marker, throwable)).thenReturn(true);
     JLoggerImpl logger = new JLoggerImpl(realLogger);
     logger.log(level, marker, throwable, "%d%S", 1, "two");
@@ -197,7 +198,7 @@ public class JLoggerImplTest {
     LogLevel level = INFO;
     Marker marker = null;
     Throwable throwable = null;
-    when(realLogger.getLogEntry(level, marker, throwable)).thenReturn(ExtLogRecord.get(level, "", marker, throwable));
+    when(realLogger.getLogEntry(level, marker, throwable)).thenReturn(ExtLogRecord.get(LOGGER_FQCN, level, "", marker, throwable));
     when(realLogger.isLoggable(level, marker, throwable)).thenReturn(true);
     JLoggerImpl logger = new JLoggerImpl(realLogger);
     logger.log(level, "%s", one);
@@ -215,7 +216,7 @@ public class JLoggerImplTest {
     LogLevel level = INFO;
     Marker marker = null;
     Throwable throwable = null;
-    when(realLogger.getLogEntry(level, marker, throwable)).thenReturn(ExtLogRecord.get(level, "", marker, throwable));
+    when(realLogger.getLogEntry(level, marker, throwable)).thenReturn(ExtLogRecord.get(LOGGER_FQCN, level, "", marker, throwable));
     when(realLogger.isLoggable(level, marker, throwable)).thenReturn(true);
     JLoggerImpl logger = new JLoggerImpl(realLogger);
     logger.log(level, "%s%s", one, two);
@@ -233,7 +234,7 @@ public class JLoggerImplTest {
     LogLevel level = INFO;
     Marker marker = null;
     Throwable throwable = null;
-    when(realLogger.getLogEntry(level, marker, throwable)).thenReturn(ExtLogRecord.get(level, "", marker, throwable));
+    when(realLogger.getLogEntry(level, marker, throwable)).thenReturn(ExtLogRecord.get(LOGGER_FQCN, level, "", marker, throwable));
     when(realLogger.isLoggable(level, marker, throwable)).thenReturn(true);
     JLoggerImpl logger = new JLoggerImpl(realLogger);
     logger.log(level, "%s%s%s", one, two, three);
@@ -251,7 +252,7 @@ public class JLoggerImplTest {
     LogLevel level = INFO;
     Marker marker = null;
     Throwable throwable = null;
-    when(realLogger.getLogEntry(level, marker, throwable)).thenReturn(ExtLogRecord.get(level, "", marker, throwable));
+    when(realLogger.getLogEntry(level, marker, throwable)).thenReturn(ExtLogRecord.get(LOGGER_FQCN, level, "", marker, throwable));
     when(realLogger.isLoggable(level, marker, throwable)).thenReturn(true);
     JLoggerImpl logger = new JLoggerImpl(realLogger);
     logger.log(level, "%s%s%s%s", one, two, three, four);
@@ -269,7 +270,7 @@ public class JLoggerImplTest {
     LogLevel level = INFO;
     Marker marker = null;
     Throwable throwable = null;
-    when(realLogger.getLogEntry(level, marker, throwable)).thenReturn(ExtLogRecord.get(level, "", marker, throwable));
+    when(realLogger.getLogEntry(level, marker, throwable)).thenReturn(ExtLogRecord.get(LOGGER_FQCN, level, "", marker, throwable));
     when(realLogger.isLoggable(level, marker, throwable)).thenReturn(true);
     JLoggerImpl logger = new JLoggerImpl(realLogger);
     logger.log(level, "%s%s%s%s%s%s", one, two, three, four, five, six);
@@ -287,7 +288,7 @@ public class JLoggerImplTest {
     LogLevel level = WARN;
     Marker marker = null;
     Throwable throwable = null;
-    when(realLogger.getLogEntry(level, marker, throwable)).thenReturn(ExtLogRecord.get(level, "", marker, throwable));
+    when(realLogger.getLogEntry(level, marker, throwable)).thenReturn(ExtLogRecord.get(LOGGER_FQCN, level, "", marker, throwable));
     when(realLogger.isLoggable(level, marker, throwable)).thenReturn(true);
     JLoggerImpl logger = new JLoggerImpl(realLogger);
     logger.log(level, () -> MSG);
@@ -305,7 +306,7 @@ public class JLoggerImplTest {
     LogLevel level = WARN;
     Marker marker = NullMarker.INSTANCE;
     Throwable throwable = null;
-    when(realLogger.getLogEntry(level, marker, throwable)).thenReturn(ExtLogRecord.get(level, "", marker, throwable));
+    when(realLogger.getLogEntry(level, marker, throwable)).thenReturn(ExtLogRecord.get(LOGGER_FQCN, level, "", marker, throwable));
     when(realLogger.isLoggable(level, marker, throwable)).thenReturn(true);
     JLoggerImpl logger = new JLoggerImpl(realLogger);
     logger.log(level, NullMarker.INSTANCE, () -> new StringBuilder(MSG));
@@ -325,7 +326,7 @@ public class JLoggerImplTest {
     LogLevel level = ERROR;
     Marker marker = null;
     Throwable throwable = NullThrowable.INSTANCE;
-    when(realLogger.getLogEntry(level, marker, throwable)).thenReturn(ExtLogRecord.get(level, "", marker, throwable));
+    when(realLogger.getLogEntry(level, marker, throwable)).thenReturn(ExtLogRecord.get(LOGGER_FQCN, level, "", marker, throwable));
     when(realLogger.isLoggable(level, marker, throwable)).thenReturn(true);
     JLoggerImpl logger = new JLoggerImpl(realLogger);
     logger.log(level, throwable, () -> MSG);
@@ -345,7 +346,7 @@ public class JLoggerImplTest {
     LogLevel level = WARN;
     Marker marker = NullMarker.INSTANCE;
     Throwable throwable = new RuntimeException("Test");
-    when(realLogger.getLogEntry(level, marker, throwable)).thenReturn(ExtLogRecord.get(level, "", marker, throwable));
+    when(realLogger.getLogEntry(level, marker, throwable)).thenReturn(ExtLogRecord.get(LOGGER_FQCN, level, "", marker, throwable));
     when(realLogger.isLoggable(level, marker, throwable)).thenReturn(true);
     JLoggerImpl logger = new JLoggerImpl(realLogger);
     logger.log(level, marker, throwable, () -> new RuntimeException("Test"));
@@ -365,7 +366,7 @@ public class JLoggerImplTest {
     LogLevel level = ERROR;
     Marker marker = null;
     Throwable throwable = new RuntimeException("MeMeMe");
-    when(realLogger.getLogEntry(level, marker, throwable)).thenReturn(ExtLogRecord.get(level, "", marker, throwable));
+    when(realLogger.getLogEntry(level, marker, throwable)).thenReturn(ExtLogRecord.get(LOGGER_FQCN, level, "", marker, throwable));
     when(realLogger.isLoggable(level, marker, throwable)).thenReturn(true);
     JLoggerImpl logger = new JLoggerImpl(realLogger);
     logger.caught(level, throwable);
@@ -384,7 +385,7 @@ public class JLoggerImplTest {
     LogLevel level = INFO;
     Marker marker = null;
     Throwable throwable = new RuntimeException("MeMeMe");
-    when(realLogger.getLogEntry(level, marker, throwable)).thenReturn(ExtLogRecord.get(level, "", marker, throwable));
+    when(realLogger.getLogEntry(level, marker, throwable)).thenReturn(ExtLogRecord.get(LOGGER_FQCN, level, "", marker, throwable));
     when(realLogger.isLoggable(level, marker, throwable)).thenReturn(true);
     JLoggerImpl logger = new JLoggerImpl(realLogger);
     Throwable returned = logger.throwing(level, throwable);

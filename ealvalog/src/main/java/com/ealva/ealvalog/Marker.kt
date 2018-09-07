@@ -23,27 +23,35 @@ import java.util.Formattable
 
 /**
  * A Marker is extra data passed to the underlying logging system and it's up to that implementation
- * on if/how a Marker is used. Examples might be that the Marker is output along with the log
- * message or the Marker might be used to route the log message.
+ * if/how a Marker is used. Examples might be that the Marker is used to filter logging,
+ * the Marker is output along with the log message, or the Marker might be used to route the log
+ * message.
  *
  * Created by Eric A. Snell on 2/28/17.
  */
 interface Marker : Serializable, Iterable<Marker>, Formattable {
   val name: String
 
+  /**
+   * Add [marker] as a reference and return true if the set of contained references did not already
+   * include [marker]
+   */
   fun add(marker: Marker): Boolean
 
+  /**
+   * Remove [marker] if it is contained as a reference and return true if set of contained
+   * references included [marker]
+   */
   fun remove(marker: Marker): Boolean
 
   /**
-   * @param marker determine if this is a child
-   * @return true if this instance is `marker` or this instance has `marker` as a child
+   * @return true if this instance is [marker] or this instance has [marker] as a reference
    */
   fun isOrContains(marker: Marker): Boolean
 
   /**
-   * @param markerName see if there is a child with this name
-   * @return true if this instance is named `markerName` or this instance has a child named `markName`
+   * @return true if this instance is named [markerName] or this instance has a reference named
+   * [markerName]
    */
   fun isOrContains(markerName: String): Boolean
 

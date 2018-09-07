@@ -18,20 +18,15 @@
 
 package com.ealva.ealvalog
 
-import java.util.Formatter
-
 /**
- * A no-op implementation of the [Marker] interface
- *
- * Created by Eric A. Snell on 2/28/17.
+ * Created by Eric A. Snell on 9/6/18.
  */
-object NullMarker : Marker {
-  override val name = "NullMarker"
-  override fun add(marker: Marker) = false
-  override fun remove(marker: Marker) = false
-  override fun isOrContains(marker: Marker) = false
-  override fun isOrContains(markerName: String) = false
-  override fun iterator(): Iterator<Marker> = emptyList<Marker>().iterator()
-  override fun toStringBuilder(builder: StringBuilder, includeContained: Boolean) = builder
-  override fun formatTo(formatter: Formatter, flags: Int, width: Int, precision: Int) {}
+open class Configuration(
+  var loggerFactory: LoggerFactory = NullLoggerFactory,
+  var markerFactory: MarkerFactory = NullMarkerFactory
+) {
+  open fun configure() {
+    Loggers.setFactory(loggerFactory)
+    Markers.setFactory(markerFactory)
+  }
 }

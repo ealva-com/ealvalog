@@ -24,14 +24,16 @@ import com.ealva.ealvalog.Marker
 import com.ealva.ealvalog.core.CoreLogger
 import org.jetbrains.annotations.TestOnly
 
+private val FQCN = Log4jLoggerAdapter::class.java.name
+
 /**
  * Created by Eric A. Snell on 8/24/18.
  */
 class Log4jLoggerAdapter internal constructor(
   override val name: String,
-  override var marker: Marker?,
+  marker: Marker?,
   private var config: Log4jLoggerConfiguration
-) : CoreLogger<Log4jBridge>(name, config) {
+) : CoreLogger<Log4jBridge>(name, marker, config) {
 
   internal fun update(configuration: Log4jLoggerConfiguration) {
     this.config = configuration
@@ -39,7 +41,7 @@ class Log4jLoggerAdapter internal constructor(
   }
 
   override fun getLogEntry(logLevel: LogLevel, marker: Marker?, throwable: Throwable?): LogEntry {
-    return LogRecordEvent.getRecordEvent(logLevel, name, marker, throwable)
+    return LogRecordEvent.getRecordEvent(FQCN, logLevel, name, resolveMarker(marker), throwable)
   }
 
   val bridgeForTest: Log4jBridge

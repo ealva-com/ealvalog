@@ -42,7 +42,7 @@ class JdkBridge internal constructor(
   handler: Handler? = null,
   logLevel: LogLevel? = null
 ) : Bridge {
-  @Volatile var parent: JdkBridge? = null  // root bridge will have a null parent
+  @field:Volatile var parent: JdkBridge? = null  // root bridge will have a null parent
   private val jdkLogger: java.util.logging.Logger =
     java.util.logging.Logger.getLogger(name).apply {
       handler?.let { addHandler(it) }

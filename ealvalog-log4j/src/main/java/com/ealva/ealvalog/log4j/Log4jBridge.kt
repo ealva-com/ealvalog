@@ -26,7 +26,9 @@ import com.ealva.ealvalog.LoggerFilter
 import com.ealva.ealvalog.Marker
 import com.ealva.ealvalog.core.Bridge
 import com.ealva.ealvalog.filter.AlwaysNeutralFilter
+import com.ealva.ealvalog.log4j.Log4jMarkerFactory.asLog4jMarker
 import org.apache.logging.log4j.LogManager
+import org.apache.logging.log4j.MarkerManager
 import org.apache.logging.log4j.core.LoggerContext
 import org.apache.logging.log4j.core.config.Configurator
 import org.apache.logging.log4j.spi.ExtendedLogger
@@ -48,7 +50,7 @@ class Log4jBridge(
 
   private val loggerConfig = (LogManager.getContext(false) as LoggerContext).configuration.getLoggerConfig(name)
 
-  @Volatile var parent: Log4jBridge? = null  // root bridge will have a null parent
+  @field:Volatile var parent: Log4jBridge? = null  // root bridge will have a null parent
 
   override var includeLocation: Boolean = false
 
@@ -107,7 +109,7 @@ class Log4jBridge(
     throwable: Throwable?
   ): FilterResult {
     return if (filter.isLoggable(loggerName, logLevel, marker, throwable) != FilterResult.DENY &&
-      log4jLogger.isEnabled(logLevel.log4jLevel, null, "", throwable)
+      log4jLogger.isEnabled(logLevel.log4jLevel, asLog4jMarker(marker), "", throwable)
     ) FilterResult.ACCEPT
     else FilterResult.DENY
   }

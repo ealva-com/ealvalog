@@ -41,10 +41,11 @@ import static org.mockito.Mockito.when;
  * Created by Eric A. Snell on 8/24/18.
  */
 public class JdkFilterTest {
-  private static String loggerName = "LoggerName";
-  private static LogLevel level = LogLevel.INFO;
-  private static Marker marker = NullMarker.INSTANCE;
-  private static Throwable throwable = NullThrowable.INSTANCE;
+  private static final String LOGGER_FQCN = "com.acme.loggers.TheLogger";
+  private static final String LOGGER_NAME = "LoggerName";
+  private static final LogLevel LOG_LEVEL = LogLevel.INFO;
+  private static final Marker MARKER = NullMarker.INSTANCE;
+  private static final Throwable THROWABLE = NullThrowable.INSTANCE;
 
   @Mock LoggerFilter loggerFilter;
 
@@ -55,47 +56,48 @@ public class JdkFilterTest {
 
   @Test
   public void isLoggableNeutral() {
-    when(loggerFilter.isLoggable(loggerName,
-                                 level,
-                                 marker,
-                                 throwable)).thenReturn(FilterResult.NEUTRAL);
+    when(loggerFilter.isLoggable(LOGGER_NAME,
+                                 LOG_LEVEL,
+                                 MARKER,
+                                 THROWABLE)).thenReturn(FilterResult.NEUTRAL);
     JdkFilter filter = new JdkFilter(loggerFilter);
-    assertThat(filter.isLoggable(loggerName, level, marker, throwable), is(FilterResult.NEUTRAL));
-    then(loggerFilter).should(times(1)).isLoggable(loggerName, level, marker, throwable);
+    assertThat(filter.isLoggable(LOGGER_NAME, LOG_LEVEL, MARKER, THROWABLE), is(FilterResult.NEUTRAL));
+    then(loggerFilter).should(times(1)).isLoggable(LOGGER_NAME, LOG_LEVEL, MARKER, THROWABLE);
   }
 
   @Test
   public void isLoggableAccept() {
-    when(loggerFilter.isLoggable(loggerName,
-                                 level,
-                                 marker,
-                                 throwable)).thenReturn(FilterResult.ACCEPT);
+    when(loggerFilter.isLoggable(LOGGER_NAME,
+                                 LOG_LEVEL,
+                                 MARKER,
+                                 THROWABLE)).thenReturn(FilterResult.ACCEPT);
     JdkFilter filter = new JdkFilter(loggerFilter);
-    assertThat(filter.isLoggable(loggerName, level, marker, throwable), is(FilterResult.ACCEPT));
-    then(loggerFilter).should(times(1)).isLoggable(loggerName, level, marker, throwable);
+    assertThat(filter.isLoggable(LOGGER_NAME, LOG_LEVEL, MARKER, THROWABLE), is(FilterResult.ACCEPT));
+    then(loggerFilter).should(times(1)).isLoggable(LOGGER_NAME, LOG_LEVEL, MARKER, THROWABLE);
   }
 
   @Test
   public void isLoggableDeny() {
-    when(loggerFilter.isLoggable(loggerName,
-                                 level,
-                                 marker,
-                                 throwable)).thenReturn(FilterResult.DENY);
+    when(loggerFilter.isLoggable(LOGGER_NAME,
+                                 LOG_LEVEL,
+                                 MARKER,
+                                 THROWABLE)).thenReturn(FilterResult.DENY);
     JdkFilter filter = new JdkFilter(loggerFilter);
-    assertThat(filter.isLoggable(loggerName, level, marker, throwable), is(FilterResult.DENY));
-    then(loggerFilter).should(times(1)).isLoggable(loggerName, level, marker, throwable);
+    assertThat(filter.isLoggable(LOGGER_NAME, LOG_LEVEL, MARKER, THROWABLE), is(FilterResult.DENY));
+    then(loggerFilter).should(times(1)).isLoggable(LOGGER_NAME, LOG_LEVEL, MARKER, THROWABLE);
   }
 
   @Test
   public void isRecordLoggable() {
-    when(loggerFilter.isLoggable(loggerName,
-                                 level,
-                                 marker,
-                                 throwable)).thenReturn(FilterResult.DENY);
+    when(loggerFilter.isLoggable(LOGGER_NAME,
+                                 LOG_LEVEL,
+                                 MARKER,
+                                 THROWABLE)).thenReturn(FilterResult.DENY);
     JdkFilter filter = new JdkFilter(loggerFilter);
-    try (ExtLogRecord record = ExtLogRecord.get(level, loggerName, marker, throwable)) {
+    try (ExtLogRecord record = ExtLogRecord.get(LOGGER_FQCN,
+                                                LOG_LEVEL, LOGGER_NAME, MARKER, THROWABLE)) {
       assertThat(filter.isLoggable(record), is(false));
-      then(loggerFilter).should(times(1)).isLoggable(loggerName, level, marker, throwable);
+      then(loggerFilter).should(times(1)).isLoggable(LOGGER_NAME, LOG_LEVEL, MARKER, THROWABLE);
     }
   }
 }

@@ -21,11 +21,13 @@ package com.ealva.ealvalog.core;
 import com.ealva.ealvalog.LogLevel;
 import com.ealva.ealvalog.Marker;
 import com.ealva.ealvalog.MarkerFactory;
+import com.ealva.ealvalog.Markers;
 
 import static com.ealva.ealvalog.core.ExtRecordFormatter.CLASS_NAME_POSITION;
 import static com.ealva.ealvalog.core.ExtRecordFormatter.DATE_POSITION;
 import static com.ealva.ealvalog.core.ExtRecordFormatter.LAST_POSITION;
 import static com.ealva.ealvalog.core.ExtRecordFormatter.LOCATION_POSITION;
+import static com.ealva.ealvalog.core.ExtRecordFormatter.LOGGER_FQCN_POSITION;
 import static com.ealva.ealvalog.core.ExtRecordFormatter.LOGGER_NAME_POSITION;
 import static com.ealva.ealvalog.core.ExtRecordFormatter.LOG_LEVEL_POSITION;
 import static com.ealva.ealvalog.core.ExtRecordFormatter.MARKER_POSITION;
@@ -57,6 +59,7 @@ import java.util.Locale;
  * Created by Eric A. Snell on 3/5/17.
  */
 public class ExtRecordFormatterTest {
+  private static final String LOGGER_FQCN = "com.acme.loggers.TheLogger";
   private static final LogLevel LOG_LEVEL = LogLevel.CRITICAL;
   private static final String MESSAGE_FORMAT = "%s";
   private static final String LOGGER_NAME = "LoggerName";
@@ -69,11 +72,9 @@ public class ExtRecordFormatterTest {
   private final static int THREAD_PRIORITY = 20;
   private final static long NANO_TIME = 1000L;
   private static final int LINE_NUMBER = 100;
-  private static final String
-      EXPECTED =
+  private static final String EXPECTED =
       String.format(Locale.getDefault(), "(%s:%d)", METHOD_NAME, LINE_NUMBER);
-  private static final String
-      EXPECTED_ALT =
+  private static final String EXPECTED_ALT =
       String.format(Locale.getDefault(), "(%s.%s:%d)", DECLARING_CLASS, METHOD_NAME, LINE_NUMBER);
   @SuppressWarnings("WeakerAccess") @Mock MarkerFactory markerFactory;
   private ExtLogRecord record;
@@ -82,7 +83,7 @@ public class ExtRecordFormatterTest {
   public void setup() {
     MockitoAnnotations.initMocks(this);
     ExtLogRecord.clearCachedRecord();
-    record = ExtLogRecord.get(LOG_LEVEL, LOGGER_NAME, MARKER, THROWABLE);
+    record = ExtLogRecord.get(LOGGER_FQCN, LOG_LEVEL, LOGGER_NAME, MARKER, THROWABLE);
     record.addLocation(0);
     record.format(MESSAGE_FORMAT, MESSAGE_ARG);
     record.setThreadPriority(THREAD_PRIORITY);
@@ -110,7 +111,8 @@ public class ExtRecordFormatterTest {
     assertThat(MARKER_POSITION, is(11));
     assertThat(THREAD_PRIORITY_POSITION, is(12));
     assertThat(NANO_POSITION, is(13));
-    assertThat(LAST_POSITION, is(13));
+    assertThat(LOGGER_FQCN_POSITION, is(14));
+    assertThat(LAST_POSITION, is(14));
   }
 
   @Test(expected = IllegalFormatConversionException.class)
@@ -268,7 +270,7 @@ public class ExtRecordFormatterTest {
   public void testMarker() {
     com.ealva.ealvalog.core.ExtRecordFormatter formatter = new ExtRecordFormatter("%11$s");
     final String markerName = "MarkerName";
-    final MarkerImpl marker = new MarkerImpl(markerName, markerFactory);
+    final BasicMarker marker = new BasicMarker(markerName);
     record.setMarker(marker);
     assertThat(formatter.format(record), is(equalTo(markerName)));
   }
@@ -296,7 +298,7 @@ public class ExtRecordFormatterTest {
   @Test
   public void testNoParametersButHasFormatting() {
     record.close(); // release the fir
-    record = ExtLogRecord.get(LOG_LEVEL, LOGGER_NAME, MARKER, THROWABLE);
+    record = ExtLogRecord.get(LOGGER_FQCN, LOG_LEVEL, LOGGER_NAME, MARKER, THROWABLE);
     record.addLocation(0);
     record.append(MESSAGE_FORMAT);
     com.ealva.ealvalog.core.ExtRecordFormatter

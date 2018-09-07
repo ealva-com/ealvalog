@@ -69,6 +69,7 @@ public class ExtLogRecord extends LogRecord implements LogEntry {
   private transient int parameterCount;   // actual number of parameters, array might be over-sized
   private transient int threadPriority;
   private transient long nanoTime;
+  private transient @NotNull String loggerFQCN;
   private transient boolean reserved;
   private transient @NotNull StringBuilder builder;
   private transient @NotNull Formatter formatter;
@@ -96,13 +97,14 @@ public class ExtLogRecord extends LogRecord implements LogEntry {
     return maxBuilderSize;
   }
 
-  public static ExtLogRecord get(final @NotNull LogLevel level,
+  public static ExtLogRecord get(final @NotNull String loggerFQCN,
+                                 final @NotNull LogLevel level,
                                  final @NotNull String loggerName,
                                  final @Nullable Marker marker,
                                  final @Nullable Throwable throwable) {
     final ExtLogRecord logRecord = getRecord();
-    logRecord.logLevel = level;
-    logRecord.setLevel(level.getJdkLevel());
+    logRecord.setLoggerFQCN(loggerFQCN);
+    logRecord.setLogLevel(level);  // sets LogLevel and java.util.logging.Level
     logRecord.setMarker(marker);
     logRecord.setThrown(throwable);
     final Thread currentThread = Thread.currentThread();
@@ -190,9 +192,11 @@ public class ExtLogRecord extends LogRecord implements LogEntry {
       location = entry.getLocation();
       threadPriority = entry.getThreadPriority();
       nanoTime = entry.getNanoTime();
+      loggerFQCN = entry.getLoggerFQCN();
     } else {
       logLevel = LogLevel.ERROR;
       threadName = Thread.currentThread().getName();
+      loggerFQCN = "";
     }
   }
 
@@ -211,6 +215,7 @@ public class ExtLogRecord extends LogRecord implements LogEntry {
     setSequenceNumber(sequenceNumber.getAndIncrement());
     threadPriority = Thread.currentThread().getPriority();
     nanoTime = System.nanoTime();
+    loggerFQCN = "";
     if (builder.capacity() > maxBuilderSize) {
       builder.setLength(maxBuilderSize);
       builder.trimToSize();
@@ -319,6 +324,14 @@ public class ExtLogRecord extends LogRecord implements LogEntry {
     nanoTime = time;
   }
 
+  @Override public @NotNull String getLoggerFQCN() {
+    return loggerFQCN;
+  }
+
+  protected void setLoggerFQCN(@NotNull final String loggerFQCN) {
+    this.loggerFQCN = loggerFQCN;
+  }
+
   @Override public void close() {
     reserved = false;
   }
@@ -332,6 +345,7 @@ public class ExtLogRecord extends LogRecord implements LogEntry {
     parameterCount = in.readInt();
     threadPriority = in.readInt();
     nanoTime = in.readLong();
+    loggerFQCN = in.readUTF();
     reserved = false;
     builder = new StringBuilder(DEFAULT_STRING_BUILDER_SIZE);
     formatter = new Formatter(builder);
@@ -346,31 +360,12 @@ public class ExtLogRecord extends LogRecord implements LogEntry {
     out.writeInt(parameterCount);
     out.writeInt(threadPriority);
     out.writeLong(nanoTime);
+    out.writeUTF(loggerFQCN);
   }
 
   @SuppressWarnings("unused")
   public ExtLogRecord copyOf() {
     return new ExtLogRecord(this);
-//    copy.setLogLevel(logLevel);  // handles Level and LogLevel
-//    copy.setSequenceNumber(getSequenceNumber());
-//    copy.setSourceClassName(getSourceClassName());
-//    copy.setSourceMethodName(getSourceMethodName());
-//    copy.builder.append(builder.toString());
-//    copy.setThreadID(getThreadID());
-//    copy.setMillis(getMillis());
-//    copy.setThrown(getThrown());
-//    copy.setLoggerName(getLoggerName());
-//    copy.setParameters(getParameters());
-//    copy.setResourceBundle(getResourceBundle());
-//    copy.setResourceBundleName(getResourceBundleName());
-//
-//    copy.threadName = threadName;
-//    copy.marker = marker;
-//    copy.location = location;
-//    copy.parameterCount = parameterCount;
-//    copy.threadPriority = threadPriority;
-//    copy.nanoTime = nanoTime;
-//    return copy;
   }
 
   @NotNull @Override public LogEntry reset() {

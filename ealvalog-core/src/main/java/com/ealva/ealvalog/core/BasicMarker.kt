@@ -19,7 +19,6 @@
 package com.ealva.ealvalog.core
 
 import com.ealva.ealvalog.Marker
-import com.ealva.ealvalog.MarkerFactory
 import java.io.IOException
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
@@ -27,7 +26,7 @@ import java.util.FormattableFlags.ALTERNATE
 import java.util.FormattableFlags.LEFT_JUSTIFY
 import java.util.FormattableFlags.UPPERCASE
 import java.util.Formatter
-import java.util.concurrent.CopyOnWriteArrayList
+import java.util.concurrent.CopyOnWriteArraySet
 
 /**
  * Basic Marker implementation
@@ -35,14 +34,8 @@ import java.util.concurrent.CopyOnWriteArrayList
  *
  * Created by Eric A. Snell on 2/28/17.
  */
-class MarkerImpl(_name: String, private val markerFactory: MarkerFactory) :
-  Marker {
-  override var name: String = _name
-    private set(value) {
-      field = value
-    }
-
-  private var containedMarkers = CopyOnWriteArrayList<Marker>()
+open class BasicMarker(override var name: String) : Marker {
+  private var containedMarkers = CopyOnWriteArraySet<Marker>()
 
   private// threadLocalStringBuilder.get(); Not thread local builder until we know we're logging markers a lot
   val stringBuilder: StringBuilder
@@ -61,7 +54,7 @@ class MarkerImpl(_name: String, private val markerFactory: MarkerFactory) :
   }
 
   override fun isOrContains(markerName: String): Boolean {
-    return isOrContains(markerFactory.get(markerName))
+    return name == markerName || containedMarkers.find { it.name == markerName  } != null
   }
 
   override fun iterator(): Iterator<Marker> {
@@ -82,14 +75,11 @@ class MarkerImpl(_name: String, private val markerFactory: MarkerFactory) :
 
     if (includeContained) {
       builder.append(name).append(OPEN)
-      var i = 0
-      val size = containedMarkers.size
-      while (i < size) {
+      containedMarkers.forEachIndexed { i, marker ->
         if (i != 0) {
           builder.append(SEPARATOR)
         }
-        containedMarkers[i].toStringBuilder(builder, true)
-        i++
+        marker.toStringBuilder(builder, true)
       }
       builder.append(CLOSE)
     }
@@ -102,7 +92,7 @@ class MarkerImpl(_name: String, private val markerFactory: MarkerFactory) :
     inputStream.defaultReadObject()
     name = inputStream.readUTF()
     @Suppress("UNCHECKED_CAST")
-    containedMarkers = inputStream.readObject() as CopyOnWriteArrayList<Marker>
+    containedMarkers = inputStream.readObject() as CopyOnWriteArraySet<Marker>
   }
 
   @Throws(IOException::class)
@@ -144,7 +134,7 @@ class MarkerImpl(_name: String, private val markerFactory: MarkerFactory) :
     if (this === other) return true
     if (javaClass != other?.javaClass) return false
 
-    other as MarkerImpl
+    other as BasicMarker
 
     if (name != other.name) return false
 

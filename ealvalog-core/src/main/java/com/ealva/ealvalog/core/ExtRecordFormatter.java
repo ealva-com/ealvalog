@@ -107,6 +107,11 @@ import java.util.logging.LogRecord;
  * <td align="center" valign="top">Long
  * <td align="center" valign="top">Nano Time
  * <p>
+ * <p><tr>
+ * <td align="center" valign="top">14$
+ * <td align="center" valign="top">"%14$s"
+ * <td align="center" valign="top">String
+ * <td align="center" valign="top">Logger Fully Qualified Class Name
  * </table>
  * <p><sup>1</sup> # flag for stack trace
  * <p><sup>2</sup> Log call site
@@ -114,7 +119,7 @@ import java.util.logging.LogRecord;
  * <p>
  * Created by Eric A. Snell on 3/4/17.
  */
-@SuppressWarnings({"WeakerAccess", "unused", "UnnecessaryBoxing"})
+@SuppressWarnings({"WeakerAccess", "unused"})
 public class ExtRecordFormatter extends Formatter {
   // Index into array is 0 based (duh) but formatter args are 1 based
   private static final int MESSAGE_INDEX = 0;
@@ -143,9 +148,11 @@ public class ExtRecordFormatter extends Formatter {
   public static final int THREAD_PRIORITY_POSITION = THREAD_PRIORITY_INDEX + 1;
   private static final int NANO_INDEX = THREAD_PRIORITY_INDEX + 1;
   public static final int NANO_POSITION = NANO_INDEX + 1;
-  public static final int LAST_POSITION = NANO_POSITION; // update if adding more formatter arguments
-  
-  private static final int ARG_COUNT = LAST_POSITION; 
+  private static final int LOGGER_FQCN_INDEX = NANO_INDEX + 1;
+  public static final int LOGGER_FQCN_POSITION = LOGGER_FQCN_INDEX + 1;
+  public static final int LAST_POSITION = LOGGER_FQCN_POSITION; // update if adding more formatter arguments
+
+  private static final int ARG_COUNT = LAST_POSITION;
 
   private static final String DATE_ARG = "%" + Integer.toString(DATE_POSITION);
 
@@ -169,7 +176,8 @@ public class ExtRecordFormatter extends Formatter {
   public static final String MARKER_ARG_TYPE = "s";
   public static final String THREAD_PRIORITY_ARG_TYPE = "d";
   public static final String NANO_TIME_ARG_TYPE = "d";
-  
+  public static final String LOGGER_FQCN_ARG_TYPE = "s";
+
   public static final String TYPICAL_FORMAT =
       DATE_TIME_FORMAT + " %4$s [%10$s] %3$s - %1$s %6$#s%n";
   public static final String TYPICAL_ANDROID_FORMAT = "[%10$s]%9$s %1$s";
@@ -285,9 +293,7 @@ public class ExtRecordFormatter extends Formatter {
     return parameters.length;
   }
 
-  private void setArgs(final ExtLogRecord record,
-                       final String msg,
-                       final Object[] formatterArgs) {
+  private void setArgs(final ExtLogRecord record, final String msg, final Object[] formatterArgs) {
     setBaseArgs(record, msg, formatterArgs);
     ((FormattableStackTraceElement)formatterArgs[LOCATION_INDEX]).setElement(record.getLocation());
     formatterArgs[THREAD_NAME_INDEX] = record.getThreadName();
@@ -295,19 +301,7 @@ public class ExtRecordFormatter extends Formatter {
     formatterArgs[MARKER_INDEX] = marker == null ? NullMarker.INSTANCE : marker;
     formatterArgs[THREAD_PRIORITY_INDEX] = record.getThreadPriority();
     formatterArgs[NANO_INDEX] = record.getNanoTime();
-  }
-
-  private void setBaseArgs(@NotNull final LogRecord record,
-                           @NotNull final String message,
-                           @NotNull final Object[] formatterArgs) {
-    formatterArgs[MESSAGE_INDEX] = message;
-    formatterArgs[THREAD_ID_INDEX] = Integer.valueOf(record.getThreadID());
-    formatterArgs[LOGGER_NAME_INDEX] = record.getLoggerName();
-    formatterArgs[LOG_LEVEL_INDEX] = LogLevel.Companion.fromLevel(record.getLevel(), LogLevel.NONE);
-    formatterArgs[DATE_INDEX] = Long.valueOf(record.getMillis());
-    ((FormattableThrowable)formatterArgs[THROWN_INDEX]).setRealThrowable(record.getThrown());
-    formatterArgs[CLASS_NAME_INDEX] = record.getSourceClassName();
-    formatterArgs[METHOD_NAME_INDEX] = record.getSourceMethodName();
+    formatterArgs[LOGGER_FQCN_INDEX] = record.getLoggerFQCN();
   }
 
   private void setArgs(final LogRecord record, final String msg, final Object[] formatterArgs) {
@@ -315,6 +309,22 @@ public class ExtRecordFormatter extends Formatter {
     ((FormattableStackTraceElement)formatterArgs[LOCATION_INDEX]).setElement(null);
     formatterArgs[THREAD_NAME_INDEX] = "";
     formatterArgs[MARKER_INDEX] = NullMarker.INSTANCE;
+    formatterArgs[THREAD_PRIORITY_INDEX] = Long.MIN_VALUE;
+    formatterArgs[NANO_INDEX] = Integer.MIN_VALUE;
+    formatterArgs[LOGGER_FQCN_INDEX] = "Unknown";
+  }
+
+  private void setBaseArgs(@NotNull final LogRecord record,
+                           @NotNull final String message,
+                           @NotNull final Object[] formatterArgs) {
+    formatterArgs[MESSAGE_INDEX] = message;
+    formatterArgs[THREAD_ID_INDEX] = record.getThreadID();
+    formatterArgs[LOGGER_NAME_INDEX] = record.getLoggerName();
+    formatterArgs[LOG_LEVEL_INDEX] = LogLevel.Companion.fromLevel(record.getLevel(), LogLevel.NONE);
+    formatterArgs[DATE_INDEX] = record.getMillis();
+    ((FormattableThrowable)formatterArgs[THROWN_INDEX]).setRealThrowable(record.getThrown());
+    formatterArgs[CLASS_NAME_INDEX] = record.getSourceClassName();
+    formatterArgs[METHOD_NAME_INDEX] = record.getSourceMethodName();
   }
 
   private static class ExtLogMessageFormatter extends LogMessageFormatterImpl {

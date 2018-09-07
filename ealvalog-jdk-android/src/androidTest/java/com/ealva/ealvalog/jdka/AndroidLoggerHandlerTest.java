@@ -44,6 +44,7 @@ import java.util.logging.LogRecord;
 
 @RunWith(AndroidJUnit4.class)
 public class AndroidLoggerHandlerTest {
+  private static final String LOGGER_FQCN = "com.acme.loggers.TheLogger";
   private AndroidLoggerHandlerForTest handler;
 
   @Before
@@ -58,7 +59,7 @@ public class AndroidLoggerHandlerTest {
   @Test
   public void testIsLoggableNoFilter() {
     final String className = "com.ealva.ealvalog.impl.AndroidLoggerHandlerTest";
-    try (final ExtLogRecord record = ExtLogRecord.get(CRITICAL, className, null, null)) {
+    try (final ExtLogRecord record = ExtLogRecord.get(LOGGER_FQCN, CRITICAL, className, null, null)) {
       final String message = "Message";
       record.append(message);
       handler.publish(record);
@@ -89,7 +90,7 @@ public class AndroidLoggerHandlerTest {
         new ExtRecordFormatter(ExtRecordFormatter.TYPICAL_ANDROID_FORMAT, true),
         AlwaysAcceptFilter.INSTANCE
     );
-    try (final ExtLogRecord record = ExtLogRecord.get(CRITICAL, getClass().getName(), null, null)) {
+    try (final ExtLogRecord record = ExtLogRecord.get(LOGGER_FQCN, CRITICAL, getClass().getName(), null, null)) {
       record.append("Message");
       handler.publish(record);
     }

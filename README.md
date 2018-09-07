@@ -64,27 +64,32 @@ public class JavaApp extends Application {
   @Override public void onCreate() {
     super.onCreate();
 
+    Configuration config;
     // Configure the Loggers singleton
-    JdkLoggerFactory factory = JdkLoggerFactory.INSTANCE;
-    Loggers.INSTANCE.setFactory(factory);
-
-    // Configure the underlying root java.util.logging.Logger
-    JdkLogger rootLogger = factory.get(JdkLoggerFactory.ROOT_LOGGER_NAME);
-    // rootLogger.setIncludeLocation(true); // makes logging more expensive
-
     if (BuildConfig.DEBUG) {
-      Fabric.with(this, CrashlyticsCore.Builder().disabled(BuildConfig.DEBUG).build());
-      rootLogger.addHandler(AndroidLoggerHandler.Companion.make());
-      rootLogger.setLogLevel(LogLevel.WARN);
+      config = new JulConfiguration(true, true, AndroidLoggerHandler.Companion.make(), LogLevel.WARN);
     } else {
       Fabric.with(this, CrashlyticsCore(), Answers(), Crashlytics());
-      rootLogger.addHandler(CrashlyticsLogHandler());
-      rootLogger.logLevel(LogLevel.ERROR);
+      config = new JulConfiguration(false, CrashlyticsLogHandler(), LogLevel.ERROR);
     }
+
+    config.configure();
   }
 }
 ```
 ```kotlin
+class KotlinApp : Application() {
+  override fun onCreate() {
+    super.onCreate()
+    if (BuildConfig.DEBUG) {
+      JulConfiguration(true, true, AndroidLoggerHandler.make(), LogLevel.WARN)
+    } else {
+      Fabric.with(this, CrashlyticsCore(), Answers(), Crashlytics())
+      JulConfiguration(false, CrashlyticsLogHandler(), LogLevel.ERROR)
+    }.configure()
+  }
+}
+
 private fun LogLevel.toAndroid(): Int {
   return when (this) {
     LogLevel.ALL -> Log.VERBOSE
@@ -141,11 +146,31 @@ public class MainActivity extends Activity  {
 private val LOG by lazyLogger(ArtistTable::class) // don't get the logger unless we actually use it
 class ArtistTable {
   fun someMethod(artistId: Long) {
-    LOG.e { +it("No record for artist _id=%d", artistId) }  // + operator add call site information
+    LOG.e { +it("No record for artist _id=%d", artistId) }  // + operator adds call site information
   }
 }
+```
+- Examples of Kotlin extension functions for debug only logging. The client should copy these from
+Loggers.kt for use in their app. This code is not provided in this library as it's Android
+specific and the "debug flag" (BuildConfig.DEBUG for Android) should defined in the application code.
+```kotlin
+inline fun Logger._w(
+  throwable: Throwable? = null,
+  marker: Marker? = null,
+  block: (LogEntry) -> Unit
+) {
+  if (BuildConfig.DEBUG) w(throwable, marker, block)
+}
 
-```     
+inline fun Logger._e(
+  throwable: Throwable? = null,
+  marker: Marker? = null,
+  block: (LogEntry) -> Unit
+) {
+  if (BuildConfig.DEBUG) e(throwable, marker, block)
+}
+```
+    
 Ensure you have the most recent version by checking [here](https://search.maven.org/search?q=ealvalog)
 
 Performance
@@ -154,19 +179,21 @@ Performance
 Using the [Loggly Logging Framework Benchmark](https://www.loggly.com/blog/benchmarking-java-logging-frameworks/),
 [modified](https://github.com/pandasys/Java-Logging-Framework-Benchmark) to include this framework, shows an average performance gain of 
 approximately 37-40% using this facade over using java.util.logging directly. This is due to eAlvaLog using cached LogRecords, StringBuilders, and 
-Formatters. 
+Formatters. Tests were conducted logging to a file synchronously. 
 
 The AndroidLogger uses the same framework but logs to the android.log.Log. eAlvaLog overhead compared to logging directly
 to android.log.Log is fundamentally String.format() over cached StringBuilders. This alleviates the need for the client to 
 do string building, so performance is comparable and can be better when the client code was previously doing extensive formatting. 
 
-Using this framework over Log4j2 results in basically the same performance as logging directly to Log4j. eAlvaLog adapts its 
-ExtLogRecord to Log4J LogEvent, which helps to avoid any performance penalty.
+Using this framework over Log4j2 currently results in approximately 1% overhead, if using typical parameterized logging, as compared to 
+logging directly to Log4j2. eAlvaLog adapts its ExtLogRecord to Log4j2 LogEvent, which helps to avoid a performance penalty. If logging 
+synchronously, using this framework's append functions performs better (approximately 3%) than logging directly to Log4j2. If logging 
+asynchronously it would be better to use parameterized logging so that formatting occurs on a background thread.
 
 Why?
 ----
 
- In developing both a general purpose library (eAlvaTag), forked from an older library, and an Android application, we used 2 
+ In developing both a general purpose library (eAlvaTag), forked from an older library, and a very large Android application, we used 2 
  different loggers. The Android specific logger was a very thin veneer over String.format() and android.util.log. The general purpose 
  library used java.util.logging and was very heavy: lots of string concatenation even when logging was never occurring, string-number 
  formatting when nothing was being logged, enormous number of StringBuilder instances being created - many totally unnecessary...
@@ -186,6 +213,7 @@ Why?
    5. Push configuration/dependency management/dependency injection into the client, while providing base classes and configuration classes.
    6. Minimize framework layers and only add heavier lower layers as needed (async logging, logging to file, database, etc.)
    7. Support Android logger and java.util.logging initially, with others added if/when necessary. 
+   8. An adapter over Log4j2 has been added but is not complete (eg. no MDC support yet) and not fully tested but exists as an example.
    
 This library was originally written in Java but has been ported to Kotlin. The original Java API was very much like other logging
 frameworks, very fat with lots of convenience methods. The Kotlin version strips away most of this API and moves the fat interface

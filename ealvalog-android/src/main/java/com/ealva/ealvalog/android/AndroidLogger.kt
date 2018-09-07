@@ -28,6 +28,8 @@ import com.ealva.ealvalog.filter.AlwaysNeutralFilter
 import com.ealva.ealvalog.util.LogUtil
 import java.util.concurrent.atomic.AtomicReference
 
+private val loggerFQCN: String = AndroidLogger::class.java.name
+
 /**
  * [com.ealva.ealvalog.Logger] implementation for Android
  *
@@ -48,7 +50,7 @@ class AndroidLogger internal constructor(
     get() = logLevel ?: LogLevel.NONE
 
   override fun isLoggable(level: LogLevel, marker: Marker?, throwable: Throwable?): Boolean {
-    return filter.isLoggable(name, level, marker, throwable).shouldProceed &&
+    return filter.isLoggable(name, level, marker ?: this.marker, throwable).shouldProceed &&
         logHandler.get().isLoggable(tag, level, marker, throwable)
   }
 
@@ -60,13 +62,13 @@ class AndroidLogger internal constructor(
     return includeLocation || logHandler.get().shouldIncludeLocation(
       tag,
       logLevel.toAndroid(),
-      marker,
+      marker ?: this.marker,
       throwable
     )
   }
 
   override fun getLogEntry(logLevel: LogLevel, marker: Marker?, throwable: Throwable?): LogEntry {
-    return ExtLogRecord.get(logLevel, name, marker, throwable)
+    return ExtLogRecord.get(loggerFQCN, logLevel, name, marker ?: this.marker, throwable)
   }
 
   override fun logImmediate(entry: LogEntry) {

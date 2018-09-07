@@ -39,8 +39,8 @@ public class BaseLoggerTest {
 //  public void setup() {
 //    MockitoAnnotations.initMocks(this);
 //    logger = new LoggerImpl();
-//    markerParameter = new com.ealva.ealvalog.core.MarkerImpl("Marker", markerFactory);
-//    loggerMarker = new MarkerImpl("Marker", markerFactory);
+//    markerParameter = new com.ealva.ealvalog.core.BasicMarker("Marker", markerFactory);
+//    loggerMarker = new BasicMarker("Marker", markerFactory);
 //    loggerWithMarker = new LoggerImpl(loggerMarker);
 //    theThrowable = new Throwable(SOME_MESSAGE);
 //  }
