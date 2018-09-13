@@ -27,6 +27,7 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -34,6 +35,13 @@ import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.core.IsNot.not;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 
 /**
  * Created by Eric A. Snell on 7/4/18.
@@ -123,5 +131,46 @@ public class ExtLogRecordTest {
     assertThat(third.getLoggerName(), is(loggerName));
   }
 
+  @Test
+  public void testSerialize() throws IOException, ClassNotFoundException {
+    final LogLevel level = LogLevel.ERROR;
+    final String loggerName = "LoggerName";
+    final Marker marker = Markers.INSTANCE.get("marker");
+    //noinspection ThrowableNotThrown
+    final Throwable throwable = new RuntimeException();
+    final String parameter = "parameter1";
+    try (final ExtLogRecord first = ExtLogRecord.get(LOGGER_FQCN,
+                                                     level,
+                                                     loggerName,
+                                                     marker,
+                                                     throwable)) {
+      first.setParameters(new Object[] {parameter});
+      assertThat(first.getLogLevel(), is(level));
+      assertThat(first.getLoggerName(), is(loggerName));
+      assertThat(first.getMarker(), is(marker));
+      assertThat(first.getThrown(), is(throwable));
 
+      ExtLogRecord second = deserialize(serialize(first), ExtLogRecord.class);
+//      second.setParameters(null);
+      assertThat(second, is(not(sameInstance(first))));
+      assertThat(second, is(equalTo(first)));
+    }
+
+  }
+
+  private static <T extends Serializable> byte[] serialize(T obj) throws IOException {
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    ObjectOutputStream oos = new ObjectOutputStream(baos);
+    oos.writeObject(obj);
+    oos.close();
+    return baos.toByteArray();
+  }
+
+  private static <T extends Serializable> T deserialize(byte[] b, Class<T> cl)
+      throws IOException, ClassNotFoundException {
+    ByteArrayInputStream bais = new ByteArrayInputStream(b);
+    ObjectInputStream ois = new ObjectInputStream(bais);
+    Object o = ois.readObject();
+    return cl.cast(o);
+  }
 }

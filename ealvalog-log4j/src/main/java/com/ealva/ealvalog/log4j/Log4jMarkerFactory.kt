@@ -68,8 +68,8 @@ object Log4jMarkerFactory : MarkerFactory {
 }
 
 private class Log4jMarker(@Transient var log4jMarker: org.apache.logging.log4j.Marker) : Marker {
-  override val name: String
-    get() = log4jMarker.name
+  @field:Transient override var name: String = log4jMarker.name
+  private set
 
   override fun add(marker: Marker): Boolean {
     return if (log4jMarker.parents.find { it.name == marker.name } == null) {
@@ -123,12 +123,29 @@ private class Log4jMarker(@Transient var log4jMarker: org.apache.logging.log4j.M
   @Throws(IOException::class, ClassNotFoundException::class)
   private fun readObject(inputStream: ObjectInputStream) {
     inputStream.defaultReadObject()
+    name = inputStream.readUTF()
     log4jMarker = MarkerManager.getMarker(name)
   }
 
   @Throws(IOException::class)
   private fun writeObject(out: ObjectOutputStream) {
     out.defaultWriteObject()
+    out.writeUTF(name)
+  }
+
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (javaClass != other?.javaClass) return false
+
+    other as Log4jMarker
+
+    if (log4jMarker != other.log4jMarker) return false
+
+    return true
+  }
+
+  override fun hashCode(): Int {
+    return log4jMarker.hashCode()
   }
 
   companion object {

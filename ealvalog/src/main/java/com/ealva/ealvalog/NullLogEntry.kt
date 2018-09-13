@@ -18,6 +18,7 @@
 
 package com.ealva.ealvalog
 
+import java.io.ObjectStreamException
 import java.util.Locale
 
 object NullLogEntry : LogEntry {
@@ -36,7 +37,7 @@ object NullLogEntry : LogEntry {
   override val loggerName = ""
   override val threadPriority = 0
   override val nanoTime = 0L
-  override val loggerFQCN: String = javaClass.name
+  override val loggerFQCN: String = NullLogger.javaClass.name
   override fun reset() = this
   override fun append(c: Char) = this
   override fun append(csq: CharSequence?) = this
@@ -51,4 +52,8 @@ object NullLogEntry : LogEntry {
   override fun format(locale: Locale, format: String, vararg args: Any) = this
   override fun log(format: String, vararg args: Any) = this
   override fun addLocation(stackDepth: Int) = this
+  @Throws(ObjectStreamException::class)
+  private fun readResolve(): Any {
+    return NullLogEntry
+  }
 }

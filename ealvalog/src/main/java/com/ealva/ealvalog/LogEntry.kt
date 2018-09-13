@@ -19,6 +19,7 @@
 package com.ealva.ealvalog
 
 import java.io.Closeable
+import java.io.Serializable
 import java.util.Locale
 
 /**
@@ -82,7 +83,7 @@ operator fun LogEntry.unaryPlus() {
  *
  * Created by Eric A. Snell on 6/29/18.
  */
-interface LogEntry : Appendable, Closeable {
+interface LogEntry : Appendable, Closeable, Serializable {
   // specify close as not throwing
   override fun close()
 

@@ -50,7 +50,7 @@ class LogRecordEvent(logEntry: LogEntry?) : ExtLogRecord(logEntry) {
     /**
      * We are obtaining a thread local [org.apache.logging.log4j.message.ReusableSimpleMessage] or
      * [org.apache.logging.log4j.message.ParameterizedMessage] from the factory, so any client
-     * should not use the returned [Message] past the lifetime of the LogRecordEvent.
+     * should not use the returned [Message] past the lifetime of this LogRecordEvent.
      */
     override fun getMessage(): Message {
       return if (parameterCount == 0) {

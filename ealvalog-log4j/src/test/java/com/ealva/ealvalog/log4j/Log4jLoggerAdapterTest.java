@@ -29,6 +29,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.Appender;
 import org.apache.logging.log4j.core.LogEvent;
 import org.apache.logging.log4j.core.Logger;
+import org.apache.logging.log4j.core.config.Configurator;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -158,6 +159,21 @@ public class Log4jLoggerAdapterTest {
                is(both(greaterThanOrEqualTo(mills)).and(lessThanOrEqualTo(System.currentTimeMillis()))));
     assertThat(event.getNanoTime(),
                is(both(greaterThanOrEqualTo(nanos)).and(lessThanOrEqualTo(System.nanoTime()))));
+  }
+
+  @Test
+  public void testSetLogLevel() {
+    final String loggerName = "com.acme.loggers.TheLogger";
+    ArgumentCaptor<LogEvent> logEventCaptor = ArgumentCaptor.forClass(LogEvent.class);
+    JLogger logger = JLoggers.get(loggerName);
+    Configurator.setLevel(loggerName, Level.INFO);
+    final String message = "Message";
+    logger.log(LogLevel.ERROR, message);
+    then(appender).should(times(1)).append(logEventCaptor.capture());
+    LogEvent event = logEventCaptor.getValue();
+    assertThat(event.getLoggerFqcn(), is(Log4jLoggerAdapter.class.getName()));
+    assertThat(event.getLevel(), is(Level.ERROR));
+    assertThat(event.getMessage().getFormattedMessage(), is(message));
   }
 
 }

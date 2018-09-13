@@ -28,9 +28,9 @@ import com.ealva.ealvalog.core.Bridge
 import com.ealva.ealvalog.filter.AlwaysNeutralFilter
 import com.ealva.ealvalog.log4j.Log4jMarkerFactory.asLog4jMarker
 import org.apache.logging.log4j.LogManager
-import org.apache.logging.log4j.MarkerManager
 import org.apache.logging.log4j.core.LoggerContext
 import org.apache.logging.log4j.core.config.Configurator
+import org.apache.logging.log4j.core.config.LoggerConfig
 import org.apache.logging.log4j.spi.ExtendedLogger
 
 /**
@@ -48,7 +48,10 @@ class Log4jBridge(
       }
     }
 
-  private val loggerConfig = (LogManager.getContext(false) as LoggerContext).configuration.getLoggerConfig(name)
+  private val loggerConfig: LoggerConfig =
+    (LogManager.getContext(javaClass.classLoader, false) as LoggerContext)
+      .configuration
+      .getLoggerConfig(name)
 
   @field:Volatile var parent: Log4jBridge? = null  // root bridge will have a null parent
 

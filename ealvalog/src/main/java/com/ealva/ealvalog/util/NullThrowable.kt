@@ -18,9 +18,16 @@
 
 package com.ealva.ealvalog.util
 
+import java.io.ObjectStreamException
+
 /**
  * Place holder throwable
  *
  * Created by Eric A. Snell on 3/13/17.
  */
-object NullThrowable: Throwable("NullThrowable")
+object NullThrowable: Throwable("NullThrowable") {
+  @Throws(ObjectStreamException::class)
+  private fun readResolve(): Any {
+    return this
+  }
+}

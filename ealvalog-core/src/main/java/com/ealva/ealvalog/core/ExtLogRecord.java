@@ -34,6 +34,7 @@ import java.io.ObjectOutputStream;
 import java.util.Arrays;
 import java.util.Formatter;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
@@ -383,7 +384,8 @@ public class ExtLogRecord extends LogRecord implements LogEntry {
     return this;
   }
 
-  @NotNull @Override public LogEntry append(final CharSequence csq, final int start, final int end) {
+  @NotNull @Override
+  public LogEntry append(final CharSequence csq, final int start, final int end) {
     builder.append(csq, start, end);
     return this;
   }
@@ -446,5 +448,57 @@ public class ExtLogRecord extends LogRecord implements LogEntry {
     }
     builder.append(format);
     return this;
+  }
+
+  @Override public boolean equals(final Object o) {
+    if (this == o) { return true; }
+    if (o == null || getClass() != o.getClass()) { return false; }
+    final ExtLogRecord that = (ExtLogRecord)o;
+    final Throwable thisThrown = getThrown();
+    final Throwable thatThrown = that.getThrown();
+    return getLevel() == that.getLevel() &&
+        getSequenceNumber() == that.getSequenceNumber() &&
+        Objects.equals(getSourceClassName(), that.getSourceClassName()) &&
+        Objects.equals(getSourceMethodName(), that.getSourceMethodName()) &&
+        Objects.equals(getMessage(), that.getMessage()) &&
+        getThreadID() == that.getThreadID() &&
+        getMillis() == that.getMillis() &&
+        Objects.equals(thisThrown.getClass(), thatThrown.getClass()) &&
+        Objects.equals(thisThrown.getMessage(), thatThrown.getMessage()) &&
+        Objects.equals(getLoggerName(), that.getLoggerName()) &&
+        Objects.equals(getResourceBundleName(), that.getResourceBundleName()) &&
+        Arrays.equals(getParameters(), that.getParameters()) &&
+        getParameterCount() == that.getParameterCount() &&
+        getThreadPriority() == that.getThreadPriority() &&
+        getNanoTime() == that.getNanoTime() &&
+//        isReserved() == that.isReserved() &&
+        getLogLevel() == that.getLogLevel() &&
+        Objects.equals(getThreadName(), that.getThreadName()) &&
+        Objects.equals(getMarker(), that.getMarker()) &&
+        Objects.equals(getLocation(), that.getLocation()) &&
+        Objects.equals(getLoggerFQCN(), that.getLoggerFQCN());
+  }
+
+  @Override public int hashCode() {
+    return Objects.hash(getLevel(),
+                        getSequenceNumber(),
+                        getSourceClassName(),
+                        getSourceMethodName(),
+                        getMessage(),
+                        getThreadID(),
+                        getMillis(),
+                        getThrown(),
+                        getLoggerName(),
+                        getResourceBundle(),
+                        getParameters(),
+                        getLogLevel(),
+                        getThreadName(),
+                        getMarker(),
+                        getLocation(),
+                        getParameterCount(),
+                        getThreadPriority(),
+                        getNanoTime(),
+//                        isReserved(),
+                        getLoggerFQCN());
   }
 }
