@@ -28,10 +28,19 @@ import com.ealva.ealvalog.core.Bridge
 import com.ealva.ealvalog.filter.AlwaysNeutralFilter
 import com.ealva.ealvalog.log4j.Log4jMarkerFactory.asLog4jMarker
 import org.apache.logging.log4j.LogManager
+import org.apache.logging.log4j.ThreadContext
 import org.apache.logging.log4j.core.LoggerContext
 import org.apache.logging.log4j.core.config.Configurator
 import org.apache.logging.log4j.core.config.LoggerConfig
+import org.apache.logging.log4j.core.config.Property
+import org.apache.logging.log4j.core.impl.ContextDataFactory
+import org.apache.logging.log4j.core.impl.ContextDataInjectorFactory
+import org.apache.logging.log4j.core.lookup.Interpolator
+import org.apache.logging.log4j.core.lookup.StrSubstitutor
 import org.apache.logging.log4j.spi.ExtendedLogger
+import org.apache.logging.log4j.spi.MutableThreadContextStack
+import org.apache.logging.log4j.util.StringMap
+import java.util.concurrent.ConcurrentHashMap
 
 /**
  * Created by Eric A. Snell on 8/24/18.
@@ -48,10 +57,16 @@ class Log4jBridge(
       }
     }
 
+  private val configuration = (LogManager.getContext(javaClass.classLoader, false) as LoggerContext)
+    .configuration
+
   private val loggerConfig: LoggerConfig =
-    (LogManager.getContext(javaClass.classLoader, false) as LoggerContext)
-      .configuration
+    configuration
       .getLoggerConfig(name)
+
+  private val properties = ConcurrentHashMap<String, String>()
+  private val tempLookup = Interpolator(properties)
+  private val subst = StrSubstitutor(tempLookup)
 
   @field:Volatile var parent: Log4jBridge? = null  // root bridge will have a null parent
 
@@ -115,6 +130,50 @@ class Log4jBridge(
       log4jLogger.isEnabled(logLevel.log4jLevel, asLog4jMarker(marker), "", throwable)
     ) FilterResult.ACCEPT
     else FilterResult.DENY
+  }
+
+  fun getRecordEvent(
+    fqcn: String,
+    logLevel: LogLevel,
+    name: String,
+    marker: Marker?,
+    throwable: Throwable?,
+    mdc: Map<String, String>?,
+    ndc: List<String>?
+  ): LogRecordEvent {
+    return LogRecordEvent.getRecordEvent(fqcn, logLevel, name, marker, throwable).apply {
+      setMdc(if (mdc != null) ReadOnlyStringMapAdapter(mdc) else createContextData(
+        if (!loggerConfig.isPropertiesRequireLookup) {
+          loggerConfig.propertyList ?: emptyList()
+        } else {
+          loggerConfig.propertyList?.mapTo(ArrayList(loggerConfig.propertyList.size)) {
+            Property.createProperty(
+              it.name,
+              if (it.isValueNeedsLookup)
+                subst.replace(this.logEvent, it.value)
+              else
+                it.value
+            )
+          } ?: emptyList()
+        }))
+      setNdc(
+        when {
+          ndc != null -> MutableThreadContextStack(ndc)
+          ThreadContext.getDepth() == 0 -> NullThreadContextStack
+          else -> ThreadContext.cloneStack()
+        }
+      )
+    }
+  }
+
+  companion object {
+    private val CONTEXT_DATA_INJECTOR = ContextDataInjectorFactory.createInjector()
+
+    private fun createContextData(properties: List<Property>): StringMap {
+      val reusable = ContextDataFactory.createContextData()
+      return CONTEXT_DATA_INJECTOR.injectContextData(properties, reusable)
+    }
+
   }
 
 }

@@ -88,7 +88,13 @@ interface Logger {
   /**
    * Obtain a [LogEntry] for use with this logger.
    */
-  fun getLogEntry(logLevel: LogLevel, marker: Marker?, throwable: Throwable?): LogEntry
+  fun getLogEntry(
+    logLevel: LogLevel,
+    marker: Marker?,
+    throwable: Throwable?,
+    mdc: Map<String, String>? = null,
+    ndc: List<String>? = null
+  ): LogEntry
 
   /**
    * Log without checking the the level. This method's primary use is for this logging framework

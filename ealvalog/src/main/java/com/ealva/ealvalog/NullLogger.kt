@@ -35,7 +35,12 @@ object NullLogger : Logger {
   override fun shouldIncludeLocation(logLevel: LogLevel, marker: Marker?, throwable: Throwable?) =
     false
   override fun isLoggable(level: LogLevel, marker: Marker?, throwable: Throwable?) = false
-  override fun getLogEntry(logLevel: LogLevel, marker: Marker?, throwable: Throwable?) =
-    NullLogEntry
+  override fun getLogEntry(
+    logLevel: LogLevel,
+    marker: Marker?,
+    throwable: Throwable?,
+    mdc: Map<String, String>?,
+    ndc: List<String>?
+  ) = NullLogEntry
   override fun logImmediate(entry: LogEntry) {}
 }

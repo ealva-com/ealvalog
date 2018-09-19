@@ -36,6 +36,9 @@ import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.only;
 import static org.mockito.Mockito.when;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * Test core functionality. Ensure it's calling the bridge correctly, including passing itself.
  * <p>
@@ -60,7 +63,8 @@ public class CoreLoggerTest {
   public void testPrintLog() {
     com.ealva.ealvalog.core.CoreLogger<com.ealva.ealvalog.core.Bridge>
         logger = new CoreLoggerForTest(LOGGER_NAME, marker, configuration);
-    final ExtLogRecord record = ExtLogRecord.get(LOGGER_FQCN, LogLevel.WARN, "", marker, null);
+    final ExtLogRecord record = ExtLogRecord.get(LOGGER_FQCN, LogLevel.WARN, "", marker, null
+    );
     record.append(MESSAGE);
     logger.logImmediate(record);
     then(bridge).should(only()).log(same(record));
@@ -131,7 +135,9 @@ public class CoreLoggerTest {
     @NotNull @Override
     public LogEntry getLogEntry(@NotNull final LogLevel logLevel,
                                 @Nullable final Marker marker,
-                                @Nullable final Throwable throwable) {
+                                @Nullable final Throwable throwable,
+                                @Nullable final Map<String, String> mdc,
+                                @Nullable final List<String> ndc) {
       return NullLogEntry.INSTANCE;
     }
 

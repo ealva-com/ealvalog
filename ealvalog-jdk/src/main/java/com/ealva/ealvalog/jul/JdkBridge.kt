@@ -59,7 +59,9 @@ class JdkBridge internal constructor(
 
   override var logToParent: Boolean
     get() = jdkLogger.useParentHandlers
-    set(value) { jdkLogger.useParentHandlers = value }
+    set(value) {
+      jdkLogger.useParentHandlers = value
+    }
 
   override val name: String
     get() = jdkLogger.name

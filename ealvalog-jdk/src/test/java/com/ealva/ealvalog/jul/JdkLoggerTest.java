@@ -83,7 +83,8 @@ public class JdkLoggerTest {
 
   @Test
   public void testChildLogsToRootHandler() {
-    try (ExtLogRecord extRecord = ExtLogRecord.get(LOGGER_FQCN, CRITICAL, CHILD_NAME, null, null)) {
+    try (ExtLogRecord extRecord = ExtLogRecord.get(LOGGER_FQCN, CRITICAL, CHILD_NAME, null, null
+    )) {
       extRecord.append(MSG);
       childLogger.logImmediate(extRecord);
 
@@ -101,7 +102,8 @@ public class JdkLoggerTest {
   @Test
   public void testSetLogLevel() {
     rootLogger.setLogLevel(TRACE);
-    try (ExtLogRecord extRecord = ExtLogRecord.get(LOGGER_FQCN, TRACE, CHILD_NAME, null, null)) {
+    try (ExtLogRecord extRecord = ExtLogRecord.get(LOGGER_FQCN, TRACE, CHILD_NAME, null, null
+    )) {
       extRecord.append(MSG);
       childLogger.logImmediate(extRecord);
 
@@ -120,7 +122,8 @@ public class JdkLoggerTest {
     childLogger.addHandler(childHandler);
     assertThat(childLogger.willLogToParent(), is(true));
 
-    try (ExtLogRecord extRecord = ExtLogRecord.get(LOGGER_FQCN, WARN, CHILD_NAME, null, null)) {
+    try (ExtLogRecord extRecord = ExtLogRecord.get(LOGGER_FQCN, WARN, CHILD_NAME, null, null
+    )) {
       extRecord.append(MSG);
       childLogger.logImmediate(extRecord);
 
@@ -161,7 +164,8 @@ public class JdkLoggerTest {
     childLogger.addHandler(childHandler);
     childLogger.setLogLevel(TRACE);
 
-    try (ExtLogRecord extRecord = ExtLogRecord.get(LOGGER_FQCN, TRACE, CHILD_NAME, null, null)) {
+    try (ExtLogRecord extRecord = ExtLogRecord.get(LOGGER_FQCN, TRACE, CHILD_NAME, null, null
+    )) {
       extRecord.append(MSG);
       childLogger.logImmediate(extRecord);
 
@@ -200,7 +204,8 @@ public class JdkLoggerTest {
   }
 
   private void logAndVerifyNoPublish(final LogLevel logLevel) {
-    try (ExtLogRecord extRecord = ExtLogRecord.get(LOGGER_FQCN, logLevel, CHILD_NAME, null, null)) {
+    try (ExtLogRecord extRecord = ExtLogRecord.get(LOGGER_FQCN, logLevel, CHILD_NAME, null, null
+    )) {
       extRecord.append(MSG);
       childLogger.logImmediate(extRecord);
 

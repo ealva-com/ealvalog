@@ -86,8 +86,13 @@ object NullJLogger : JLogger {
   override val name = "NullJLogger"
   override var marker: Marker? = null
   override var logLevel: LogLevel? = LogLevel.NONE
-  override fun getLogEntry(logLevel: LogLevel, marker: Marker?, throwable: Throwable?) =
-    NullLogEntry
+  override fun getLogEntry(
+    logLevel: LogLevel,
+    marker: Marker?,
+    throwable: Throwable?,
+    mdc: Map<String, String>?,
+    ndc: List<String>?
+  ) = NullLogEntry
 
   override fun logImmediate(entry: LogEntry) {}
 }

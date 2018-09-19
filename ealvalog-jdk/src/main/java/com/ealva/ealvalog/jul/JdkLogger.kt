@@ -48,8 +48,20 @@ class JdkLogger internal constructor(
     config.addLoggerHandler(this, handler)
   }
 
-  override fun getLogEntry(logLevel: LogLevel, marker: Marker?, throwable: Throwable?): LogEntry {
-    return ExtLogRecord.get(loggerFQCN, logLevel, name, resolveMarker(marker), throwable)
+  override fun getLogEntry(
+    logLevel: LogLevel,
+    marker: Marker?,
+    throwable: Throwable?,
+    mdc: Map<String, String>?,
+    ndc: List<String>?
+  ): LogEntry {
+    return ExtLogRecord.get(
+      loggerFQCN,
+      logLevel,
+      name,
+      resolveMarker(marker),
+      throwable
+    )
   }
 
   val bridgeForTest: JdkBridge

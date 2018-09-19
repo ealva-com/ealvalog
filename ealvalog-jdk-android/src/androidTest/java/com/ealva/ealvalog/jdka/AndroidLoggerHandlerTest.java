@@ -59,7 +59,8 @@ public class AndroidLoggerHandlerTest {
   @Test
   public void testIsLoggableNoFilter() {
     final String className = "com.ealva.ealvalog.impl.AndroidLoggerHandlerTest";
-    try (final ExtLogRecord record = ExtLogRecord.get(LOGGER_FQCN, CRITICAL, className, null, null)) {
+    try (final ExtLogRecord record = ExtLogRecord.get(LOGGER_FQCN, CRITICAL, className, null, null
+    )) {
       final String message = "Message";
       record.append(message);
       handler.publish(record);
@@ -90,7 +91,8 @@ public class AndroidLoggerHandlerTest {
         new ExtRecordFormatter(ExtRecordFormatter.TYPICAL_ANDROID_FORMAT, true),
         AlwaysAcceptFilter.INSTANCE
     );
-    try (final ExtLogRecord record = ExtLogRecord.get(LOGGER_FQCN, CRITICAL, getClass().getName(), null, null)) {
+    try (final ExtLogRecord record = ExtLogRecord.get(LOGGER_FQCN, CRITICAL, getClass().getName(), null, null
+    )) {
       record.append("Message");
       handler.publish(record);
     }

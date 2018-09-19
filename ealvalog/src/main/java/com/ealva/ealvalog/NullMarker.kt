@@ -26,8 +26,9 @@ import java.util.Formatter
  *
  * Created by Eric A. Snell on 2/28/17.
  */
+@Suppress("unused")
 object NullMarker : Marker {
-  @Suppress("unused") private const val serialVersionUID = -6861067652369180156L
+  private const val serialVersionUID = -6861067652369180156L
   override val name = "NullMarker"
   override fun add(marker: Marker) = false
   override fun remove(marker: Marker) = false
@@ -37,7 +38,5 @@ object NullMarker : Marker {
   override fun toStringBuilder(builder: StringBuilder, includeContained: Boolean) = builder
   override fun formatTo(formatter: Formatter, flags: Int, width: Int, precision: Int) {}
   @Throws(ObjectStreamException::class)
-  private fun readResolve(): Any {
-    return NullMarker
-  }
+  private fun readResolve(): Any = NullMarker
 }

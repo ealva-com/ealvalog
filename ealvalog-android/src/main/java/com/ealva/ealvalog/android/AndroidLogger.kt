@@ -67,8 +67,20 @@ class AndroidLogger internal constructor(
     )
   }
 
-  override fun getLogEntry(logLevel: LogLevel, marker: Marker?, throwable: Throwable?): LogEntry {
-    return ExtLogRecord.get(loggerFQCN, logLevel, name, marker ?: this.marker, throwable)
+  override fun getLogEntry(
+    logLevel: LogLevel,
+    marker: Marker?,
+    throwable: Throwable?,
+    mdc: Map<String, String>?,
+    ndc: List<String>?
+  ): LogEntry {
+    return ExtLogRecord.get(
+      loggerFQCN,
+      logLevel,
+      name,
+      marker ?: this.marker,
+      throwable
+    )
   }
 
   override fun logImmediate(entry: LogEntry) {

@@ -25,9 +25,8 @@ import java.io.ObjectStreamException
  *
  * Created by Eric A. Snell on 3/13/17.
  */
+@Suppress("unused")
 object NullThrowable: Throwable("NullThrowable") {
   @Throws(ObjectStreamException::class)
-  private fun readResolve(): Any {
-    return this
-  }
+  private fun readResolve(): Any = NullThrowable
 }

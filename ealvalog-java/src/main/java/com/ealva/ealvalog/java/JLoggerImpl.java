@@ -29,6 +29,8 @@ import com.ealva.ealvalog.util.LogUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
+import java.util.Map;
 import java.util.function.Supplier;
 
 /**
@@ -59,6 +61,8 @@ public class JLoggerImpl implements JLogger {
     if (isLoggable(level, realLogger.getMarker(), null)) {
       try (LogEntry record = realLogger.getLogEntry(level,
                                                     realLogger.getMarker(),
+                                                    null,
+                                                    null,
                                                     null)) {
         if (realLogger.shouldIncludeLocation(level, realLogger.getMarker(), null)) {
           record.addLocation(STACK_DEPTH);
@@ -74,9 +78,7 @@ public class JLoggerImpl implements JLogger {
                   @NotNull final Marker marker,
                   @NotNull final String msg) {
     if (isLoggable(level, marker, null)) {
-      try (LogEntry record = realLogger.getLogEntry(level,
-                                                    marker,
-                                                    null)) {
+      try (LogEntry record = realLogger.getLogEntry(level, marker, null, null, null)) {
         if (realLogger.shouldIncludeLocation(level, marker, null)) {
           record.addLocation(STACK_DEPTH);
         }
@@ -93,7 +95,9 @@ public class JLoggerImpl implements JLogger {
     if (isLoggable(level, realLogger.getMarker(), throwable)) {
       try (LogEntry record = realLogger.getLogEntry(level,
                                                     realLogger.getMarker(),
-                                                    throwable)) {
+                                                    throwable,
+                                                    null,
+                                                    null)) {
         if (realLogger.shouldIncludeLocation(level, realLogger.getMarker(), throwable)) {
           record.addLocation(STACK_DEPTH);
         }
@@ -109,9 +113,7 @@ public class JLoggerImpl implements JLogger {
                   @NotNull final Throwable throwable,
                   @NotNull final String msg) {
     if (isLoggable(level, marker, throwable)) {
-      try (LogEntry record = realLogger.getLogEntry(level,
-                                                    marker,
-                                                    throwable)) {
+      try (LogEntry record = realLogger.getLogEntry(level, marker, throwable, null, null)) {
         if (realLogger.shouldIncludeLocation(level, marker, throwable)) {
           record.addLocation(STACK_DEPTH);
         }
@@ -127,9 +129,7 @@ public class JLoggerImpl implements JLogger {
                   @NotNull final String format,
                   @NotNull final Object... formatArgs) {
     if (isLoggable(level, marker, null)) {
-      try (LogEntry record = realLogger.getLogEntry(level,
-                                                    marker,
-                                                    null)) {
+      try (LogEntry record = realLogger.getLogEntry(level, marker, null, null, null)) {
         if (realLogger.shouldIncludeLocation(level, marker, null)) {
           record.addLocation(STACK_DEPTH);
         }
@@ -147,7 +147,9 @@ public class JLoggerImpl implements JLogger {
     if (isLoggable(level, null, throwable)) {
       try (LogEntry record = realLogger.getLogEntry(level,
                                                     realLogger.getMarker(),
-                                                    throwable)) {
+                                                    throwable,
+                                                    null,
+                                                    null)) {
         if (realLogger.shouldIncludeLocation(level, realLogger.getMarker(), throwable)) {
           record.addLocation(STACK_DEPTH);
         }
@@ -164,9 +166,7 @@ public class JLoggerImpl implements JLogger {
                   @NotNull final String format,
                   @NotNull final Object... formatArgs) {
     if (isLoggable(level, marker, throwable)) {
-      try (LogEntry record = realLogger.getLogEntry(level,
-                                                    marker,
-                                                    throwable)) {
+      try (LogEntry record = realLogger.getLogEntry(level, marker, throwable, null, null)) {
         if (realLogger.shouldIncludeLocation(level, marker, throwable)) {
           record.addLocation(STACK_DEPTH);
         }
@@ -183,6 +183,8 @@ public class JLoggerImpl implements JLogger {
     if (isLoggable(level, null, null)) {
       try (LogEntry record = realLogger.getLogEntry(level,
                                                     realLogger.getMarker(),
+                                                    null,
+                                                    null,
                                                     null)) {
         if (realLogger.shouldIncludeLocation(level, realLogger.getMarker(), null)) {
           record.addLocation(STACK_DEPTH);
@@ -201,6 +203,8 @@ public class JLoggerImpl implements JLogger {
     if (isLoggable(level, null, null)) {
       try (LogEntry record = realLogger.getLogEntry(level,
                                                     realLogger.getMarker(),
+                                                    null,
+                                                    null,
                                                     null)) {
         if (realLogger.shouldIncludeLocation(level, realLogger.getMarker(), null)) {
           record.addLocation(STACK_DEPTH);
@@ -220,6 +224,8 @@ public class JLoggerImpl implements JLogger {
     if (isLoggable(level, null, null)) {
       try (LogEntry record = realLogger.getLogEntry(level,
                                                     realLogger.getMarker(),
+                                                    null,
+                                                    null,
                                                     null)) {
         if (realLogger.shouldIncludeLocation(level, realLogger.getMarker(), null)) {
           record.addLocation(STACK_DEPTH);
@@ -240,6 +246,8 @@ public class JLoggerImpl implements JLogger {
     if (isLoggable(level, null, null)) {
       try (LogEntry record = realLogger.getLogEntry(level,
                                                     realLogger.getMarker(),
+                                                    null,
+                                                    null,
                                                     null)) {
         if (realLogger.shouldIncludeLocation(level, realLogger.getMarker(), null)) {
           record.addLocation(STACK_DEPTH);
@@ -261,6 +269,8 @@ public class JLoggerImpl implements JLogger {
     if (isLoggable(level, null, null)) {
       try (LogEntry record = realLogger.getLogEntry(level,
                                                     realLogger.getMarker(),
+                                                    null,
+                                                    null,
                                                     null)) {
         if (realLogger.shouldIncludeLocation(level, realLogger.getMarker(), null)) {
           record.addLocation(STACK_DEPTH);
@@ -279,6 +289,8 @@ public class JLoggerImpl implements JLogger {
     if (isLoggable(level, null, null)) {
       try (LogEntry record = realLogger.getLogEntry(level,
                                                     realLogger.getMarker(),
+                                                    null,
+                                                    null,
                                                     null)) {
         if (realLogger.shouldIncludeLocation(level, realLogger.getMarker(), null)) {
           record.addLocation(STACK_DEPTH);
@@ -294,9 +306,7 @@ public class JLoggerImpl implements JLogger {
                   @NotNull final Marker marker,
                   @NotNull final Supplier<?> supplier) {
     if (isLoggable(level, marker, null)) {
-      try (LogEntry record = realLogger.getLogEntry(level,
-                                                    marker,
-                                                    null)) {
+      try (LogEntry record = realLogger.getLogEntry(level, marker, null, null, null)) {
         if (realLogger.shouldIncludeLocation(level, marker, null)) {
           record.addLocation(STACK_DEPTH);
         }
@@ -313,7 +323,9 @@ public class JLoggerImpl implements JLogger {
     if (isLoggable(level, null, throwable)) {
       try (LogEntry record = realLogger.getLogEntry(level,
                                                     realLogger.getMarker(),
-                                                    throwable)) {
+                                                    throwable,
+                                                    null,
+                                                    null)) {
         if (realLogger.shouldIncludeLocation(level, realLogger.getMarker(), throwable)) {
           record.addLocation(STACK_DEPTH);
         }
@@ -329,9 +341,7 @@ public class JLoggerImpl implements JLogger {
                   @NotNull final Throwable throwable,
                   @NotNull final Supplier<?> supplier) {
     if (isLoggable(level, marker, throwable)) {
-      try (LogEntry record = realLogger.getLogEntry(level,
-                                                    marker,
-                                                    throwable)) {
+      try (LogEntry record = realLogger.getLogEntry(level, marker, throwable, null, null)) {
         if (realLogger.shouldIncludeLocation(level, marker, throwable)) {
           record.addLocation(STACK_DEPTH);
         }
@@ -345,7 +355,9 @@ public class JLoggerImpl implements JLogger {
     if (isLoggable(level, null, throwable)) {
       try (LogEntry record = realLogger.getLogEntry(level,
                                                     realLogger.getMarker(),
-                                                    throwable)) {
+                                                    throwable,
+                                                    null,
+                                                    null)) {
         if (realLogger.shouldIncludeLocation(level, realLogger.getMarker(), null)) {
           record.addLocation(STACK_DEPTH);
         }
@@ -361,7 +373,9 @@ public class JLoggerImpl implements JLogger {
     if (isLoggable(level, null, throwable)) {
       try (LogEntry record = realLogger.getLogEntry(level,
                                                     realLogger.getMarker(),
-                                                    throwable)) {
+                                                    throwable,
+                                                    null,
+                                                    null)) {
         if (realLogger.shouldIncludeLocation(level, realLogger.getMarker(), null)) {
           record.addLocation(STACK_DEPTH);
         }
@@ -425,8 +439,10 @@ public class JLoggerImpl implements JLogger {
   @NotNull @Override
   public LogEntry getLogEntry(@NotNull final LogLevel logLevel,
                               @Nullable final Marker marker,
-                              @Nullable final Throwable throwable) {
-    return realLogger.getLogEntry(logLevel, marker, throwable);
+                              @Nullable final Throwable throwable,
+                              @Nullable final Map<String, String> mdc,
+                              @Nullable final List<String> ndc) {
+    return realLogger.getLogEntry(logLevel, marker, throwable, mdc, ndc);
   }
 
   @NotNull @Override public LoggerFilter getFilter() {

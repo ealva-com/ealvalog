@@ -1,3 +1,4 @@
+
 eAlvaLog
 ========
 
@@ -24,8 +25,9 @@ Libraries
   4. Java Android app with android logging only: ealvalog-android, ealvalog-java, ealvalog-core, and ealvalog
   5. App requiring java.util.logging (JUL) functionality: ealvalog-jdk and #3 or #4
   6. App requiring JUL and android logging: ealvalog-jdk-android and #5
-  7. Extending/customizing java logging: ealvalog-java, ealvalog-core, and ealvalog
-  8. Implementing a facade over another logging framework: ealvalog-core and ealvalog. See ealvalog-jdk as an example.
+  7. App requiring Log4j2 functionality: ealvalog-log4j, alvalog-core, and ealvalog
+  8. Extending/customizing java logging: ealvalog-java, ealvalog-core, and ealvalog
+  9. Implementing a facade over another logging framework: ealvalog-core and ealvalog. See ealvalog-log4j as an example.
   
   See the sample apps for use and required libs (build.gradle)  
 
@@ -152,7 +154,7 @@ class ArtistTable {
 ```
 - Examples of Kotlin extension functions for debug only logging. The client should copy these from
 Loggers.kt for use in their app. This code is not provided in this library as it's Android
-specific and the "debug flag" (BuildConfig.DEBUG for Android) should defined in the application code.
+specific and the "debug flag" (BuildConfig.DEBUG for Android) should be defined in the application code.
 ```kotlin
 inline fun Logger._w(
   throwable: Throwable? = null,
@@ -183,12 +185,20 @@ Formatters. Tests were conducted logging to a file synchronously.
 
 The AndroidLogger uses the same framework but logs to the android.log.Log. eAlvaLog overhead compared to logging directly
 to android.log.Log is fundamentally String.format() over cached StringBuilders. This alleviates the need for the client to 
-do string building, so performance is comparable and can be better when the client code was previously doing extensive formatting. 
+do string building, so performance is comparable and will be better when the client code was previously doing extensive formatting. 
 
-Using this framework over Log4j2 currently results in approximately 1% overhead, if using typical parameterized logging, as compared to 
-logging directly to Log4j2. eAlvaLog adapts its ExtLogRecord to Log4j2 LogEvent, which helps to avoid a performance penalty. If logging 
-synchronously, using this framework's append functions performs better (approximately 3%) than logging directly to Log4j2. If logging 
-asynchronously it would be better to use parameterized logging so that formatting occurs on a background thread.
+Using this framework over Log4j2 results in approximately the same performance, if using typical parameterized logging, as
+logging directly to Log4j2. eAlvaLog adapts its ExtLogRecord to Log4j2 LogEvent, which helps to avoid a performance penalty. Logging 
+synchronously using this framework's append functions performs better (approximately 2-3% in the Loggly test harness) than logging directly 
+to Log4j2. If logging asynchronously it would be better to use parameterized logging so that formatting occurs on a background thread. 
+
+Note: The Log4j2 and Jul tests are written in java, while most of the eAlvaLog tests are written in Kotlin.
+The Kotlin compiler inserts calls to kotlin.jvm.internal.Intrinsics.checkParameterIsNotNull() for function parameters that are
+specified as not nullable, which slightly increases the runtime of these functions. Profiling using VisualVM shows these calls account for 1.5-2.5%
+of total execution time. During a run where the log methods, eg. writeToDestination(), are executed 3,781,759, checkParameterIsNotNull()
+is executed 83,198,741, given a particular version of eAlvaLog. These calls could account for the performance differences between using
+eAlvaLog and using Log4j2 directly, during most profiling runs, however this difference is within the deviation found executing the same
+tests back-to-back.
 
 Why?
 ----
@@ -201,7 +211,7 @@ Why?
  We know of 3 very good logging frameworks, 1 Android specific and 2 general purpose. None of these provided what we wanted. The Android 
  specific lib is very nice in both API and implementation, but does not provide anything close to our requirements. The 2 general purpose 
  libraries, one widely used and the other state-of-art, are very heavy in both API and code. While tools such as Proguard help in this 
- area, we want to start with something that is light (not much code) and thin (not much API).
+ area, we want to start with something a facade that is light (not much code) and thin (not much API) over multiple logger frameworks.
  
  We decided we wanted a facade over various other logging implementations that provides:
    1. Aggressively minimize object creation, especially when no logging will actually occur.
@@ -213,7 +223,7 @@ Why?
    5. Push configuration/dependency management/dependency injection into the client, while providing base classes and configuration classes.
    6. Minimize framework layers and only add heavier lower layers as needed (async logging, logging to file, database, etc.)
    7. Support Android logger and java.util.logging initially, with others added if/when necessary. 
-   8. An adapter over Log4j2 has been added but is not complete (eg. no MDC support yet) and not fully tested but exists as an example.
+   8. An adapter over Log4j2 has been added and exists as an example. An adapter for Logback would look very similar.
    
 This library was originally written in Java but has been ported to Kotlin. The original Java API was very much like other logging
 frameworks, very fat with lots of convenience methods. The Kotlin version strips away most of this API and moves the fat interface
@@ -241,7 +251,8 @@ to provide custom logging methods.
   7. One design goal of eAlvaLog is to keep as much configuration code out of the framework as possible. Instead it is expected 
   dependencies will be injected either by provided helper classes or client code. This area is still largely TBD, but separation of 
   concerns keeps the logging code much more simple.
-  8. The underlying formatting code uses java.util.Formatter printf style formatting. We chose this for much greater flexibility in 
+  8. The underlying formatting code for the Android logger uses java.util.Formatter printf style formatting. This is also available
+  in the Jul logger but requires a Handler of the type provided by this framework. We chose this for much greater flexibility in 
   formatting and to remove client code we found in applications and libraries that formats information specifically for logging. The 
   result is pushing formatting down into the framework, providing very flexible formatting options. The framework uses a thread local
   formatter/string builder combination to greatly reduce object creation. All formatting is done into a reused, per-thread, StringBuilder.

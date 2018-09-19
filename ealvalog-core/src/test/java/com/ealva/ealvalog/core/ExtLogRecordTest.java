@@ -62,7 +62,8 @@ public class ExtLogRecordTest {
     final Marker marker = Markers.INSTANCE.get("marker");
     //noinspection ThrowableNotThrown
     final Throwable throwable = new RuntimeException();
-    final ExtLogRecord first = ExtLogRecord.get(LOGGER_FQCN, level, loggerName, marker, throwable);
+    final ExtLogRecord first = ExtLogRecord.get(LOGGER_FQCN, level, loggerName, marker, throwable
+    );
     assertThat(first.getLogLevel(), is(level));
     assertThat(first.getLoggerName(), is(loggerName));
     assertThat(first.getMarker(), is(marker));
@@ -74,7 +75,8 @@ public class ExtLogRecordTest {
     final Throwable secondThrowable = null;
     final ExtLogRecord
         second =
-        ExtLogRecord.get(LOGGER_FQCN, secondLevel, secondLoggerName, secondMarker, secondThrowable);
+        ExtLogRecord.get(LOGGER_FQCN, secondLevel, secondLoggerName, secondMarker, secondThrowable
+        );
     assertThat(second, sameInstance(first));
     assertThat(second.getLogLevel(), is(secondLevel));
     assertThat(second.getLoggerName(), is(secondLoggerName));
@@ -86,7 +88,8 @@ public class ExtLogRecordTest {
   public void testGetCachedRecord() {
     final LogLevel level = LogLevel.ERROR;
     final String loggerName = "LoggerName";
-    final ExtLogRecord first = ExtLogRecord.get(LOGGER_FQCN, level, loggerName, null, null);
+    final ExtLogRecord first = ExtLogRecord.get(LOGGER_FQCN, level, loggerName, null, null
+    );
     final String firstParm = "first";
     final String secondParm = "second";
     first.setParameters(new Object[]{firstParm, secondParm});
@@ -125,7 +128,8 @@ public class ExtLogRecordTest {
     second.close();
     final LogLevel logLevel = LogLevel.WARN;
     final String loggerName = "Other";
-    final ExtLogRecord third = ExtLogRecord.get(LOGGER_FQCN, logLevel, loggerName, null, null);
+    final ExtLogRecord third = ExtLogRecord.get(LOGGER_FQCN, logLevel, loggerName, null, null
+    );
     assertThat(first, sameInstance(third));
     assertThat(third.getLogLevel(), is(logLevel));
     assertThat(third.getLoggerName(), is(loggerName));

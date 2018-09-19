@@ -104,7 +104,6 @@ public class ExtLogRecord extends LogRecord implements LogEntry {
                                  final @Nullable Marker marker,
                                  final @Nullable Throwable throwable) {
     final ExtLogRecord logRecord = getRecord();
-    logRecord.setLoggerFQCN(loggerFQCN);
     logRecord.setLogLevel(level);  // sets LogLevel and java.util.logging.Level
     logRecord.setMarker(marker);
     logRecord.setThrown(throwable);
@@ -112,6 +111,7 @@ public class ExtLogRecord extends LogRecord implements LogEntry {
     logRecord.setThreadName(currentThread.getName());
     logRecord.setThreadID((int)currentThread.getId());
     logRecord.setLoggerName(loggerName);
+    logRecord.setLoggerFQCN(loggerFQCN);
     return logRecord;
   }
 
@@ -180,6 +180,7 @@ public class ExtLogRecord extends LogRecord implements LogEntry {
     formatter = new Formatter(builder);
     if (entry != null) {
       logLevel = entry.getLogLevel();
+      setLevel(logLevel.getJdkLevel());
       setSequenceNumber(entry.getSequenceNumber());
       setSourceClassName(entry.getSourceClassName());
       setSourceMethodName(entry.getSourceMethodName());
@@ -196,6 +197,7 @@ public class ExtLogRecord extends LogRecord implements LogEntry {
       loggerFQCN = entry.getLoggerFQCN();
     } else {
       logLevel = LogLevel.ERROR;
+      setLevel(logLevel.getJdkLevel());
       threadName = Thread.currentThread().getName();
       loggerFQCN = "";
     }
@@ -501,4 +503,5 @@ public class ExtLogRecord extends LogRecord implements LogEntry {
 //                        isReserved(),
                         getLoggerFQCN());
   }
+
 }

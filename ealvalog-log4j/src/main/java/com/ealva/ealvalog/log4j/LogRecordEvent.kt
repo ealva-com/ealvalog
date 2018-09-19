@@ -33,8 +33,11 @@ import org.apache.logging.log4j.core.time.Instant
 import org.apache.logging.log4j.core.time.MutableInstant
 import org.apache.logging.log4j.message.Message
 import org.apache.logging.log4j.message.ReusableMessageFactory
-import org.apache.logging.log4j.spi.DefaultThreadContextMap
+import org.apache.logging.log4j.spi.MutableThreadContextStack
 import org.apache.logging.log4j.util.ReadOnlyStringMap
+import java.io.IOException
+import java.io.ObjectInputStream
+import java.io.ObjectOutputStream
 
 private val LOG by lazyLogger(LogRecordEvent::class)
 
@@ -42,6 +45,38 @@ private val LOG by lazyLogger(LogRecordEvent::class)
  * Created by Eric A. Snell on 8/29/18.
  */
 class LogRecordEvent(logEntry: LogEntry?) : ExtLogRecord(logEntry) {
+  @field:Transient private var contextData: ReadOnlyStringMap = NullReadOnlyStringMap
+  @field:Transient private var contextStack: ThreadContext.ContextStack = NullThreadContextStack
+
+  fun setMdc(mdc: ReadOnlyStringMap) {
+    contextData = mdc
+  }
+
+  fun setNdc(ndc: ThreadContext.ContextStack) {
+    contextStack = ndc
+  }
+
+  override fun reserve(): LogRecordEvent {
+    super.reserve()
+    return this
+  }
+
+  @Throws(IOException::class)
+  private fun writeObject(out: ObjectOutputStream) {
+    out.defaultWriteObject()
+    out.writeObject(contextData.toMap())
+    out.writeObject(contextStack.asList())
+  }
+
+  @Throws(IOException::class, ClassNotFoundException::class)
+  private fun readObject(inputStream: ObjectInputStream) {
+    inputStream.defaultReadObject()
+    @Suppress("UNCHECKED_CAST")
+    contextData = ReadOnlyStringMapAdapter(inputStream.readObject() as Map<String, String>)
+    @Suppress("UNCHECKED_CAST")
+    contextStack = MutableThreadContextStack(inputStream.readObject() as List<String>)
+  }
+
   val logEvent: LogEvent = object : LogEvent {
     override fun getLevel(): Level {
       return logLevel.log4jLevel
@@ -124,11 +159,11 @@ class LogRecordEvent(logEntry: LogEntry?) : ExtLogRecord(logEntry) {
     }
 
     override fun getContextData(): ReadOnlyStringMap {
-      return DefaultThreadContextMap()
+      return this@LogRecordEvent.contextData
     }
 
     override fun getContextStack(): ThreadContext.ContextStack {
-      return ThreadContext.EMPTY_STACK
+      return this@LogRecordEvent.contextStack
     }
 
     override fun getThrownProxy(): ThrowableProxy? {
@@ -146,11 +181,6 @@ class LogRecordEvent(logEntry: LogEntry?) : ExtLogRecord(logEntry) {
     }
 
     override fun setIncludeLocation(locationRequired: Boolean) {}
-  }
-
-  override fun reserve(): LogRecordEvent {
-    super.reserve()
-    return this
   }
 
   companion object {
@@ -175,20 +205,7 @@ class LogRecordEvent(logEntry: LogEntry?) : ExtLogRecord(logEntry) {
       marker: Marker?,
       throwable: Throwable?
     ): LogRecordEvent {
-      var result: LogRecordEvent? = threadLocalRecord.get()
-      if (result == null) {
-        result = LogRecordEvent(null)
-        threadLocalRecord.set(result)
-      }
-      return (if (result.isReserved) {
-        LOG.e {
-              it(
-                "Had to make a new LogRecordEvent because the thread local is already in use. In use=%s",
-                threadLocalRecord.get() ?: "Null?"
-              )
-            }
-        LogRecordEvent(null).reserve()
-      } else result.reserve()).apply {
+      return reserveRecord().apply {
         setLoggerFQCN(loggerFQCN)
         setLogLevel(logLevel)
         setLoggerName(name)
@@ -197,5 +214,23 @@ class LogRecordEvent(logEntry: LogEntry?) : ExtLogRecord(logEntry) {
       }
     }
 
+    private fun reserveRecord(): LogRecordEvent {
+      var result: LogRecordEvent? = threadLocalRecord.get()
+      if (result == null) {
+        result = LogRecordEvent(null)
+        threadLocalRecord.set(result)
+      }
+      return if (result.isReserved) {
+        LOG.e {
+          it(
+            "Had to make a new LogRecordEvent because the thread local is already in use. In use=%s",
+            threadLocalRecord.get() ?: "Null?"
+          )
+        }
+        LogRecordEvent(null).reserve()
+      } else {
+        result.reserve()
+      }
+    }
   }
 }

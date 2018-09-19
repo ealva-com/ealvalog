@@ -21,6 +21,7 @@ package com.ealva.ealvalog
 import java.io.ObjectStreamException
 import java.util.Locale
 
+@Suppress("unused")
 object NullLogEntry : LogEntry {
   override fun close() {}
   override val logLevel = LogLevel.NONE
@@ -53,7 +54,5 @@ object NullLogEntry : LogEntry {
   override fun log(format: String, vararg args: Any) = this
   override fun addLocation(stackDepth: Int) = this
   @Throws(ObjectStreamException::class)
-  private fun readResolve(): Any {
-    return NullLogEntry
-  }
+  private fun readResolve(): Any = NullLogEntry
 }
