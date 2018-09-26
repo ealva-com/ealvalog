@@ -92,8 +92,7 @@ interface Logger {
     logLevel: LogLevel,
     marker: Marker?,
     throwable: Throwable?,
-    mdc: Map<String, String>? = null,
-    ndc: List<String>? = null
+    mdcContext: MdcContext?
   ): LogEntry
 
   /**

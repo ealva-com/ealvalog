@@ -39,8 +39,7 @@ object NullLogger : Logger {
     logLevel: LogLevel,
     marker: Marker?,
     throwable: Throwable?,
-    mdc: Map<String, String>?,
-    ndc: List<String>?
+    mdcContext: MdcContext?
   ) = NullLogEntry
   override fun logImmediate(entry: LogEntry) {}
 }

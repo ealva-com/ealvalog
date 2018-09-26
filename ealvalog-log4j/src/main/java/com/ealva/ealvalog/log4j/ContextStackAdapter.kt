@@ -25,9 +25,7 @@ import org.apache.logging.log4j.spi.ThreadContextStack
 /**
  * Created by Eric A. Snell on 9/17/18.
  */
-class ContextStackAdapter : ThreadContextStack {
-
-  var list: MutableList<String> = mutableListOf()
+class ContextStackAdapter(var list: MutableList<String> = mutableListOf()) : ThreadContextStack {
 
   override fun contains(element: String): Boolean {
     return list.contains(element)

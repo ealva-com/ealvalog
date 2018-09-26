@@ -22,9 +22,6 @@ import com.ealva.ealvalog.LogEntry
 import com.ealva.ealvalog.LogLevel
 import com.ealva.ealvalog.Marker
 import com.ealva.ealvalog.core.ExtLogRecord
-import com.ealva.ealvalog.e
-import com.ealva.ealvalog.invoke
-import com.ealva.ealvalog.lazyLogger
 import org.apache.logging.log4j.Level
 import org.apache.logging.log4j.ThreadContext
 import org.apache.logging.log4j.core.LogEvent
@@ -33,48 +30,18 @@ import org.apache.logging.log4j.core.time.Instant
 import org.apache.logging.log4j.core.time.MutableInstant
 import org.apache.logging.log4j.message.Message
 import org.apache.logging.log4j.message.ReusableMessageFactory
-import org.apache.logging.log4j.spi.MutableThreadContextStack
 import org.apache.logging.log4j.util.ReadOnlyStringMap
-import java.io.IOException
-import java.io.ObjectInputStream
-import java.io.ObjectOutputStream
-
-private val LOG by lazyLogger(LogRecordEvent::class)
 
 /**
  * Created by Eric A. Snell on 8/29/18.
  */
 class LogRecordEvent(logEntry: LogEntry?) : ExtLogRecord(logEntry) {
-  @field:Transient private var contextData: ReadOnlyStringMap = NullReadOnlyStringMap
-  @field:Transient private var contextStack: ThreadContext.ContextStack = NullThreadContextStack
-
-  fun setMdc(mdc: ReadOnlyStringMap) {
-    contextData = mdc
-  }
-
-  fun setNdc(ndc: ThreadContext.ContextStack) {
-    contextStack = ndc
-  }
+  @field:Transient private val contextData = ReadOnlyStringMapAdapter()
+  @field:Transient private val contextStack = ContextStackAdapter()
 
   override fun reserve(): LogRecordEvent {
     super.reserve()
     return this
-  }
-
-  @Throws(IOException::class)
-  private fun writeObject(out: ObjectOutputStream) {
-    out.defaultWriteObject()
-    out.writeObject(contextData.toMap())
-    out.writeObject(contextStack.asList())
-  }
-
-  @Throws(IOException::class, ClassNotFoundException::class)
-  private fun readObject(inputStream: ObjectInputStream) {
-    inputStream.defaultReadObject()
-    @Suppress("UNCHECKED_CAST")
-    contextData = ReadOnlyStringMapAdapter(inputStream.readObject() as Map<String, String>)
-    @Suppress("UNCHECKED_CAST")
-    contextStack = MutableThreadContextStack(inputStream.readObject() as List<String>)
   }
 
   val logEvent: LogEvent = object : LogEvent {
@@ -159,11 +126,13 @@ class LogRecordEvent(logEntry: LogEntry?) : ExtLogRecord(logEntry) {
     }
 
     override fun getContextData(): ReadOnlyStringMap {
-      return this@LogRecordEvent.contextData
+      return this@LogRecordEvent.contextData.apply { map = mdc ?: emptyMap() }
     }
 
     override fun getContextStack(): ThreadContext.ContextStack {
-      return this@LogRecordEvent.contextStack
+      return this@LogRecordEvent.contextStack.apply {
+        list = ndc?.toMutableList() ?: mutableListOf()
+      }
     }
 
     override fun getThrownProxy(): ThrowableProxy? {
@@ -196,40 +165,34 @@ class LogRecordEvent(logEntry: LogEntry?) : ExtLogRecord(logEntry) {
 
     private val messageFactory = ReusableMessageFactory.INSTANCE
 
-    private val threadLocalRecord = ThreadLocal<LogRecordEvent>()
+    private val threadLocal = ThreadLocal<LogRecordEvent>().apply { set(LogRecordEvent(null)) }
 
-    fun getRecordEvent(
+    fun get(
       loggerFQCN: String,
       logLevel: LogLevel,
       name: String,
       marker: Marker?,
-      throwable: Throwable?
+      throwable: Throwable?,
+      mdc: Map<String, String>?,
+      ndc: List<String>?
     ): LogRecordEvent {
       return reserveRecord().apply {
-        setLoggerFQCN(loggerFQCN)
-        setLogLevel(logLevel)
-        setLoggerName(name)
+        setLogLevel(logLevel) // sets LogLevel and java.util.logging.Level
         this.marker = marker
         setThrown(throwable)
+        setLoggerName(name)
+        setLoggerFQCN(loggerFQCN)
+        setMdc(mdc)
+        setNdc(ndc)
       }
     }
 
     private fun reserveRecord(): LogRecordEvent {
-      var result: LogRecordEvent? = threadLocalRecord.get()
-      if (result == null) {
-        result = LogRecordEvent(null)
-        threadLocalRecord.set(result)
-      }
-      return if (result.isReserved) {
-        LOG.e {
-          it(
-            "Had to make a new LogRecordEvent because the thread local is already in use. In use=%s",
-            threadLocalRecord.get() ?: "Null?"
-          )
-        }
+      val record = threadLocal.get()
+      return if (record.isReserved) {
         LogRecordEvent(null).reserve()
       } else {
-        result.reserve()
+        record.reserve()
       }
     }
   }

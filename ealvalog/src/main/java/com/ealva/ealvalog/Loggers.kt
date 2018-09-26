@@ -21,7 +21,6 @@
 package com.ealva.ealvalog
 
 import com.ealva.ealvalog.util.LogUtil
-
 import kotlin.reflect.KClass
 
 /**
@@ -66,10 +65,11 @@ fun <T : Any> T.lazyLogger(marker: Marker? = null, includeLocation: Boolean = fa
 inline fun Logger.t(
   throwable: Throwable? = null,
   marker: Marker? = null,
+  mdcContext: MdcContext? = null,
   block: (LogEntry) -> Unit
 ) {
   if (isLoggable(LogLevel.TRACE, marker, throwable)) {
-    getLogEntry(LogLevel.TRACE, marker, throwable, null, null).use { record ->
+    getLogEntry(LogLevel.TRACE, marker, throwable, mdcContext).use { record ->
       block(record)
       logImmediate(record)
     }
@@ -79,10 +79,11 @@ inline fun Logger.t(
 inline fun Logger.d(
   throwable: Throwable? = null,
   marker: Marker? = null,
+  mdcContext: MdcContext? = null,
   block: (LogEntry) -> Unit
 ) {
   if (isLoggable(LogLevel.DEBUG, marker, throwable)) {
-    getLogEntry(LogLevel.DEBUG, marker, throwable, null, null).use { record ->
+    getLogEntry(LogLevel.DEBUG, marker, throwable, mdcContext).use { record ->
       block(record)
       logImmediate(record)
     }
@@ -92,10 +93,11 @@ inline fun Logger.d(
 inline fun Logger.i(
   throwable: Throwable? = null,
   marker: Marker? = null,
+  mdcContext: MdcContext? = null,
   block: (LogEntry) -> Unit
 ) {
   if (isLoggable(LogLevel.INFO, marker, throwable)) {
-    getLogEntry(LogLevel.INFO, marker, throwable, null, null).use { record ->
+    getLogEntry(LogLevel.INFO, marker, throwable, mdcContext).use { record ->
       block(record)
       logImmediate(record)
     }
@@ -105,10 +107,11 @@ inline fun Logger.i(
 inline fun Logger.w(
   throwable: Throwable? = null,
   marker: Marker? = null,
+  mdcContext: MdcContext? = null,
   block: (LogEntry) -> Unit
 ) {
   if (isLoggable(LogLevel.WARN, marker, throwable)) {
-    getLogEntry(LogLevel.WARN, marker, throwable, null, null).use { record ->
+    getLogEntry(LogLevel.WARN, marker, throwable, mdcContext).use { record ->
       block(record)
       logImmediate(record)
     }
@@ -118,10 +121,11 @@ inline fun Logger.w(
 inline fun Logger.e(
   throwable: Throwable? = null,
   marker: Marker? = null,
+  mdcContext: MdcContext? = null,
   block: (LogEntry) -> Unit
 ) {
   if (isLoggable(LogLevel.ERROR, marker, throwable)) {
-    getLogEntry(LogLevel.ERROR, marker, throwable, null, null).use { record ->
+    getLogEntry(LogLevel.ERROR, marker, throwable, mdcContext).use { record ->
       block(record)
       logImmediate(record)
     }
@@ -131,10 +135,11 @@ inline fun Logger.e(
 inline fun Logger.wtf(
   throwable: Throwable? = null,
   marker: Marker? = null,
+  mdcContext: MdcContext? = null,
   block: (LogEntry) -> Unit
 ) {
   if (isLoggable(LogLevel.CRITICAL, marker, throwable)) {
-    getLogEntry(LogLevel.CRITICAL, marker, throwable, null, null).use { record ->
+    getLogEntry(LogLevel.CRITICAL, marker, throwable, mdcContext).use { record ->
       block(record)
       logImmediate(record)
     }

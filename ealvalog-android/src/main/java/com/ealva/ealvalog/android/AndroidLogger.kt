@@ -24,6 +24,7 @@ import com.ealva.ealvalog.LogLevel
 import com.ealva.ealvalog.Logger
 import com.ealva.ealvalog.LoggerFilter
 import com.ealva.ealvalog.Marker
+import com.ealva.ealvalog.MdcContext
 import com.ealva.ealvalog.filter.AlwaysNeutralFilter
 import com.ealva.ealvalog.util.LogUtil
 import java.util.concurrent.atomic.AtomicReference
@@ -71,15 +72,16 @@ class AndroidLogger internal constructor(
     logLevel: LogLevel,
     marker: Marker?,
     throwable: Throwable?,
-    mdc: Map<String, String>?,
-    ndc: List<String>?
+    mdcContext: MdcContext?
   ): LogEntry {
     return ExtLogRecord.get(
       loggerFQCN,
       logLevel,
       name,
       marker ?: this.marker,
-      throwable
+      throwable,
+      mdcContext?.mdc,
+      mdcContext?.ndc
     )
   }
 

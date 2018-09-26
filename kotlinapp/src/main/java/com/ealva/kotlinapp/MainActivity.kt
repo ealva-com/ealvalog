@@ -26,6 +26,8 @@ import com.ealva.ealvalog.invoke
 import com.ealva.ealvalog.logger
 import com.ealva.ealvalog.unaryPlus
 import com.ealva.ealvalog.w
+import kotlinx.coroutines.experimental.GlobalScope
+import kotlinx.coroutines.experimental.launch
 
 private val LOG = logger(MainActivity::class)
 
@@ -35,6 +37,9 @@ class MainActivity : AppCompatActivity() {
     LOG.e { it("onCreate %1\$tH:%1\$tM:%1\$tS.%1\$tL", System.currentTimeMillis()) }
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_main)
+    GlobalScope.launch {
+      something()
+    }
   }
 
   override fun onStart() {
@@ -55,6 +60,10 @@ class MainActivity : AppCompatActivity() {
     } catch (ex: RuntimeException) {
       LOG.e(ex) { +it("Caught: %s", ex.message ?: "") }  // log exception with location information
     }
+  }
+
+  private fun something() {
+    LOG.e { +it("test") }
   }
 
   private fun throwsSomething() {

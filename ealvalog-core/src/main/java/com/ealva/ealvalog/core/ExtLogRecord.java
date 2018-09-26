@@ -32,8 +32,11 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Formatter;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Level;
@@ -42,7 +45,7 @@ import java.util.logging.LogRecord;
 /**
  * Subclass of LogRecord adding the extra info we need. Not thread safe.
  * <p>
- * Use {@link #getRecord()} to obtain an ExtLogRecord which is associated with a thread and needs
+ * Use {@link #reserveRecord()} to obtain an ExtLogRecord which is associated with a thread and needs
  * to be {@link #close()}ed to be properly reused. Lower layers of the logging framework
  * need to copy this ExtLogRecord if it's to be passed to another thread.
  * <p>
@@ -71,6 +74,8 @@ public class ExtLogRecord extends LogRecord implements LogEntry {
   private transient int threadPriority;
   private transient long nanoTime;
   private transient @NotNull String loggerFQCN;
+  private transient @Nullable Map<String, String> mdc;
+  private transient @Nullable List<String> ndc;
   private transient boolean reserved;
   private transient @NotNull StringBuilder builder;
   private transient @NotNull Formatter formatter;
@@ -102,20 +107,21 @@ public class ExtLogRecord extends LogRecord implements LogEntry {
                                  final @NotNull LogLevel level,
                                  final @NotNull String loggerName,
                                  final @Nullable Marker marker,
-                                 final @Nullable Throwable throwable) {
-    final ExtLogRecord logRecord = getRecord();
+                                 final @Nullable Throwable throwable,
+                                 final @Nullable Map<String, String> mdc,
+                                 final @Nullable List<String> ndc) {
+    final ExtLogRecord logRecord = reserveRecord();
     logRecord.setLogLevel(level);  // sets LogLevel and java.util.logging.Level
     logRecord.setMarker(marker);
     logRecord.setThrown(throwable);
-    final Thread currentThread = Thread.currentThread();
-    logRecord.setThreadName(currentThread.getName());
-    logRecord.setThreadID((int)currentThread.getId());
     logRecord.setLoggerName(loggerName);
     logRecord.setLoggerFQCN(loggerFQCN);
+    logRecord.setMdc(mdc);
+    logRecord.setNdc(ndc);
     return logRecord;
   }
 
-  private static ExtLogRecord getRecord() {
+  private static ExtLogRecord reserveRecord() {
     ExtLogRecord result = threadLocalRecord.get();
     if (result == null) {
       result = new ExtLogRecord(null);
@@ -195,11 +201,15 @@ public class ExtLogRecord extends LogRecord implements LogEntry {
       threadPriority = entry.getThreadPriority();
       nanoTime = entry.getNanoTime();
       loggerFQCN = entry.getLoggerFQCN();
+      mdc = entry.getMdc();
+      ndc = entry.getNdc();
     } else {
       logLevel = LogLevel.ERROR;
       setLevel(logLevel.getJdkLevel());
       threadName = Thread.currentThread().getName();
       loggerFQCN = "";
+      mdc = Collections.emptyMap();
+      ndc = Collections.emptyList();
     }
   }
 
@@ -207,18 +217,35 @@ public class ExtLogRecord extends LogRecord implements LogEntry {
     return reserved;
   }
 
+  /**
+   * Sets the following:
+   * <ul>
+   * <li>{@link #isReserved()}</li>
+   * <li>{@link #setMessage(String)}</li>
+   * <li>{@link #setParameters(Object[])}</li>
+   * <li>{@link #setLocation(StackTraceElement)}</li>
+   * <li>{@link #setMillis(long)}</li>
+   * <li>{@link #setSequenceNumber(long)}</li>
+   * <li>{@link #setThreadName(String)}</li>
+   * <li>{@link #setThreadID(int)}</li>
+   * <li>{@link #setThreadPriority(int)}</li>
+   * <li>{@link #setNanoTime(long)}</li>
+   * <li>trim the builder if necessary and set length to 0</li>
+   * </ul>
+   * @return the ExtLogRecord for single use
+   */
   protected ExtLogRecord reserve() {
     reserved = true;
     super.setMessage(null);
     setParameters(null);
-    logLevel = LogLevel.NONE;
-    marker = null;
     location = null;
     setMillis(System.currentTimeMillis());
     setSequenceNumber(sequenceNumber.getAndIncrement());
-    threadPriority = Thread.currentThread().getPriority();
+    final Thread currentThread = Thread.currentThread();
+    setThreadName(currentThread.getName());
+    setThreadID((int)currentThread.getId());
+    threadPriority = currentThread.getPriority();
     nanoTime = System.nanoTime();
-    loggerFQCN = "";
     if (builder.capacity() > maxBuilderSize) {
       builder.setLength(maxBuilderSize);
       builder.trimToSize();
@@ -335,10 +362,27 @@ public class ExtLogRecord extends LogRecord implements LogEntry {
     this.loggerFQCN = loggerFQCN;
   }
 
+  @Nullable @Override public Map<String, String> getMdc() {
+    return mdc;
+  }
+
+  public void setMdc(@Nullable final Map<String, String> mdc) {
+    this.mdc = mdc;
+  }
+
+  @Nullable @Override public List<String> getNdc() {
+    return ndc;
+  }
+
+  public void setNdc(@Nullable final List<String> ndc) {
+    this.ndc = ndc;
+  }
+
   @Override public void close() {
     reserved = false;
   }
 
+  @SuppressWarnings("unchecked")
   private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
     in.defaultReadObject();
     logLevel = (LogLevel)in.readObject();
@@ -349,6 +393,8 @@ public class ExtLogRecord extends LogRecord implements LogEntry {
     threadPriority = in.readInt();
     nanoTime = in.readLong();
     loggerFQCN = in.readUTF();
+    mdc = (Map<String, String>)in.readObject();
+    ndc = (List<String>)in.readObject();
     reserved = false;
     builder = new StringBuilder(DEFAULT_STRING_BUILDER_SIZE);
     formatter = new Formatter(builder);
@@ -364,6 +410,8 @@ public class ExtLogRecord extends LogRecord implements LogEntry {
     out.writeInt(threadPriority);
     out.writeLong(nanoTime);
     out.writeUTF(loggerFQCN);
+    out.writeObject(mdc);
+    out.writeObject(ndc);
   }
 
   @SuppressWarnings("unused")
@@ -478,7 +526,9 @@ public class ExtLogRecord extends LogRecord implements LogEntry {
         Objects.equals(getThreadName(), that.getThreadName()) &&
         Objects.equals(getMarker(), that.getMarker()) &&
         Objects.equals(getLocation(), that.getLocation()) &&
-        Objects.equals(getLoggerFQCN(), that.getLoggerFQCN());
+        Objects.equals(getLoggerFQCN(), that.getLoggerFQCN()) &&
+        Objects.equals(getMdc(), that.getMdc()) &&
+        Objects.equals(getNdc(), that.getNdc());
   }
 
   @Override public int hashCode() {
@@ -501,7 +551,8 @@ public class ExtLogRecord extends LogRecord implements LogEntry {
                         getThreadPriority(),
                         getNanoTime(),
 //                        isReserved(),
-                        getLoggerFQCN());
+                        getLoggerFQCN(),
+                        getMdc(),
+                        getNdc());
   }
-
 }

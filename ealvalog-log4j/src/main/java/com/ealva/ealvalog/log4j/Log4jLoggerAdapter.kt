@@ -21,6 +21,7 @@ package com.ealva.ealvalog.log4j
 import com.ealva.ealvalog.LogEntry
 import com.ealva.ealvalog.LogLevel
 import com.ealva.ealvalog.Marker
+import com.ealva.ealvalog.MdcContext
 import com.ealva.ealvalog.core.CoreLogger
 import org.jetbrains.annotations.TestOnly
 
@@ -38,10 +39,17 @@ class Log4jLoggerAdapter internal constructor(
     logLevel: LogLevel,
     marker: Marker?,
     throwable: Throwable?,
-    mdc: Map<String, String>?,
-    ndc: List<String>?
+    mdcContext: MdcContext?
   ): LogEntry {
-    return bridge.getRecordEvent(FQCN, logLevel, name, marker, throwable, mdc, ndc)
+    return bridge.getRecordEvent(
+      FQCN,
+      logLevel,
+      name,
+      marker,
+      throwable,
+      mdcContext?.mdc,
+      mdcContext?.ndc
+    )
   }
 
   internal fun update(configuration: Log4jLoggerConfiguration) {

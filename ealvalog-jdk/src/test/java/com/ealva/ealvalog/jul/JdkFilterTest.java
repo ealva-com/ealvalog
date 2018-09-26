@@ -95,8 +95,8 @@ public class JdkFilterTest {
                                  THROWABLE)).thenReturn(FilterResult.DENY);
     JdkFilter filter = new JdkFilter(loggerFilter);
     try (ExtLogRecord record = ExtLogRecord.get(LOGGER_FQCN,
-                                                LOG_LEVEL, LOGGER_NAME, MARKER, THROWABLE
-    )) {
+                                                LOG_LEVEL, LOGGER_NAME, MARKER, THROWABLE,
+                                                null, null)) {
       assertThat(filter.isLoggable(record), is(false));
       then(loggerFilter).should(times(1)).isLoggable(LOGGER_NAME, LOG_LEVEL, MARKER, THROWABLE);
     }

@@ -16,13 +16,14 @@
  * limitations under the License.
  */
 
-package com.ealva.ealvalog.core;
+package com.ealva.ealvalog
 
 /**
- * Created by Eric A. Snell on 8/30/18.
+ * Created by Eric A. Snell on 9/20/18.
  */
-interface Reservable<T> {
-  T reserve();
-
-  boolean isReserved();
+interface MdcContext {
+  val mdc: Map<String, String>?
+  val ndc: List<String>?
 }
+
+

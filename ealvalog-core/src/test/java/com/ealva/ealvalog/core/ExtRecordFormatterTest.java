@@ -83,7 +83,7 @@ public class ExtRecordFormatterTest {
   public void setup() {
     MockitoAnnotations.initMocks(this);
     ExtLogRecord.clearCachedRecord();
-    record = ExtLogRecord.get(LOGGER_FQCN, LOG_LEVEL, LOGGER_NAME, MARKER, THROWABLE);
+    record = ExtLogRecord.get(LOGGER_FQCN, LOG_LEVEL, LOGGER_NAME, MARKER, THROWABLE, null, null);
     record.addLocation(0);
     record.format(MESSAGE_FORMAT, MESSAGE_ARG);
     record.setThreadPriority(THREAD_PRIORITY);
@@ -298,7 +298,7 @@ public class ExtRecordFormatterTest {
   @Test
   public void testNoParametersButHasFormatting() {
     record.close(); // release the fir
-    record = ExtLogRecord.get(LOGGER_FQCN, LOG_LEVEL, LOGGER_NAME, MARKER, THROWABLE);
+    record = ExtLogRecord.get(LOGGER_FQCN, LOG_LEVEL, LOGGER_NAME, MARKER, THROWABLE, null, null);
     record.addLocation(0);
     record.append(MESSAGE_FORMAT);
     com.ealva.ealvalog.core.ExtRecordFormatter

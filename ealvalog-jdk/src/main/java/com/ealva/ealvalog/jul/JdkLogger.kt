@@ -21,6 +21,7 @@ package com.ealva.ealvalog.jul
 import com.ealva.ealvalog.LogEntry
 import com.ealva.ealvalog.LogLevel
 import com.ealva.ealvalog.Marker
+import com.ealva.ealvalog.MdcContext
 import com.ealva.ealvalog.core.CoreLogger
 import com.ealva.ealvalog.core.ExtLogRecord
 import org.jetbrains.annotations.TestOnly
@@ -52,15 +53,16 @@ class JdkLogger internal constructor(
     logLevel: LogLevel,
     marker: Marker?,
     throwable: Throwable?,
-    mdc: Map<String, String>?,
-    ndc: List<String>?
+    mdcContext: MdcContext?
   ): LogEntry {
     return ExtLogRecord.get(
       loggerFQCN,
       logLevel,
       name,
       resolveMarker(marker),
-      throwable
+      throwable,
+      mdcContext?.mdc,
+      mdcContext?.ndc
     )
   }
 

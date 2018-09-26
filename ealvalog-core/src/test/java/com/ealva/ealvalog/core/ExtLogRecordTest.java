@@ -62,8 +62,8 @@ public class ExtLogRecordTest {
     final Marker marker = Markers.INSTANCE.get("marker");
     //noinspection ThrowableNotThrown
     final Throwable throwable = new RuntimeException();
-    final ExtLogRecord first = ExtLogRecord.get(LOGGER_FQCN, level, loggerName, marker, throwable
-    );
+    final ExtLogRecord first = ExtLogRecord.get(LOGGER_FQCN, level, loggerName, marker, throwable,
+                                                null, null);
     assertThat(first.getLogLevel(), is(level));
     assertThat(first.getLoggerName(), is(loggerName));
     assertThat(first.getMarker(), is(marker));
@@ -75,8 +75,8 @@ public class ExtLogRecordTest {
     final Throwable secondThrowable = null;
     final ExtLogRecord
         second =
-        ExtLogRecord.get(LOGGER_FQCN, secondLevel, secondLoggerName, secondMarker, secondThrowable
-        );
+        ExtLogRecord.get(LOGGER_FQCN, secondLevel, secondLoggerName, secondMarker, secondThrowable,
+                         null, null);
     assertThat(second, sameInstance(first));
     assertThat(second.getLogLevel(), is(secondLevel));
     assertThat(second.getLoggerName(), is(secondLoggerName));
@@ -88,8 +88,8 @@ public class ExtLogRecordTest {
   public void testGetCachedRecord() {
     final LogLevel level = LogLevel.ERROR;
     final String loggerName = "LoggerName";
-    final ExtLogRecord first = ExtLogRecord.get(LOGGER_FQCN, level, loggerName, null, null
-    );
+    final ExtLogRecord first = ExtLogRecord.get(LOGGER_FQCN, level, loggerName, null, null,
+                                                null, null);
     final String firstParm = "first";
     final String secondParm = "second";
     first.setParameters(new Object[]{firstParm, secondParm});
@@ -106,7 +106,7 @@ public class ExtLogRecordTest {
     final String secondMessage = "%s %d %f";
     final ExtLogRecord
         second =
-        ExtLogRecord.get(LOGGER_FQCN, secondLevel, secondLoggerName, null, null);
+        ExtLogRecord.get(LOGGER_FQCN, secondLevel, secondLoggerName, null, null, null, null);
     second.setMessage(secondMessage);
     assertThat(second.getLogLevel(), is(secondLevel));
     assertThat(second.getLoggerName(), is(secondLoggerName));
@@ -120,16 +120,16 @@ public class ExtLogRecordTest {
   @Test
   public void testGetMultiple() {
     final ExtLogRecord first =
-        ExtLogRecord.get(LOGGER_FQCN, LogLevel.ERROR, "LoggerName", null, null);
+        ExtLogRecord.get(LOGGER_FQCN, LogLevel.ERROR, "LoggerName", null, null, null, null);
     final ExtLogRecord second =
-        ExtLogRecord.get(LOGGER_FQCN, LogLevel.ERROR, "LoggerName", null, null);
+        ExtLogRecord.get(LOGGER_FQCN, LogLevel.ERROR, "LoggerName", null, null, null, null);
     assertThat(first, not(sameInstance(second)));
     first.close();
     second.close();
     final LogLevel logLevel = LogLevel.WARN;
     final String loggerName = "Other";
-    final ExtLogRecord third = ExtLogRecord.get(LOGGER_FQCN, logLevel, loggerName, null, null
-    );
+    final ExtLogRecord third = ExtLogRecord.get(LOGGER_FQCN, logLevel, loggerName, null, null,
+                                                null, null);
     assertThat(first, sameInstance(third));
     assertThat(third.getLogLevel(), is(logLevel));
     assertThat(third.getLoggerName(), is(loggerName));
@@ -147,7 +147,7 @@ public class ExtLogRecordTest {
                                                      level,
                                                      loggerName,
                                                      marker,
-                                                     throwable)) {
+                                                     throwable, null, null)) {
       first.setParameters(new Object[] {parameter});
       assertThat(first.getLogLevel(), is(level));
       assertThat(first.getLoggerName(), is(loggerName));

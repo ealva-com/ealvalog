@@ -22,6 +22,7 @@ import com.ealva.ealvalog.LogEntry;
 import com.ealva.ealvalog.LogLevel;
 import com.ealva.ealvalog.LoggerFilter;
 import com.ealva.ealvalog.Marker;
+import com.ealva.ealvalog.MdcContext;
 import com.ealva.ealvalog.NullLogEntry;
 
 import org.jetbrains.annotations.NotNull;
@@ -35,9 +36,6 @@ import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.only;
 import static org.mockito.Mockito.when;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * Test core functionality. Ensure it's calling the bridge correctly, including passing itself.
@@ -63,8 +61,8 @@ public class CoreLoggerTest {
   public void testPrintLog() {
     com.ealva.ealvalog.core.CoreLogger<com.ealva.ealvalog.core.Bridge>
         logger = new CoreLoggerForTest(LOGGER_NAME, marker, configuration);
-    final ExtLogRecord record = ExtLogRecord.get(LOGGER_FQCN, LogLevel.WARN, "", marker, null
-    );
+    final ExtLogRecord record = ExtLogRecord.get(LOGGER_FQCN, LogLevel.WARN, "", marker, null,
+                                                 null, null);
     record.append(MESSAGE);
     logger.logImmediate(record);
     then(bridge).should(only()).log(same(record));
@@ -136,8 +134,7 @@ public class CoreLoggerTest {
     public LogEntry getLogEntry(@NotNull final LogLevel logLevel,
                                 @Nullable final Marker marker,
                                 @Nullable final Throwable throwable,
-                                @Nullable final Map<String, String> mdc,
-                                @Nullable final List<String> ndc) {
+                                @Nullable final MdcContext mdcContext) {
       return NullLogEntry.INSTANCE;
     }
 

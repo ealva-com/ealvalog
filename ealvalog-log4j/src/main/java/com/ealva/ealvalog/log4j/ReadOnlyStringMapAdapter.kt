@@ -25,7 +25,7 @@ import org.apache.logging.log4j.util.TriConsumer
 /**
  * Created by Eric A. Snell on 9/17/18.
  */
-class ReadOnlyStringMapAdapter(var map: Map<String, String>) : ReadOnlyStringMap {
+class ReadOnlyStringMapAdapter(var map: Map<String, String> = emptyMap()) : ReadOnlyStringMap {
 
   override fun isEmpty(): Boolean {
     return map.isEmpty()

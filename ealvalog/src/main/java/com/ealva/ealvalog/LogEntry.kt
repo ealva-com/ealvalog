@@ -117,6 +117,10 @@ interface LogEntry : Appendable, Closeable, Serializable {
 
   val loggerFQCN: String
 
+  val mdc: Map<String, String>?
+
+  val ndc: List<String>?
+
   /**
    * Reset the message, ie. `setLength(0)`
    */

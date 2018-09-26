@@ -22,6 +22,7 @@ import com.ealva.ealvalog.LogEntry
 import com.ealva.ealvalog.LogLevel
 import com.ealva.ealvalog.LoggerFilter
 import com.ealva.ealvalog.Marker
+import com.ealva.ealvalog.MdcContext
 import com.ealva.ealvalog.NullLogEntry
 import com.ealva.ealvalog.filter.AlwaysNeutralFilter
 import java.util.function.Supplier
@@ -90,8 +91,7 @@ object NullJLogger : JLogger {
     logLevel: LogLevel,
     marker: Marker?,
     throwable: Throwable?,
-    mdc: Map<String, String>?,
-    ndc: List<String>?
+    mdcContext: MdcContext?
   ) = NullLogEntry
 
   override fun logImmediate(entry: LogEntry) {}

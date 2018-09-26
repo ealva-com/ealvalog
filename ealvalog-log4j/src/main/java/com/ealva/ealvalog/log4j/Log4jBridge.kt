@@ -38,7 +38,6 @@ import org.apache.logging.log4j.core.impl.ContextDataInjectorFactory
 import org.apache.logging.log4j.core.lookup.Interpolator
 import org.apache.logging.log4j.core.lookup.StrSubstitutor
 import org.apache.logging.log4j.spi.ExtendedLogger
-import org.apache.logging.log4j.spi.MutableThreadContextStack
 import org.apache.logging.log4j.util.StringMap
 import java.util.concurrent.ConcurrentHashMap
 
@@ -57,16 +56,12 @@ class Log4jBridge(
       }
     }
 
-  private val configuration = (LogManager.getContext(javaClass.classLoader, false) as LoggerContext)
-    .configuration
+  private val configuration =
+    (LogManager.getContext(javaClass.classLoader, false) as LoggerContext).configuration
 
-  private val loggerConfig: LoggerConfig =
-    configuration
-      .getLoggerConfig(name)
+  private val loggerConfig: LoggerConfig =configuration.getLoggerConfig(name)
 
-  private val properties = ConcurrentHashMap<String, String>()
-  private val tempLookup = Interpolator(properties)
-  private val subst = StrSubstitutor(tempLookup)
+  private val subst = StrSubstitutor(Interpolator(ConcurrentHashMap()))
 
   @field:Volatile var parent: Log4jBridge? = null  // root bridge will have a null parent
 
@@ -106,6 +101,25 @@ class Log4jBridge(
 
   override fun log(logEntry: LogEntry) {
     LogRecordEvent.fromLogEntry(logEntry).use { record ->
+      if (record.mdc == null) {
+        record.setMdc(createContextData(
+          if (!loggerConfig.isPropertiesRequireLookup) {
+            loggerConfig.propertyList ?: emptyList()
+          } else {
+            loggerConfig.propertyList?.mapTo(ArrayList(loggerConfig.propertyList.size)) {
+              Property.createProperty(
+                it.name,
+                if (it.isValueNeedsLookup)
+                  subst.replace(record.logEvent, it.value)
+                else
+                  it.value
+              )
+            } ?: emptyList()
+          }).toMap())
+      }
+      if (record.ndc == null && ThreadContext.getDepth() > 0) {
+        record.setNdc(ThreadContext.cloneStack().asList())
+      }
       loggerConfig.log(record.logEvent)
     }
   }
@@ -141,29 +155,7 @@ class Log4jBridge(
     mdc: Map<String, String>?,
     ndc: List<String>?
   ): LogRecordEvent {
-    return LogRecordEvent.getRecordEvent(fqcn, logLevel, name, marker, throwable).apply {
-      setMdc(if (mdc != null) ReadOnlyStringMapAdapter(mdc) else createContextData(
-        if (!loggerConfig.isPropertiesRequireLookup) {
-          loggerConfig.propertyList ?: emptyList()
-        } else {
-          loggerConfig.propertyList?.mapTo(ArrayList(loggerConfig.propertyList.size)) {
-            Property.createProperty(
-              it.name,
-              if (it.isValueNeedsLookup)
-                subst.replace(this.logEvent, it.value)
-              else
-                it.value
-            )
-          } ?: emptyList()
-        }))
-      setNdc(
-        when {
-          ndc != null -> MutableThreadContextStack(ndc)
-          ThreadContext.getDepth() == 0 -> NullThreadContextStack
-          else -> ThreadContext.cloneStack()
-        }
-      )
-    }
+    return LogRecordEvent.get(fqcn, logLevel, name, marker, throwable, mdc, ndc)
   }
 
   companion object {
