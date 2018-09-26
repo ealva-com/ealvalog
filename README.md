@@ -1,6 +1,7 @@
 
 eAlvaLog
 ========
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.ealva/ealvalog/badge.svg?style=flat)](https://maven-badges.herokuapp.com/maven-central/com.ealva/ealvalog)
 
 *eAlvaLog* is a Kotlin/Java logging facade initially inspired by various other logging frameworks
 
@@ -37,9 +38,9 @@ Quick Start
 - Android Setup
 ```groovy
 dependencies {
-    implementation 'com.ealva:ealvalog:0.02.00-SNAPSHOT'
-    implementation 'com.ealva:ealvalog-core:0.02.00-SNAPSHOT'
-    implementation 'com.ealva:ealvalog-android:0.02.00-SNAPSHOT'
+    implementation 'com.ealva:ealvalog:0.3.0'
+    implementation 'com.ealva:ealvalog-core:0.3.0'
+    implementation 'com.ealva:ealvalog-android:0.3.0'
 }
 ```
 ```java
@@ -54,11 +55,11 @@ public class MyApp extends Application {
 - Setup for facade over java.util.logging and also logs to Android log 
 ```groovy
 dependencies {
-    implementation 'com.ealva:ealvalog:0.02.00-SNAPSHOT'
-    implementation 'com.ealva:ealvalog-core:0.02.00-SNAPSHOT'
-    implementation 'com.ealva:ealvalog-java:0.02.00-SNAPSHOT'
-    implementation 'com.ealva:ealvalog-jdk:0.02.00-SNAPSHOT'
-    implementation 'com.ealva:ealvalog-jdk-android:0.02.00-SNAPSHOT'
+    implementation 'com.ealva:ealvalog:0.3.0'
+    implementation 'com.ealva:ealvalog-core:0.3.0'
+    implementation 'com.ealva:ealvalog-java:0.3.0'
+    implementation 'com.ealva:ealvalog-jdk:0.3.0'
+    implementation 'com.ealva:ealvalog-jdk-android:0.3.0'
 }
 ```
 ```java
