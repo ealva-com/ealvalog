@@ -30,18 +30,18 @@ fun <T : Any> logger(
   forClass: KClass<T>,
   marker: Marker? = null,
   includeLocation: Boolean = false
-): Logger = forClass.logger(marker, includeLocation)
+): Logger = logger(forClass.java.name, marker, includeLocation)
 
 fun <T : Any> lazyLogger(
   forClass: KClass<T>,
   marker: Marker? = null,
   includeLocation: Boolean = false
-): Lazy<Logger> = forClass.lazyLogger(marker, includeLocation)
+): Lazy<Logger> = lazy { logger(forClass.java.name, marker, includeLocation) }
 
 inline fun <reified R : Any> R.logger(
   marker: Marker? = null,
   includeLocation: Boolean = false
-): Logger = Loggers.get(R::class.java.name.substringBefore("\$Companion"), marker, includeLocation)
+): Logger = Loggers.get(this.javaClass.name.substringBefore("\$Companion"), marker, includeLocation)
 
 inline fun <reified R : Any> R.lazyLogger(
   marker: Marker? = null,

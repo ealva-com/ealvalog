@@ -44,7 +44,7 @@ class MainActivity : AppCompatActivity() {
 
   override fun onStart() {
     super.onStart()
-    LOG.w { it("onStart 0x%s 0x%X", Integer.toHexString(256), 256) }
+    OTHER_LOG.w { it("onStart 0x%s 0x%X", Integer.toHexString(256), 256) }
 
     // Should not log because root logger log level was set to LogLevel.WARN in JavaApp
     LOG.i { it("SHOULD NOT BE LOGGED") }
@@ -70,6 +70,10 @@ class MainActivity : AppCompatActivity() {
     val ex = RuntimeException("Exception Message")
     LOG.e(ex) { +it("Throwing: %s", ex.message ?: "") }
     throw ex
+  }
+
+  companion object {
+    private val OTHER_LOG = logger()
   }
 
 }
