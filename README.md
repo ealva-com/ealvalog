@@ -1,7 +1,7 @@
 
 eAlvaLog
 ========
-[![Maven metadata URL](https://img.shields.io/maven-metadata/v/http/central.maven.org/maven2/com/ealva/ealvalog/maven-metadata.xml.svg?style=plastic)](http://central.maven.org/maven2/com/ealva/ealvalog/)
+[![Maven metadata URL](https://img.shields.io/maven-metadata/v/http/central.maven.org/maven2/com/ealva/ealvalog/maven-metadata.xml.svg?style=plastic)](http://central.maven.org/maven2/com/ealva/)
 
 *eAlvaLog* is a Kotlin/Java logging facade initially inspired by various other logging frameworks
 
