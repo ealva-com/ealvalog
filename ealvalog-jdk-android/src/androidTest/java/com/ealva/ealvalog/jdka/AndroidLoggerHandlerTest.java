@@ -18,10 +18,9 @@
 
 package com.ealva.ealvalog.jdka;
 
-import com.ealva.ealvalog.core.ExtLogRecord;
 import com.ealva.ealvalog.LoggerFilter;
+import com.ealva.ealvalog.core.ExtLogRecord;
 import com.ealva.ealvalog.core.ExtRecordFormatter;
-import com.ealva.ealvalog.filter.AlwaysAcceptFilter;
 import com.ealva.ealvalog.filter.AlwaysNeutralFilter;
 import com.ealva.ealvalog.util.LogUtil;
 
@@ -49,11 +48,10 @@ public class AndroidLoggerHandlerTest {
 
   @Before
   public void setup() {
-    handler =
-        new AndroidLoggerHandlerForTest(new ExtRecordFormatter("%1$s",
-                                                               true),
-                                        AlwaysNeutralFilter.INSTANCE,
-                                        new ErrorManager());
+    handler = new AndroidLoggerHandlerForTest(
+        new ExtRecordFormatter(ExtRecordFormatter.TYPICAL_ANDROID_FORMAT, true),
+        AlwaysNeutralFilter.INSTANCE,
+        new ErrorManager());
   }
 
   @Test
@@ -65,9 +63,10 @@ public class AndroidLoggerHandlerTest {
       record.append(message);
       handler.publish(record);
 
+      final String expected = "[" + Thread.currentThread().getName() + "] " + message;
       assertThat(handler.record, is((LogRecord)record));
       assertThat(handler.tag, is(LogUtil.tagFromName(className)));
-      assertThat(handler.msg, is(message));
+      assertThat(handler.msg, is(expected));
     }
   }
 
@@ -87,17 +86,21 @@ public class AndroidLoggerHandlerTest {
 
   @Test
   public void testLogOutput() {
-    AndroidLoggerHandler handler = AndroidLoggerHandler.Companion.make(
-        new ExtRecordFormatter(ExtRecordFormatter.TYPICAL_ANDROID_FORMAT, true),
-        AlwaysAcceptFilter.INSTANCE
-    );
-    try (final ExtLogRecord record = ExtLogRecord.get(LOGGER_FQCN, CRITICAL, getClass().getName(), null, null,
+    final String message = "Message";
+    final String format = message + " %s";
+    final String parm = "test";
+    try (final ExtLogRecord record = ExtLogRecord.get(LOGGER_FQCN,
+                                                      CRITICAL,
+                                                      "LoggerName",
+                                                      null,
+                                                      null,
                                                       null,
                                                       null)) {
-      record.append("Message");
+      record.setFormatAndArgs(format, parm);
       handler.publish(record);
     }
-
+    final String expected = "[" + Thread.currentThread().getName() + "] " + message + " " + parm;
+    assertThat(handler.msg, is(expected));
   }
 
   class AndroidLoggerHandlerForTest extends AndroidLoggerHandler {

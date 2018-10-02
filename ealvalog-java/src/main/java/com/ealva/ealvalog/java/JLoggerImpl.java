@@ -130,7 +130,7 @@ public class JLoggerImpl implements JLogger {
         if (realLogger.shouldIncludeLocation(level, marker, null)) {
           record.addLocation(STACK_DEPTH);
         }
-        record.log(format, formatArgs);
+        record.setFormatAndArgs(format, formatArgs);
         logImmediate(record);
       }
     }
@@ -149,7 +149,7 @@ public class JLoggerImpl implements JLogger {
         if (realLogger.shouldIncludeLocation(level, realLogger.getMarker(), throwable)) {
           record.addLocation(STACK_DEPTH);
         }
-        record.log(format, formatArgs);
+        record.setFormatAndArgs(format, formatArgs);
         logImmediate(record);
       }
     }
@@ -166,7 +166,7 @@ public class JLoggerImpl implements JLogger {
         if (realLogger.shouldIncludeLocation(level, marker, throwable)) {
           record.addLocation(STACK_DEPTH);
         }
-        record.log(format, formatArgs);
+        record.setFormatAndArgs(format, formatArgs);
         logImmediate(record);
       }
     }
@@ -184,7 +184,7 @@ public class JLoggerImpl implements JLogger {
         if (realLogger.shouldIncludeLocation(level, realLogger.getMarker(), null)) {
           record.addLocation(STACK_DEPTH);
         }
-        record.log(format, arg1);
+        record.setFormatAndArgs(format, arg1);
         logImmediate(record);
       }
     }
@@ -203,7 +203,7 @@ public class JLoggerImpl implements JLogger {
         if (realLogger.shouldIncludeLocation(level, realLogger.getMarker(), null)) {
           record.addLocation(STACK_DEPTH);
         }
-        record.log(format, arg1, arg2);
+        record.setFormatAndArgs(format, arg1, arg2);
         logImmediate(record);
       }
     }
@@ -223,7 +223,7 @@ public class JLoggerImpl implements JLogger {
         if (realLogger.shouldIncludeLocation(level, realLogger.getMarker(), null)) {
           record.addLocation(STACK_DEPTH);
         }
-        record.log(format, arg1, arg2, arg3);
+        record.setFormatAndArgs(format, arg1, arg2, arg3);
         logImmediate(record);
       }
     }
@@ -244,7 +244,7 @@ public class JLoggerImpl implements JLogger {
         if (realLogger.shouldIncludeLocation(level, realLogger.getMarker(), null)) {
           record.addLocation(STACK_DEPTH);
         }
-        record.log(format, arg1, arg2, arg3, arg4);
+        record.setFormatAndArgs(format, arg1, arg2, arg3, arg4);
         logImmediate(record);
       }
     }
@@ -270,7 +270,7 @@ public class JLoggerImpl implements JLogger {
         // used when passing vararg to vararg and the spread operator is required. Instead
         // we'll use our own combineArgs() so the spread functionality is isolated here and
         // not repeated multiple times in Kotlin code
-        record.log(format, LogUtil.combineArgs(remaining, arg1, arg2, arg3, arg4));
+        record.setFormatAndArgs(format, LogUtil.combineArgs(remaining, arg1, arg2, arg3, arg4));
         logImmediate(record);
       }
     }

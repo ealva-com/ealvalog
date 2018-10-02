@@ -30,11 +30,11 @@ class KotlinApp : Application() {
   override fun onCreate() {
     super.onCreate()
     if (BuildConfig.DEBUG) {
-      JulConfiguration(true, true, AndroidLoggerHandler.make(), LogLevel.WARN)
+      JulConfiguration(true, true, LogLevel.WARN, AndroidLoggerHandler.make())
     } else {
       //      Fabric.with(this, CrashlyticsCore(), Answers(), Crashlytics());
       //      config = new JulConfiguration(false, CrashlyticsLogHandler(), LogLevel.ERROR);
-      JulConfiguration(true, true, AndroidLoggerHandler.make(), LogLevel.ERROR)
+      JulConfiguration(true, true, LogLevel.ERROR, AndroidLoggerHandler.make())
     }.configure()
   }
 }

@@ -26,41 +26,30 @@ import kotlin.reflect.KClass
 /**
  * Created by Eric A. Snell on 8/8/18.
  */
-fun logger(name: String, marker: Marker? = null, includeLocation: Boolean = false): Logger {
-  return Loggers.get(name, marker, includeLocation)
-}
-
-fun <T : Any> logger(
-  forClass: Class<T>,
-  marker: Marker? = null,
-  includeLocation: Boolean = false
-): Logger {
-  return logger(forClass.name, marker, includeLocation)
-}
-
 fun <T : Any> logger(
   forClass: KClass<T>,
   marker: Marker? = null,
   includeLocation: Boolean = false
-): Logger {
-  return logger(forClass.java, marker, includeLocation)
-}
+): Logger = forClass.logger(marker, includeLocation)
 
 fun <T : Any> lazyLogger(
   forClass: KClass<T>,
   marker: Marker? = null,
   includeLocation: Boolean = false
-): Lazy<Logger> {
-  return lazy { logger(forClass.java, marker, includeLocation) }
-}
+): Lazy<Logger> = forClass.lazyLogger(marker, includeLocation)
 
-fun <T : Any> T.logger(marker: Marker? = null, includeLocation: Boolean = false): Logger {
-  return logger(javaClass, marker, includeLocation)
-}
+inline fun <reified R : Any> R.logger(
+  marker: Marker? = null,
+  includeLocation: Boolean = false
+): Logger = Loggers.get(R::class.java.name.substringBefore("\$Companion"), marker, includeLocation)
 
-fun <T : Any> T.lazyLogger(marker: Marker? = null, includeLocation: Boolean = false): Lazy<Logger> {
-  return lazy { logger(javaClass, marker, includeLocation) }
-}
+inline fun <reified R : Any> R.lazyLogger(
+  marker: Marker? = null,
+  includeLocation: Boolean = false
+): Lazy<Logger> = lazy { logger(marker, includeLocation) }
+
+fun logger(name: String, marker: Marker? = null, includeLocation: Boolean = false): Logger =
+  Loggers.get(name, marker, includeLocation)
 
 inline fun Logger.t(
   throwable: Throwable? = null,

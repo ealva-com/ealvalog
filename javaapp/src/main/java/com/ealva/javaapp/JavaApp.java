@@ -36,12 +36,12 @@ public class JavaApp extends Application {
     // Configure the Loggers singleton
     if (BuildConfig.DEBUG) {
       config =
-          new JulConfiguration(true, true, AndroidLoggerHandler.Companion.make(), LogLevel.WARN);
+          new JulConfiguration(true, true, LogLevel.WARN, AndroidLoggerHandler.Companion.make());
     } else {
 //      Fabric.with(this, CrashlyticsCore(), Answers(), Crashlytics());
 //      config = new JulConfiguration(false, CrashlyticsLogHandler(), LogLevel.ERROR);
       config =
-          new JulConfiguration(true, true, AndroidLoggerHandler.Companion.make(), LogLevel.ERROR);
+          new JulConfiguration(true, true, LogLevel.ERROR, AndroidLoggerHandler.Companion.make());
     }
 
     config.configure();

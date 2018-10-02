@@ -31,9 +31,11 @@ import static com.ealva.ealvalog.core.ExtRecordFormatter.LOGGER_FQCN_POSITION;
 import static com.ealva.ealvalog.core.ExtRecordFormatter.LOGGER_NAME_POSITION;
 import static com.ealva.ealvalog.core.ExtRecordFormatter.LOG_LEVEL_POSITION;
 import static com.ealva.ealvalog.core.ExtRecordFormatter.MARKER_POSITION;
+import static com.ealva.ealvalog.core.ExtRecordFormatter.MDC_POSITION;
 import static com.ealva.ealvalog.core.ExtRecordFormatter.MESSAGE_POSITION;
 import static com.ealva.ealvalog.core.ExtRecordFormatter.METHOD_NAME_POSITION;
 import static com.ealva.ealvalog.core.ExtRecordFormatter.NANO_POSITION;
+import static com.ealva.ealvalog.core.ExtRecordFormatter.NDC_POSITION;
 import static com.ealva.ealvalog.core.ExtRecordFormatter.THREAD_ID_POSITION;
 import static com.ealva.ealvalog.core.ExtRecordFormatter.THREAD_NAME_POSITION;
 import static com.ealva.ealvalog.core.ExtRecordFormatter.THREAD_PRIORITY_POSITION;
@@ -112,7 +114,9 @@ public class ExtRecordFormatterTest {
     assertThat(THREAD_PRIORITY_POSITION, is(12));
     assertThat(NANO_POSITION, is(13));
     assertThat(LOGGER_FQCN_POSITION, is(14));
-    assertThat(LAST_POSITION, is(14));
+    assertThat(MDC_POSITION, is(15));
+    assertThat(NDC_POSITION, is(16));
+    assertThat(LAST_POSITION, is(16));
   }
 
   @Test(expected = IllegalFormatConversionException.class)

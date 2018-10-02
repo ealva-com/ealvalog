@@ -27,7 +27,7 @@ import android.support.v7.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
   // We're using JLoggers/JLogger for the Java logging interface
-  private static final JLogger LOG = JLoggers.get(MainActivity.class);
+  private static final JLogger LOG = JLoggers.get();
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {

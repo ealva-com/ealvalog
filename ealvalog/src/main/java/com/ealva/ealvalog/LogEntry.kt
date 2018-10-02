@@ -37,10 +37,10 @@ operator fun LogEntry.invoke(msg: String): LogEntry {
  * prefers the printf style of [String.format], which uses [java.util.Formatter], though there is
  * is a small performance penalty for String.format() over java.util.Formatter
  *
- * See [LogEntry.log]
+ * See [LogEntry.setFormatAndArgs]
  */
 operator fun LogEntry.invoke(format: String, vararg args: Any): LogEntry {
-  log(format, *args)
+  setFormatAndArgs(format, *args)
   return this
 }
 
@@ -149,7 +149,7 @@ interface LogEntry : Appendable, Closeable, Serializable {
    * resulting String is set into this LogEntry. The underlying logging system sees only a
    * simple string with no parameter substitution
    *
-   * If the underlying logging is asynchronous, prefer [log] over this method, which will delay
+   * If the underlying logging is asynchronous, prefer [setFormatAndArgs] over this method, which will delay
    * string formatting until the last possible moment (typically on a background thread)
    */
   fun format(format: String, vararg args: Any): LogEntry
@@ -159,7 +159,7 @@ interface LogEntry : Appendable, Closeable, Serializable {
    * formatting. The resulting String is set into this LogEntry. The underlying logging system sees
    * only a simple string with no parameter substitution arguments
    *
-   * If the underlying logging is asynchronous, prefer [log] over this method, which will delay
+   * If the underlying logging is asynchronous, prefer [setFormatAndArgs] over this method, which will delay
    * string formatting until the last possible moment (typically on a background thread)
    */
   fun format(locale: Locale, format: String, vararg args: Any): LogEntry
@@ -173,7 +173,7 @@ interface LogEntry : Appendable, Closeable, Serializable {
    * If the underlying logging is asynchronous, prefer this method over [format], which will delay
    * string formatting until the last possible moment (typically on a background thread)
    */
-  fun log(format: String, vararg args: Any): LogEntry
+  fun setFormatAndArgs(format: String, vararg args: Any): LogEntry
 
   /**
    * Add the source location, determined by examining the call stack, to the log record. This is

@@ -53,7 +53,7 @@ object NullLogEntry : LogEntry {
   override fun append(d: Double) = this
   override fun format(format: String, vararg args: Any) = this
   override fun format(locale: Locale, format: String, vararg args: Any) = this
-  override fun log(format: String, vararg args: Any) = this
+  override fun setFormatAndArgs(format: String, vararg args: Any) = this
   override fun addLocation(stackDepth: Int) = this
   @Throws(ObjectStreamException::class)
   private fun readResolve(): Any = NullLogEntry

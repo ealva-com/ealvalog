@@ -150,7 +150,11 @@ public class ExtRecordFormatter extends Formatter {
   public static final int NANO_POSITION = NANO_INDEX + 1;
   private static final int LOGGER_FQCN_INDEX = NANO_INDEX + 1;
   public static final int LOGGER_FQCN_POSITION = LOGGER_FQCN_INDEX + 1;
-  public static final int LAST_POSITION = LOGGER_FQCN_POSITION; // update if adding more formatter arguments
+  private static final int MDC_INDEX = LOGGER_FQCN_INDEX + 1;
+  public static final int MDC_POSITION = MDC_INDEX + 1;
+  private static final int NDC_INDEX = MDC_INDEX + 1;
+  public static final int NDC_POSITION = NDC_INDEX + 1;
+  public static final int LAST_POSITION = NDC_POSITION; // update if adding more formatter arguments
 
   private static final int ARG_COUNT = LAST_POSITION;
 

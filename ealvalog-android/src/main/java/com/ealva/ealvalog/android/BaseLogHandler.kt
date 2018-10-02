@@ -90,8 +90,7 @@ abstract class BaseLogHandler : LogHandler {
         .append(callerLocation.lineNumber)
         .append(") ")
     }
-    val logMessage = formatter.append(locale, msg, *formatArgs)
-      .toString()
+    val logMessage = formatter.append(locale, msg, *formatArgs).toString()
     log(androidLevel, tag, logMessage, throwable)
   }
 

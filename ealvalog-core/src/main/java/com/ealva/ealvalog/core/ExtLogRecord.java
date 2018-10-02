@@ -492,11 +492,11 @@ public class ExtLogRecord extends LogRecord implements LogEntry {
   }
 
   @NotNull @Override
-  public LogEntry log(@NotNull final String format, @NotNull final Object... args) {
+  public LogEntry setFormatAndArgs(@NotNull final String format, @NotNull final Object... args) {
     if (args.length > 0) {
       setParameters(args);
     }
-    builder.append(format);
+    setMessage(format);
     return this;
   }
 
