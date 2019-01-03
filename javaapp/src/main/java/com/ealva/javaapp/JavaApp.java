@@ -18,12 +18,13 @@
 
 package com.ealva.javaapp;
 
-import com.ealva.ealvalog.Configuration;
 import com.ealva.ealvalog.LogLevel;
 import com.ealva.ealvalog.jdka.AndroidLoggerHandler;
 import com.ealva.ealvalog.jul.JulConfiguration;
 
 import android.app.Application;
+
+import java.util.Collections;
 
 /**
  * Created by Eric A. Snell on 8/14/18.
@@ -32,18 +33,18 @@ public class JavaApp extends Application {
   @Override public void onCreate() {
     super.onCreate();
 
-    Configuration config;
+    JulConfiguration config;
     // Configure the Loggers singleton
     if (BuildConfig.DEBUG) {
       config =
-          new JulConfiguration(true, true, LogLevel.WARN, AndroidLoggerHandler.Companion.make());
+          new JulConfiguration(true, true, LogLevel.WARN);
     } else {
 //      Fabric.with(this, CrashlyticsCore(), Answers(), Crashlytics());
 //      config = new JulConfiguration(false, CrashlyticsLogHandler(), LogLevel.ERROR);
       config =
-          new JulConfiguration(true, true, LogLevel.ERROR, AndroidLoggerHandler.Companion.make());
+          new JulConfiguration(true, true, LogLevel.ERROR);
     }
 
-    config.configure();
+    config.configure(Collections.singletonList(AndroidLoggerHandler.Companion.make()));
   }
 }

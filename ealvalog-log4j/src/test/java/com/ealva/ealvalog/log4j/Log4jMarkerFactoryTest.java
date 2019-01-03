@@ -43,7 +43,7 @@ public class Log4jMarkerFactoryTest {
 
   @Test
   public void testMarkerSerialization() throws IOException, ClassNotFoundException {
-    new Log4jConfiguration().configure();
+    new Log4jConfiguration();
     Marker first = Markers.INSTANCE.get("TestIt");
     Marker second = deserialize(serialize(first), Marker.class);
     assertThat(second, is(not(sameInstance(first))));

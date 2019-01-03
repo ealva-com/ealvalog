@@ -29,12 +29,13 @@ import com.ealva.ealvalog.jul.JulConfiguration
 class KotlinApp : Application() {
   override fun onCreate() {
     super.onCreate()
-    if (BuildConfig.DEBUG) {
-      JulConfiguration(true, true, LogLevel.WARN, AndroidLoggerHandler.make())
+    val config = if (BuildConfig.DEBUG) {
+      JulConfiguration(true, true, LogLevel.WARN)
     } else {
       //      Fabric.with(this, CrashlyticsCore(), Answers(), Crashlytics());
       //      config = new JulConfiguration(false, CrashlyticsLogHandler(), LogLevel.ERROR);
-      JulConfiguration(true, true, LogLevel.ERROR, AndroidLoggerHandler.make())
-    }.configure()
+      JulConfiguration(true, true, LogLevel.ERROR)
+    }
+    config.configure(listOf(AndroidLoggerHandler.make()))
   }
 }

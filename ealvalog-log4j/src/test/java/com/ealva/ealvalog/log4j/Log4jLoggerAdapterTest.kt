@@ -55,7 +55,7 @@ class Log4jLoggerAdapterTest {
     }
     val rootLogger = LogManager.getRootLogger() as Logger
     rootLogger.addAppender(appender)
-    Log4jConfiguration().configure()
+    Log4jConfiguration()
   }
 
   @After

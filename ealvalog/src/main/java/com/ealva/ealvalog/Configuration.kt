@@ -21,11 +21,8 @@ package com.ealva.ealvalog
 /**
  * Created by Eric A. Snell on 9/6/18.
  */
-open class Configuration(
-  var loggerFactory: LoggerFactory = NullLoggerFactory,
-  var markerFactory: MarkerFactory = NullMarkerFactory
-) {
-  open fun configure() {
+open class Configuration(loggerFactory: LoggerFactory, markerFactory: MarkerFactory) {
+  init {
     Loggers.setFactory(loggerFactory)
     Markers.setFactory(markerFactory)
   }

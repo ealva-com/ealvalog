@@ -32,11 +32,24 @@ fun <T : Any> logger(
   includeLocation: Boolean = false
 ): Logger = logger(forClass.java.name, marker, includeLocation)
 
+fun logger(
+  name: String,
+  marker: Marker? = null,
+  includeLocation: Boolean = false
+): Logger =
+  Loggers.get(name, marker, includeLocation)
+
 fun <T : Any> lazyLogger(
   forClass: KClass<T>,
   marker: Marker? = null,
   includeLocation: Boolean = false
-): Lazy<Logger> = lazy { logger(forClass.java.name, marker, includeLocation) }
+): Lazy<Logger> = lazyLogger(forClass.java.name, marker, includeLocation)
+
+fun lazyLogger(
+  name: String,
+  marker: Marker? = null,
+  includeLocation: Boolean = false
+): Lazy<Logger> = lazy { logger(name, marker, includeLocation) }
 
 inline fun <reified R : Any> R.logger(
   marker: Marker? = null,
@@ -47,9 +60,6 @@ inline fun <reified R : Any> R.lazyLogger(
   marker: Marker? = null,
   includeLocation: Boolean = false
 ): Lazy<Logger> = lazy { logger(marker, includeLocation) }
-
-fun logger(name: String, marker: Marker? = null, includeLocation: Boolean = false): Logger =
-  Loggers.get(name, marker, includeLocation)
 
 inline fun Logger.t(
   throwable: Throwable? = null,
@@ -203,7 +213,7 @@ object Loggers {
 
 /*
 Example Android extension functions for Debug mode. Use these when you only want the particular
-log statement in when BuildConfig.DEBUG is true.
+log statement when BuildConfig.DEBUG is true.
 
 inline fun Logger._t(
   throwable: Throwable? = null,

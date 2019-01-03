@@ -29,17 +29,15 @@ import java.util.logging.Handler
 class JulConfiguration(
   private var resetJulLoggers: Boolean,
   private var rootIncludeLocation: Boolean,
-  private var rootLogLevel: LogLevel,
-  private vararg val rootHandlers: Handler
+  private var rootLogLevel: LogLevel
 ) : Configuration(JdkLoggerFactory, BasicMarkerFactory()) {
-  override fun configure() {
-    super.configure()
+  fun configure(rootHandlers: List<Handler>) {
     if (resetJulLoggers) JdkLoggerFactory.reset(true)
     val rootLogger = JdkLoggerFactory.root
     rootLogger.includeLocation = rootIncludeLocation
     rootLogger.logLevel = rootLogLevel
     rootHandlers.forEach { handler ->
-      rootLogger.addHandler(handler)
+      JdkLoggerFactory.root.addHandler(handler)
     }
   }
 }
