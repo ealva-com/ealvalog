@@ -22,8 +22,9 @@ import com.ealva.ealvalog.LogLevel;
 import com.ealva.ealvalog.java.JLogger;
 import com.ealva.ealvalog.java.JLoggers;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
   // We're using JLoggers/JLogger for the Java logging interface

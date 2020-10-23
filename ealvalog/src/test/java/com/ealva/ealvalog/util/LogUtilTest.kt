@@ -23,7 +23,7 @@ import org.junit.Test
 
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.`is`
-import org.junit.Assert.assertThat
+import org.hamcrest.MatcherAssert.assertThat
 
 /**
  * Test some utility methods
@@ -52,11 +52,11 @@ class LogUtilTest {
   fun tesTagFromName() {
     val result = "OuterClass"
 
-    assertThat(com.ealva.ealvalog.util.LogUtil.tagFromName(plain), `is`(equalTo(result)))
-    assertThat(com.ealva.ealvalog.util.LogUtil.tagFromName(anonInner), `is`(equalTo(result)))
-    assertThat(com.ealva.ealvalog.util.LogUtil.tagFromName(inner), `is`(equalTo(result)))
-    assertThat(com.ealva.ealvalog.util.LogUtil.tagFromName(inner2), `is`(equalTo(result)))
-    assertThat(com.ealva.ealvalog.util.LogUtil.tagFromName(innerInner), `is`(equalTo(result)))
+    assertThat(LogUtil.tagFromName(plain), `is`(equalTo(result)))
+    assertThat(LogUtil.tagFromName(anonInner), `is`(equalTo(result)))
+    assertThat(LogUtil.tagFromName(inner), `is`(equalTo(result)))
+    assertThat(LogUtil.tagFromName(inner2), `is`(equalTo(result)))
+    assertThat(LogUtil.tagFromName(innerInner), `is`(equalTo(result)))
   }
 
   @Test
@@ -64,19 +64,19 @@ class LogUtilTest {
     val result = "com.test.OuterClass"
 
     assertThat(
-      com.ealva.ealvalog.util.LogUtil.stripInnerClassesFromName(plain),
+      LogUtil.stripInnerClassesFromName(plain),
       `is`(equalTo(result))
     )
     assertThat(
-      com.ealva.ealvalog.util.LogUtil.stripInnerClassesFromName(anonInner),
+      LogUtil.stripInnerClassesFromName(anonInner),
       `is`(equalTo(result))
     )
     assertThat(
-      com.ealva.ealvalog.util.LogUtil.stripInnerClassesFromName(inner),
+      LogUtil.stripInnerClassesFromName(inner),
       `is`(equalTo(result))
     )
     assertThat(
-      com.ealva.ealvalog.util.LogUtil.stripInnerClassesFromName(inner2),
+      LogUtil.stripInnerClassesFromName(inner2),
       `is`(equalTo(result))
     )
     assertThat(LogUtil.stripInnerClassesFromName(innerInner), `is`(equalTo(result)))

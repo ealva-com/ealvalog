@@ -58,7 +58,7 @@ import java.util.logging.LogRecord;
 public class ExtLogRecord extends LogRecord implements LogEntry {
   private static final long serialVersionUID = 936230097973648802L;
   private static final AtomicLong sequenceNumber = new AtomicLong(1);
-  private static ThreadLocal<ExtLogRecord> threadLocalRecord = new ThreadLocal<>();
+  private static final ThreadLocal<ExtLogRecord> threadLocalRecord = new ThreadLocal<>();
   /** The default, and minimum, size of cached string builders. This is a per thread cost */
   public static final int DEFAULT_STRING_BUILDER_SIZE = 1024;
   /** The default maximum size of cached string builders */
@@ -471,13 +471,13 @@ public class ExtLogRecord extends LogRecord implements LogEntry {
   }
 
   @NotNull @Override public LogEntry format(@NotNull final String format,
-                                            @NotNull final Object... args) {
+                                            final Object @NotNull ... args) {
     return format(Locale.getDefault(), format, args);
   }
 
   @NotNull @Override public LogEntry format(@NotNull Locale locale,
                                             @NotNull final String format,
-                                            @NotNull final Object... args) {
+                                            final Object @NotNull ... args) {
     if (args.length > 0) {
       formatter.format(locale, format, args);
     } else {
@@ -492,7 +492,7 @@ public class ExtLogRecord extends LogRecord implements LogEntry {
   }
 
   @NotNull @Override
-  public LogEntry setFormatAndArgs(@NotNull final String format, @NotNull final Object... args) {
+  public LogEntry setFormatAndArgs(@NotNull final String format, final Object @NotNull ... args) {
     if (args.length > 0) {
       setParameters(args);
     }

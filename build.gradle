@@ -17,18 +17,17 @@
  */
 
 buildscript {
-    ext.kotlin_version = '1.2.71'
-    ext.log4j_version = '2.11.1'
+    ext.kotlin_version = '1.4.10'
+    ext.log4j_version = '2.13.3'
 
     ext {
         versions = [
-                'support_library': '27.1.1',
+                'support_library': '29.0.0',
         ]
         setup = [
-                'compile_sdk': 27,
-//                'build_tools': '27.0.3',
+                'compile_sdk': 29,
                 'min_sdk'    : 21,
-                'target_sdk' : 26
+                'target_sdk' : 29
         ]
     }
 
@@ -41,7 +40,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.1.4'
+        classpath 'com.android.tools.build:gradle:4.0.2'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
@@ -56,10 +55,6 @@ allprojects {
         }
     }
     group = 'com.ealva'
-}
-
-task wrapper(type: Wrapper) {
-    gradleVersion = '2.14'
 }
 
 task clean(type: Delete) {

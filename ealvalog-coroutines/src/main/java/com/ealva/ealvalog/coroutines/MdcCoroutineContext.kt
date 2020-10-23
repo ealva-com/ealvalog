@@ -19,8 +19,8 @@
 package com.ealva.ealvalog.coroutines
 
 import com.ealva.ealvalog.MdcContext
-import kotlin.coroutines.experimental.AbstractCoroutineContextElement
-import kotlin.coroutines.experimental.CoroutineContext
+import kotlin.coroutines.AbstractCoroutineContextElement
+import kotlin.coroutines.CoroutineContext
 
 typealias MdcKey = MdcCoroutineContext.Key
 

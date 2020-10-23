@@ -18,16 +18,16 @@
 
 package com.ealva.kotlinapp
 
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import com.ealva.ealvalog.e
 import com.ealva.ealvalog.i
 import com.ealva.ealvalog.invoke
 import com.ealva.ealvalog.logger
 import com.ealva.ealvalog.unaryPlus
 import com.ealva.ealvalog.w
-import kotlinx.coroutines.experimental.GlobalScope
-import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 private val LOG = logger(MainActivity::class)
 
