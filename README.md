@@ -37,9 +37,9 @@ Quick Start
 - Android Setup
 ```groovy
 dependencies {
-    implementation 'com.ealva:ealvalog:0.5.3'
-    implementation 'com.ealva:ealvalog-core:0.5.3'
-    implementation 'com.ealva:ealvalog-android:0.5.3'
+    implementation 'com.ealva:ealvalog:0.5.4'
+    implementation 'com.ealva:ealvalog-core:0.5.4'
+    implementation 'com.ealva:ealvalog-android:0.5.4'
 }
 ```
 ```java
@@ -54,11 +54,11 @@ public class MyApp extends Application {
 - Setup for facade over java.util.logging and also logs to Android log 
 ```groovy
 dependencies {
-    implementation 'com.ealva:ealvalog:0.5.3'
-    implementation 'com.ealva:ealvalog-core:0.5.3'
-    implementation 'com.ealva:ealvalog-java:0.5.3'
-    implementation 'com.ealva:ealvalog-jdk:0.5.3'
-    implementation 'com.ealva:ealvalog-jdk-android:0.5.3'
+    implementation 'com.ealva:ealvalog:0.5.4'
+    implementation 'com.ealva:ealvalog-core:0.5.4'
+    implementation 'com.ealva:ealvalog-java:0.5.4'
+    implementation 'com.ealva:ealvalog-jdk:0.5.4'
+    implementation 'com.ealva:ealvalog-jdk-android:0.5.4'
 }
 ```
 ```java

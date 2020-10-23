@@ -1,15 +1,10 @@
 Change Log
 ==========
 
-Version 0.0.18 *(2018-06-30)*
+Version 0.5.4 *(2020-10-23)*
 ----------------------------
 
- * Prepare for Kotlin interface
-
-Version 0.0.9 *(2017-03-18)*
-----------------------------
-
- * More tests, come convenience methods for Android users, update README
+ * Add StdoutLogger and factory
 
 Version 0.0.1 *(2017-02-28)*
 ----------------------------
