@@ -1,8 +1,6 @@
 
 eAlvaLog
 ========
-[![Maven metadata URL](https://img.shields.io/maven-metadata/v/http/central.maven.org/maven2/com/ealva/ealvalog/maven-metadata.xml.svg?style=plastic)](http://central.maven.org/maven2/com/ealva/)
-
 *eAlvaLog* is a Kotlin/Java logging facade initially inspired by various other logging frameworks
 
 Libraries
@@ -24,6 +22,7 @@ Libraries
   2. Java Library: ealvalog and ealvalog-java. Add ealvalog-core if Markers are needed
   3. Kotlin Android app with android logging only: ealvalog-android, ealvalog-core, and ealvalog
   4. Java Android app with android logging only: ealvalog-android, ealvalog-java, ealvalog-core, and ealvalog
+  4. Java Android app with android logging only: ealvalog-android, ealvalog-java, ealvalog-core, and ealvalog
   5. App requiring java.util.logging (JUL) functionality: ealvalog-jdk and #3 or #4
   6. App requiring JUL and android logging: ealvalog-jdk-android and #5
   7. App requiring Log4j2 functionality: ealvalog-log4j, alvalog-core, and ealvalog
@@ -38,9 +37,9 @@ Quick Start
 - Android Setup
 ```groovy
 dependencies {
-    implementation 'com.ealva:ealvalog:0.3.0'
-    implementation 'com.ealva:ealvalog-core:0.3.0'
-    implementation 'com.ealva:ealvalog-android:0.3.0'
+    implementation 'com.ealva:ealvalog:0.5.3'
+    implementation 'com.ealva:ealvalog-core:0.5.3'
+    implementation 'com.ealva:ealvalog-android:0.5.3'
 }
 ```
 ```java
@@ -55,11 +54,11 @@ public class MyApp extends Application {
 - Setup for facade over java.util.logging and also logs to Android log 
 ```groovy
 dependencies {
-    implementation 'com.ealva:ealvalog:0.3.0'
-    implementation 'com.ealva:ealvalog-core:0.3.0'
-    implementation 'com.ealva:ealvalog-java:0.3.0'
-    implementation 'com.ealva:ealvalog-jdk:0.3.0'
-    implementation 'com.ealva:ealvalog-jdk-android:0.3.0'
+    implementation 'com.ealva:ealvalog:0.5.3'
+    implementation 'com.ealva:ealvalog-core:0.5.3'
+    implementation 'com.ealva:ealvalog-java:0.5.3'
+    implementation 'com.ealva:ealvalog-jdk:0.5.3'
+    implementation 'com.ealva:ealvalog-jdk-android:0.5.3'
 }
 ```
 ```java

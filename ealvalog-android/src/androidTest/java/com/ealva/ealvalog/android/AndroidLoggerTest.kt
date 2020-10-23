@@ -18,8 +18,8 @@
 
 package com.ealva.ealvalog.android
 
-import android.support.test.runner.AndroidJUnit4
 import android.util.Log
+import androidx.test.runner.AndroidJUnit4
 import com.ealva.ealvalog.LogLevel
 import com.ealva.ealvalog.Loggers
 import com.ealva.ealvalog.Markers
