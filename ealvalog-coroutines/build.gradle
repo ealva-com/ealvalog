@@ -62,13 +62,10 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
 }
 
 tasks.withType(Javadoc) {
+  excludes = ['**/*.kt'] // < ---- Exclude all kotlin files from javadoc file.
     options.addStringOption('Xdoclint:none', '-quiet')
     options.addStringOption('encoding', 'UTF-8')
     options.addStringOption('charSet', 'UTF-8')
-}
-
-task wrapper(type: Wrapper) {
-  gradleVersion = '6.3'
 }
 
 apply from: rootProject.file('gradle/gradle-mvn-push-jar.gradle')
