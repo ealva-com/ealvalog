@@ -141,7 +141,7 @@ public class JLoggerImpl implements JLogger {
                   @NotNull final Throwable throwable,
                   @NotNull final String format,
                   @NotNull final Object... formatArgs) {
-    if (isLoggable(level, null, throwable)) {
+    if (isLoggable(level, realLogger.getMarker(), throwable)) {
       try (LogEntry record = realLogger.getLogEntry(level,
                                                     realLogger.getMarker(),
                                                     throwable,
@@ -176,7 +176,7 @@ public class JLoggerImpl implements JLogger {
   public void log(@NotNull final LogLevel level,
                   @NotNull final String format,
                   @NotNull final Object arg1) {
-    if (isLoggable(level, null, null)) {
+    if (isLoggable(level, realLogger.getMarker(), null)) {
       try (LogEntry record = realLogger.getLogEntry(level,
                                                     realLogger.getMarker(),
                                                     null,
@@ -195,7 +195,7 @@ public class JLoggerImpl implements JLogger {
                   @NotNull final String format,
                   @NotNull final Object arg1,
                   @NotNull final Object arg2) {
-    if (isLoggable(level, null, null)) {
+    if (isLoggable(level, realLogger.getMarker(), null)) {
       try (LogEntry record = realLogger.getLogEntry(level,
                                                     realLogger.getMarker(),
                                                     null,
@@ -215,7 +215,7 @@ public class JLoggerImpl implements JLogger {
                   @NotNull final Object arg1,
                   @NotNull final Object arg2,
                   @NotNull final Object arg3) {
-    if (isLoggable(level, null, null)) {
+    if (isLoggable(level, realLogger.getMarker(), null)) {
       try (LogEntry record = realLogger.getLogEntry(level,
                                                     realLogger.getMarker(),
                                                     null,
@@ -236,7 +236,7 @@ public class JLoggerImpl implements JLogger {
                   @NotNull final Object arg2,
                   @NotNull final Object arg3,
                   @NotNull final Object arg4) {
-    if (isLoggable(level, null, null)) {
+    if (isLoggable(level, realLogger.getMarker(), null)) {
       try (LogEntry record = realLogger.getLogEntry(level,
                                                     realLogger.getMarker(),
                                                     null,
@@ -258,7 +258,7 @@ public class JLoggerImpl implements JLogger {
                   @NotNull final Object arg3,
                   @NotNull final Object arg4,
                   @NotNull final Object... remaining) {
-    if (isLoggable(level, null, null)) {
+    if (isLoggable(level, realLogger.getMarker(), null)) {
       try (LogEntry record = realLogger.getLogEntry(level,
                                                     realLogger.getMarker(),
                                                     null,
@@ -277,7 +277,7 @@ public class JLoggerImpl implements JLogger {
   }
 
   public void log(@NotNull final LogLevel level, @NotNull final Supplier<?> supplier) {
-    if (isLoggable(level, null, null)) {
+    if (isLoggable(level, realLogger.getMarker(), null)) {
       try (LogEntry record = realLogger.getLogEntry(level,
                                                     realLogger.getMarker(),
                                                     null,
@@ -310,7 +310,7 @@ public class JLoggerImpl implements JLogger {
   public void log(@NotNull final LogLevel level,
                   @NotNull final Throwable throwable,
                   @NotNull final Supplier<?> supplier) {
-    if (isLoggable(level, null, throwable)) {
+    if (isLoggable(level, realLogger.getMarker(), throwable)) {
       try (LogEntry record = realLogger.getLogEntry(level,
                                                     realLogger.getMarker(),
                                                     throwable,
@@ -341,7 +341,7 @@ public class JLoggerImpl implements JLogger {
   }
 
   @Override public void caught(@NotNull final LogLevel level, @NotNull final Throwable throwable) {
-    if (isLoggable(level, null, throwable)) {
+    if (isLoggable(level, realLogger.getMarker(), throwable)) {
       try (LogEntry record = realLogger.getLogEntry(level,
                                                     realLogger.getMarker(),
                                                     throwable,
@@ -358,7 +358,7 @@ public class JLoggerImpl implements JLogger {
   @NotNull @Override
   public <T extends Throwable> T throwing(@NotNull final LogLevel level,
                                           @NotNull final T throwable) {
-    if (isLoggable(level, null, throwable)) {
+    if (isLoggable(level, realLogger.getMarker(), throwable)) {
       try (LogEntry record = realLogger.getLogEntry(level,
                                                     realLogger.getMarker(),
                                                     throwable,
